@@ -1,4 +1,4 @@
-# generative-studios
+# Generative Studios
 
 Explore a large collection of high quality interactive generative artworks right in your browser.
 
