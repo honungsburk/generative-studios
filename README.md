@@ -1,6 +1,6 @@
 # generative-studios
 
-Explore a large collection of high quality generative artworks in a simple web app.
+Explore a large collection of high quality interactive generative artworks right in your browser.
 
 ### Install & Build
 
