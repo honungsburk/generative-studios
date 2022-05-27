@@ -7,21 +7,31 @@ import * as Palatte from "../../Libraries/P5Extra/Palette";
 // P5.js Hooks
 
 /**
- * The setup function is run before anything else.
+ *
+ * @returns a seed to be used to create the artwork
  */
-export function setup(p5: p5Types, canvasParentRef: Element) {
-  /**
-   * Using SVG leads to smaller image sizes + infinite resolution! Perfect
-   * when creating an NFT.
-   */
-  // createCanvas(CANVAS_SIZE_X, CANVAS_SIZE_Y, SVG)
-  // Since we want a static image we will turn off the looping.
-  p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
-  p5.noLoop();
-  p5.rectMode(p5.CENTER); //??? can be removed???
+export function generateSeed(): string {
+  return Math.random().toString().substr(2, 8);
 }
 
-export function draw(p5: p5Types) {
+/**
+ * The setup function is run before anything else.
+ */
+export const setup =
+  (sidebarWidth: number) => (p5: p5Types, canvasParentRef: Element) => {
+    /**
+     * Using SVG leads to smaller image sizes + infinite resolution! Perfect
+     * when creating an NFT.
+     */
+    // createCanvas(CANVAS_SIZE_X, CANVAS_SIZE_Y, SVG)
+    // Since we want a static image we will turn off the looping.
+    p5.createCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight).parent(
+      canvasParentRef
+    );
+    p5.rectMode(p5.CENTER); //??? can be removed???
+  };
+
+export const draw = (seed: string) => (p5: p5Types) => {
   /**
    * We start by defining some pre-requisites for the split triangle algorithm.
    * An immediate problem occurs: an image is a rectangle but our algorithm can only
@@ -38,18 +48,14 @@ export function draw(p5: p5Types) {
   let t1 = new Triangle(a, b, c);
   let t2 = new Triangle(d, b, c);
 
-  const rand = "asdasdxcq2esdfa";
-  let rng = new RNG(rand);
+  let rng = new RNG(seed);
 
   // By randomly selecting a composition of strategies the algorithm will
   // have more variation. The exact probabilities are not to important I simply
   // used what worked.
   let [split_strat, split_strat_name] = make_split_strat(rng);
-  console.log(split_strat_name);
   let [depth_strat, depth_strat_name] = make_depth_strat(rng);
-  console.log(depth_strat_name);
   let [dist_strat, dist_strat_name] = make_dist_strat(rng);
-  console.log(dist_strat_name);
   let jitter_amount = rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]);
   let jitter = with_jitter(rng, jitter_amount);
   console.log(`with_jitter(${jitter_amount})`);
@@ -85,7 +91,7 @@ export function draw(p5: p5Types) {
    * to the correct state when it builds the image and draws the tree.
    */
   if (rng.bernoulli(0.3)) {
-    rng = new RNG(rand);
+    rng = new RNG(seed);
 
     let [split_strat_2, split_strat_name_2] = make_split_strat(rng);
     split_strat = split_strat_2;
@@ -121,7 +127,7 @@ export function draw(p5: p5Types) {
       strokeWeight
     )
   );
-}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
