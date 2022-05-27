@@ -6,15 +6,16 @@ import Loading from "./Pages/Loading";
 // Lazy load routes to allow for code splitting.
 const Home = lazy(() => import("./Pages/Home"));
 const AlgoMarble = lazy(() => import("./Pages/AlgoMarble"));
-function App() {
-  const [count, setCount] = useState(0);
+const StainedGlass = lazy(() => import("./Pages/StainedGlass"));
 
+function App() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/algomarble" element={<AlgoMarble />} />
+        <Route path="/stained-glass" element={<StainedGlass />} />
       </Routes>
     </Suspense>
   );
