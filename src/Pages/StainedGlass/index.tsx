@@ -3,6 +3,7 @@ import Sketch from "react-p5";
 import p5Types from "p5";
 import * as Algorithm from "./Algorithm";
 import {
+  Text,
   VStack,
   HStack,
   Tabs,
@@ -13,6 +14,7 @@ import {
   Heading,
   Input,
   IconButton,
+  Divider,
 } from "@chakra-ui/react";
 import * as Icon from "../../Components/Icon";
 
@@ -39,7 +41,7 @@ export default function StainedGlass() {
       />
       <Sketch
         setup={Algorithm.setup(sidebarWidth)}
-        draw={Algorithm.draw(seed)}
+        draw={Algorithm.draw(seed, Algorithm.generateSettings(seed))}
         windowResized={windowResized}
       />
     </HStack>
@@ -91,9 +93,11 @@ type TuneProps = {
 
 function TuneTab(props: TuneProps): JSX.Element {
   return (
-    <VStack>
+    <VStack align={"left"}>
+      <Text fontSize="lg">Seed</Text>
       <HStack>
         <IconButton
+          colorScheme={"blackAlpha"}
           aria-label="Random Seed"
           icon={<Icon.Random />}
           onClick={() => props.setSeed(Algorithm.generateSeed())}
@@ -107,6 +111,8 @@ function TuneTab(props: TuneProps): JSX.Element {
           }}
         />
       </HStack>
+      <Divider />
+      <Text fontSize="lg">Settings</Text>
     </VStack>
   );
 }

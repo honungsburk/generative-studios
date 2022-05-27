@@ -126,6 +126,13 @@ export const complimentary =
     return [p5.color(H, S, V), p5.color((H + 180) % 360, S, V)];
   };
 
+export type CosinePalette = {
+  red: CosineColor;
+  green: CosineColor;
+  blue: CosineColor;
+  mode: ConsineMode;
+};
+
 export type CosineColor = {
   a: number;
   b: number;
@@ -149,11 +156,9 @@ export type ConsineMode = "MOD" | "SMOOTH";
 export const cosine_palette =
   (p5: p5Types) =>
   (
-    {
-      red,
-      green,
-      blue,
-    }: { red: CosineColor; green: CosineColor; blue: CosineColor },
+    red: CosineColor,
+    green: CosineColor,
+    blue: CosineColor,
     mode: ConsineMode
   ) => {
     let red_color = MathExtra.cosine(red.a, red.b, red.c, red.d);

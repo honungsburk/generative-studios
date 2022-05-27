@@ -2,7 +2,7 @@ import { RNG } from "../../Libraries/Random";
 import Point2D from "./Point2D";
 import Triangle from "./Triangle";
 import p5Types from "p5";
-import * as Palatte from "../../Libraries/P5Extra/Palette";
+import * as Palette from "../../Libraries/P5Extra/Palette";
 
 // P5.js Hooks
 
@@ -12,6 +12,35 @@ import * as Palatte from "../../Libraries/P5Extra/Palette";
  */
 export function generateSeed(): string {
   return Math.random().toString().substr(2, 8);
+}
+
+/**
+ * Settings you can play with to influence the algorithm
+ */
+type Settings = {
+  splittingStrategy: SplitStrategy;
+  depthStrategy: DepthStrategy;
+  distStrategy: DistanceStrategy;
+  jitter: number;
+  palette: Palette.CosinePalette;
+  symmectric: boolean;
+};
+
+/**
+ *
+ * @param rng random number generator
+ * @returns
+ */
+export function generateSettings(seed: string): Settings {
+  let rng = new RNG(seed);
+  return {
+    splittingStrategy: generateSplitStrat(rng),
+    depthStrategy: generateDepthStrategy(rng),
+    distStrategy: generateDistStrategy(rng),
+    jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
+    palette: generatePalette(rng),
+    symmectric: rng.bernoulli(0.3),
+  };
 }
 
 /**
@@ -31,7 +60,7 @@ export const setup =
     p5.rectMode(p5.CENTER); //??? can be removed???
   };
 
-export const draw = (seed: string) => (p5: p5Types) => {
+export const draw = (seed: string, settings: Settings) => (p5: p5Types) => {
   /**
    * We start by defining some pre-requisites for the split triangle algorithm.
    * An immediate problem occurs: an image is a rectangle but our algorithm can only
@@ -50,37 +79,22 @@ export const draw = (seed: string) => (p5: p5Types) => {
 
   let rng = new RNG(seed);
 
-  // By randomly selecting a composition of strategies the algorithm will
-  // have more variation. The exact probabilities are not to important I simply
-  // used what worked.
-  let [split_strat, split_strat_name] = make_split_strat(rng);
-  let [depth_strat, depth_strat_name] = make_depth_strat(rng);
-  let [dist_strat, dist_strat_name] = make_dist_strat(rng);
-  let jitter_amount = rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]);
-  let jitter = with_jitter(rng, jitter_amount);
-  console.log(`with_jitter(${jitter_amount})`);
-  let palette = make_palette(p5)(rng);
-  let strokeColor = make_strokeColor(rng);
-  let strokeWeight = rng.pickFromWeightedList([
-    { weight: 8, value: 1 },
-    { weight: 1, value: 2 },
-  ]);
+  let split_strat = getSplitStratFn(rng, settings.splittingStrategy);
+  let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
+  let dist_strat = getDistStrategyFn(rng, settings.distStrategy);
+  let jitter = genJitterFn(rng, settings.jitter);
+  let palette = Palette.cosine_palette(p5)(
+    settings.palette.red,
+    settings.palette.green,
+    settings.palette.blue,
+    settings.palette.mode
+  );
 
   // Construct the upper triangle of the image
   let st1 = new SmartTree(t1, split_strat, depth_strat, 0);
   st1.split();
 
-  st1.dfs(
-    draw_color_leaf(
-      p5,
-      rng,
-      dist_strat,
-      jitter,
-      palette,
-      strokeColor,
-      strokeWeight
-    )
-  );
+  st1.dfs(draw_color_leaf(p5, dist_strat, jitter, palette));
 
   /**
    * 30% of the time we reset the random number generator. This causes the two
@@ -90,54 +104,55 @@ export const draw = (seed: string) => (p5: p5Types) => {
    * you ask? Well, it is because we need the get the random number generator
    * to the correct state when it builds the image and draws the tree.
    */
-  if (rng.bernoulli(0.3)) {
+  if (settings.symmectric) {
     rng = new RNG(seed);
-
-    let [split_strat_2, split_strat_name_2] = make_split_strat(rng);
-    split_strat = split_strat_2;
-    let [depth_strat_2, depth_strat_name_2] = make_depth_strat(rng);
-    depth_strat = depth_strat_2;
-    let [dist_strat_2, dist_strat_name_2] = make_dist_strat(rng);
-    dist_strat = dist_strat_2;
-
-    jitter = with_jitter(
-      rng,
-      rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4])
+    split_strat = getSplitStratFn(rng, settings.splittingStrategy);
+    depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
+    dist_strat = getDistStrategyFn(rng, settings.distStrategy);
+    jitter = genJitterFn(rng, settings.jitter);
+    palette = Palette.cosine_palette(p5)(
+      settings.palette.red,
+      settings.palette.green,
+      settings.palette.blue,
+      settings.palette.mode
     );
-    palette = make_palette(p5)(rng);
-    strokeColor = make_strokeColor(rng);
-    let strokeWeight = rng.pickFromWeightedList([
-      { weight: 8, value: 1 },
-      { weight: 1, value: 2 },
-    ]);
   }
 
   // Construct the lower triangle of the image
   let st2 = new SmartTree(t2, split_strat, depth_strat, 0);
   st2.split();
 
-  st2.dfs(
-    draw_color_leaf(
-      p5,
-      rng,
-      dist_strat,
-      jitter,
-      palette,
-      strokeColor,
-      strokeWeight
-    )
-  );
+  st2.dfs(draw_color_leaf(p5, dist_strat, jitter, palette));
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export type SplitStrategy = (triangle: Triangle) => [Triangle, Triangle];
+export type SplitStrategyFn = (triangle: Triangle) => [Triangle, Triangle];
 
-export function make_split_strat(rng: RNG): [SplitStrategy, string] {
+export type SplitStrategy =
+  | "Split Random"
+  | "Split Random Balanced"
+  | "Split Middle";
+
+export function getSplitStratFn(
+  rng: RNG,
+  strat: SplitStrategy
+): SplitStrategyFn {
+  switch (strat) {
+    case "Split Random":
+      return split_random(rng);
+    case "Split Random Balanced":
+      return split_random_balanced(rng);
+    case "Split Middle":
+      return split_middle;
+  }
+}
+
+export function generateSplitStrat(rng: RNG): SplitStrategy {
   return rng.pickFromWeightedList([
-    { weight: 1, value: [split_random(rng), "split_random"] },
-    { weight: 2, value: [split_random_balanced(rng), "split_random_balanced"] },
-    { weight: 1, value: [split_middle, "split_middle"] },
+    { weight: 1, value: "Split Random" },
+    { weight: 2, value: "Split Random Balanced" },
+    { weight: 1, value: "Split Random Balanced" },
   ]);
 }
 
@@ -147,7 +162,7 @@ export function make_split_strat(rng: RNG): [SplitStrategy, string] {
  *
  * @param {json} triangle
  */
-const split_middle: SplitStrategy = (triangle) => {
+const split_middle: SplitStrategyFn = (triangle) => {
   //find the longest side
   let origin = new Point2D(0, 0);
   let lab = triangle.a.minus(triangle.b).distance_to(origin);
@@ -184,7 +199,7 @@ const split_middle: SplitStrategy = (triangle) => {
  * @param {RNG} rng
  * @returns
  */
-const split_random: (rng: RNG) => SplitStrategy = (rng) => (triangle) => {
+const split_random: (rng: RNG) => SplitStrategyFn = (rng) => (triangle) => {
   let cut = rng.truncated_gaussian(0.5, 1, 0.1, 0.9);
   let choice = rng.random();
   if (choice < 1 / 3) {
@@ -218,7 +233,7 @@ const split_random: (rng: RNG) => SplitStrategy = (rng) => (triangle) => {
  * @param {RNG} rng
  * @returns
  */
-const split_random_balanced: (rng: RNG) => SplitStrategy =
+const split_random_balanced: (rng: RNG) => SplitStrategyFn =
   (rng) => (triangle) => {
     let cut = rng.truncated_gaussian(0.5, 1, 0.1, 0.9);
     //find the longest side
@@ -262,27 +277,59 @@ const make_strokeColor: (
 
 ////// Depth //////
 
-type DepthStrategy = (currentDepth: number) => {
+type DepthStrategyFn = (currentDepth: number) => {
   result: boolean;
-  callBack: (currentDepth: number) => DepthStrategy;
+  callBack: (currentDepth: number) => DepthStrategyFn;
 };
 
-function make_depth_strat(rng: RNG): [DepthStrategy, string] {
+export type DepthStrategy =
+  | {
+      kind: "Max Depth";
+      maxDepth: number;
+    }
+  | {
+      kind: "Flip Depth";
+      p: number;
+      depth: number;
+    }
+  | {
+      kind: "Inherited Depth";
+      depth: number;
+    };
+
+const getDepthStrategyFn = (rng: RNG, strat: DepthStrategy) => {
+  switch (strat.kind) {
+    case "Max Depth":
+      return max_depth(strat.maxDepth);
+    case "Flip Depth":
+      return coin_flip_depth(rng, strat.p, strat.depth);
+    case "Inherited Depth":
+      return inherited_depth(rng, strat.depth);
+  }
+};
+
+function generateDepthStrategy(rng: RNG): DepthStrategy {
   let m_depth = rng.uniformInteger(7, 12);
-  let max_depth_string = `max_depth(${m_depth})`;
 
   let p = rng.truncated_gaussian(0.1, 0.2, 0, 0.2);
   let depth2 = rng.uniformInteger(5, 9);
-  let flip_depth_string = `flip_depth(${p}, ${depth2})`;
-  let flip_depth = coin_flip_depth(rng, p, depth2);
 
   let depth3 = rng.uniformInteger(3, 5);
-  let in_depth = inherited_depth(rng, depth3);
-  let inherited_depth_string = `inherited_depth(${depth3})`;
-  return rng.pickUniform([
-    [max_depth(m_depth), max_depth_string],
-    [flip_depth, flip_depth_string],
-    [in_depth, inherited_depth_string],
+
+  return rng.pickUniform<DepthStrategy>([
+    {
+      kind: "Max Depth",
+      maxDepth: m_depth,
+    },
+    {
+      kind: "Flip Depth",
+      p: p,
+      depth: depth2,
+    },
+    {
+      kind: "Inherited Depth",
+      depth: depth3,
+    },
   ]);
 }
 
@@ -291,7 +338,7 @@ function make_depth_strat(rng: RNG): [DepthStrategy, string] {
  *
  * @param {number} depth the maximum depth allowed
  */
-function max_depth(depth: number): DepthStrategy {
+function max_depth(depth: number): DepthStrategyFn {
   let f = (current_depth: number) => {
     return { result: current_depth <= depth, callBack: f };
   };
@@ -311,7 +358,7 @@ function coin_flip_depth(
   rng: RNG,
   p: number,
   max_depth: number
-): DepthStrategy {
+): DepthStrategyFn {
   let f = function (current_depth: number) {
     return {
       result: current_depth <= max_depth || rng.bernoulli(p),
@@ -330,7 +377,7 @@ function coin_flip_depth(
  * @param {number} min_depth the minimum depth
  * @returns
  */
-function inherited_depth(rng: RNG, min_depth: number): DepthStrategy {
+function inherited_depth(rng: RNG, min_depth: number): DepthStrategyFn {
   let f = function (current_depth: number) {
     if (min_depth <= current_depth) {
       let max_depth = rng.binomial(11, 0.6) + min_depth;
@@ -356,8 +403,8 @@ function inherited_depth(rng: RNG, min_depth: number): DepthStrategy {
  * @param {RNG} rng the random number generator
  * @param {number} size_x the pixel size of the final image in the x direction
  * @param {number} size_y the pixel size of the final image in the y direction
- * @param {DistanceMetric} distance the function used to calculate the distance which decides the color
- * @param {Jitter} jitter adds jitter to the distance
+ * @param {DistanceStrategyFn} distance the function used to calculate the distance which decides the color
+ * @param {JitterFn} jitter adds jitter to the distance
  * @param {*} palette call back that given a number spits out a color
  * @param {Color} strokeColor given a color returns a color
  * @param {number} strokeW the stroke width of each triangle
@@ -365,12 +412,11 @@ function inherited_depth(rng: RNG, min_depth: number): DepthStrategy {
  */
 function draw_color_leaf(
   p5: p5Types,
-  rng: RNG,
-  distance: DistanceMetric,
-  jitter: Jitter,
-  palette: (t: number) => p5Types.Color,
-  strokeColor: (color: p5Types.Color) => p5Types.Color,
-  strokeW: number
+  distance: DistanceStrategyFn,
+  jitter: JitterFn,
+  palette: (t: number) => p5Types.Color
+  // strokeColor: (color: p5Types.Color) => p5Types.Color,
+  // strokeW: number
 ) {
   return (smartTree: SmartTree) => {
     if (smartTree.isLeaf()) {
@@ -384,8 +430,8 @@ function draw_color_leaf(
       let color = palette(jitter(distance(smartTree.triangle)) * 3);
 
       p5.fill(color);
-      p5.stroke(strokeColor(color));
-      p5.strokeWeight(strokeW);
+      p5.stroke(color);
+      // p5.strokeWeight(strokeW);
       p5.triangle(x1, y1, x2, y2, x3, y3);
     }
   };
@@ -398,11 +444,11 @@ function draw_color_leaf(
  * @param {RNG} rng a random number generator
  * @returns a cosine palette taking in a number and spitting out a color
  */
-const make_palette = (p5: p5Types) => (rng: RNG) => {
+function generatePalette(rng: RNG): Palette.CosinePalette {
   let levels = [0, 1 / 5, 2 / 5, 3 / 5, 4 / 5, 1];
   let b_picks = [1 / 4, 1 / 2, 3 / 4];
   let c_picks = [2 / 5, 3 / 5, 4 / 5, 1];
-  const args = {
+  return {
     red: {
       a: rng.pickUniform(levels),
       b:
@@ -427,19 +473,16 @@ const make_palette = (p5: p5Types) => (rng: RNG) => {
       c: rng.pickUniform(c_picks),
       d: rng.pickUniform(levels),
     },
+    mode: rng.pickFromWeightedList<Palette.ConsineMode>([
+      { weight: 9, value: "SMOOTH" },
+      { weight: 1, value: "MOD" },
+    ]),
   };
-
-  let mode = rng.pickFromWeightedList<Palatte.ConsineMode>([
-    { weight: 9, value: "SMOOTH" },
-    { weight: 1, value: "MOD" },
-  ]);
-
-  return Palatte.cosine_palette(p5)(args, mode);
-};
+}
 
 ////// Jitter //////
 
-type Jitter = (val: number) => number;
+type JitterFn = (val: number) => number;
 
 /**
  *
@@ -450,7 +493,7 @@ type Jitter = (val: number) => number;
  * @param {number} magnitude number between 0-1
  * @returns a function that jitters its inputs
  */
-function with_jitter(rng: RNG, magnitude: number): Jitter {
+function genJitterFn(rng: RNG, magnitude: number): JitterFn {
   return function (val: number) {
     let lower = val - magnitude;
     if (lower < 0) {
@@ -467,14 +510,36 @@ function with_jitter(rng: RNG, magnitude: number): Jitter {
 
 ////// Triangle Distance Metric //////
 
-type DistanceMetric = (triangle: Triangle) => number;
+type DistanceStrategyFn = (triangle: Triangle) => number;
 
-function make_dist_strat(rng: RNG): [DistanceMetric, string] {
+type DistanceStrategy =
+  | "X Centroid"
+  | "Y Centroid"
+  | "Dist to Random"
+  | "Dist to Middle";
+
+function getDistStrategyFn(
+  rng: RNG,
+  strat: DistanceStrategy
+): DistanceStrategyFn {
+  switch (strat) {
+    case "X Centroid":
+      return x_centroid;
+    case "Y Centroid":
+      return y_centroid;
+    case "Dist to Random":
+      return dist_to_random(rng);
+    case "Dist to Middle":
+      return dist_to_middle;
+  }
+}
+
+function generateDistStrategy(rng: RNG): DistanceStrategy {
   return rng.pickUniform([
-    [x_centroid, "x_centroid"],
-    [y_centroid, "y_centroid"],
-    [dist_to_random(rng), "dist_to_random"],
-    [dist_to_middle, "dist_to_middle"],
+    "X Centroid",
+    "Y Centroid",
+    "Dist to Random",
+    "Dist to Middle",
   ]);
 }
 
@@ -483,7 +548,7 @@ function make_dist_strat(rng: RNG): [DistanceMetric, string] {
  * @param {triangle} triangle
  * @returns returns the x coordinate of the triangle's centroid
  */
-const x_centroid: DistanceMetric = (triangle) => {
+const x_centroid: DistanceStrategyFn = (triangle) => {
   return triangle.center().x;
 };
 
@@ -492,7 +557,7 @@ const x_centroid: DistanceMetric = (triangle) => {
  * @param {triangle} triangle
  * @returns returns the y coordinate of the triangle's centroid
  */
-const y_centroid: DistanceMetric = (triangle) => {
+const y_centroid: DistanceStrategyFn = (triangle) => {
   return triangle.center().y;
 };
 
@@ -502,19 +567,21 @@ const y_centroid: DistanceMetric = (triangle) => {
  * @returns a function that calculates the euclidean distance between a triangle
  * and the given Point.
  */
-const dist_to_centroid: (other: Point2D) => DistanceMetric =
+const dist_to_centroid: (other: Point2D) => DistanceStrategyFn =
   (other) => (triangle) => {
     return triangle.center().distance_to(other);
   };
 
-const dist_to_middle: DistanceMetric = dist_to_centroid(new Point2D(0.5, 0.5));
+const dist_to_middle: DistanceStrategyFn = dist_to_centroid(
+  new Point2D(0.5, 0.5)
+);
 
 /**
  *
  * @param {RNG} rng
  * @returns the euclidean distance of a triangle's centroid to a random point.
  */
-const dist_to_random: (rng: RNG) => DistanceMetric = (rng) => {
+const dist_to_random: (rng: RNG) => DistanceStrategyFn = (rng) => {
   let rndPoint = new Point2D(rng.random(), rng.random());
   return dist_to_centroid(rndPoint);
 };
@@ -529,14 +596,14 @@ const dist_to_random: (rng: RNG) => DistanceMetric = (rng) => {
 class SmartTree {
   children: SmartTree[] = [];
   triangle: Triangle;
-  split_strategy: SplitStrategy;
-  depth_strategy: DepthStrategy;
+  split_strategy: SplitStrategyFn;
+  depth_strategy: DepthStrategyFn;
   depth: number;
 
   constructor(
     triangle: Triangle,
-    split_strategy: SplitStrategy,
-    depth_strategy: DepthStrategy,
+    split_strategy: SplitStrategyFn,
+    depth_strategy: DepthStrategyFn,
     depth: number
   ) {
     this.triangle = triangle;
