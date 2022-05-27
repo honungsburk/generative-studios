@@ -17,13 +17,13 @@ export function generateSeed(): string {
 /**
  * Settings you can play with to influence the algorithm
  */
-type Settings = {
+export type Settings = {
   splittingStrategy: SplitStrategy;
   depthStrategy: DepthStrategy;
   distStrategy: DistanceStrategy;
   jitter: number;
   palette: Palette.CosinePalette;
-  symmectric: boolean;
+  symmetry: boolean;
 };
 
 /**
@@ -39,7 +39,7 @@ export function generateSettings(seed: string): Settings {
     distStrategy: generateDistStrategy(rng),
     jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
     palette: generatePalette(rng),
-    symmectric: rng.bernoulli(0.3),
+    symmetry: rng.bernoulli(0.3),
   };
 }
 
@@ -81,7 +81,7 @@ export const draw = (seed: string, settings: Settings) => (p5: p5Types) => {
 
   let split_strat = getSplitStratFn(rng, settings.splittingStrategy);
   let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
-  let dist_strat = getDistStrategyFn(rng, settings.distStrategy);
+  let dist_strat = getDistStrategyFn(settings.distStrategy);
   let jitter = genJitterFn(rng, settings.jitter);
   let palette = Palette.cosine_palette(p5)(
     settings.palette.red,
@@ -104,11 +104,11 @@ export const draw = (seed: string, settings: Settings) => (p5: p5Types) => {
    * you ask? Well, it is because we need the get the random number generator
    * to the correct state when it builds the image and draws the tree.
    */
-  if (settings.symmectric) {
+  if (settings.symmetry) {
     rng = new RNG(seed);
     split_strat = getSplitStratFn(rng, settings.splittingStrategy);
     depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
-    dist_strat = getDistStrategyFn(rng, settings.distStrategy);
+    dist_strat = getDistStrategyFn(settings.distStrategy);
     jitter = genJitterFn(rng, settings.jitter);
     palette = Palette.cosine_palette(p5)(
       settings.palette.red,
@@ -128,6 +128,10 @@ export const draw = (seed: string, settings: Settings) => (p5: p5Types) => {
 ////////////////////////////////////////////////////////////////////////////////
 
 export type SplitStrategyFn = (triangle: Triangle) => [Triangle, Triangle];
+
+export const SPLITRANDOM: SplitStrategy = "Split Random";
+export const SPLITRANDOMBALANCED: SplitStrategy = "Split Random Balanced";
+export const SPLITMIDDLE: SplitStrategy = "Split Middle";
 
 export type SplitStrategy =
   | "Split Random"
@@ -512,34 +516,50 @@ function genJitterFn(rng: RNG, magnitude: number): JitterFn {
 
 type DistanceStrategyFn = (triangle: Triangle) => number;
 
-type DistanceStrategy =
-  | "X Centroid"
-  | "Y Centroid"
-  | "Dist to Random"
-  | "Dist to Middle";
+export const XCentroid: DistanceStrategy = { kind: "X Centroid" };
+export const YCentroid: DistanceStrategy = { kind: "Y Centroid" };
+export const DistToPoint: (x: number, y: number) => DistanceStrategy = (
+  x,
+  y
+) => {
+  return { kind: "Dist to Point", x: x, y: y };
+};
 
-function getDistStrategyFn(
-  rng: RNG,
-  strat: DistanceStrategy
-): DistanceStrategyFn {
-  switch (strat) {
+export function getDistanceStrategy(
+  kind: "X Centroid" | "Y Centroid" | "Dist to Point"
+): DistanceStrategy {
+  switch (kind) {
+    case "X Centroid":
+      return XCentroid;
+    case "Y Centroid":
+      return YCentroid;
+    case "Dist to Point":
+      return DistToPoint(Math.random(), Math.random());
+  }
+}
+
+export type DistanceStrategy =
+  | { kind: "X Centroid" }
+  | { kind: "Y Centroid" }
+  | { kind: "Dist to Point"; x: number; y: number };
+
+function getDistStrategyFn(strat: DistanceStrategy): DistanceStrategyFn {
+  switch (strat.kind) {
     case "X Centroid":
       return x_centroid;
     case "Y Centroid":
       return y_centroid;
-    case "Dist to Random":
-      return dist_to_random(rng);
-    case "Dist to Middle":
-      return dist_to_middle;
+    case "Dist to Point":
+      return dist_to_centroid(new Point2D(strat.x, strat.y));
   }
 }
 
 function generateDistStrategy(rng: RNG): DistanceStrategy {
   return rng.pickUniform([
-    "X Centroid",
-    "Y Centroid",
-    "Dist to Random",
-    "Dist to Middle",
+    XCentroid,
+    YCentroid,
+    DistToPoint(rng.random(), rng.random()),
+    DistToPoint(0.5, 0.5),
   ]);
 }
 
