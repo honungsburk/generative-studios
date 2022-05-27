@@ -4,9 +4,6 @@ import Triangle from "./Triangle";
 import p5Types from "p5";
 import * as Palatte from "../../Libraries/P5Extra/Palette";
 
-const CANVAS_SIZE_X = 1200;
-const CANVAS_SIZE_Y = 1200;
-
 // P5.js Hooks
 
 /**
@@ -19,7 +16,7 @@ export function setup(p5: p5Types, canvasParentRef: Element) {
    */
   // createCanvas(CANVAS_SIZE_X, CANVAS_SIZE_Y, SVG)
   // Since we want a static image we will turn off the looping.
-  p5.createCanvas(CANVAS_SIZE_X, CANVAS_SIZE_Y).parent(canvasParentRef);
+  p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
   p5.noLoop();
   p5.rectMode(p5.CENTER); //??? can be removed???
 }
@@ -41,7 +38,7 @@ export function draw(p5: p5Types) {
   let t1 = new Triangle(a, b, c);
   let t2 = new Triangle(d, b, c);
 
-  const rand = "asdasdxcq2esdf";
+  const rand = "asdasdxcq2esdfa";
   let rng = new RNG(rand);
 
   // By randomly selecting a composition of strategies the algorithm will
@@ -71,8 +68,6 @@ export function draw(p5: p5Types) {
     draw_color_leaf(
       p5,
       rng,
-      CANVAS_SIZE_X,
-      CANVAS_SIZE_Y,
       dist_strat,
       jitter,
       palette,
@@ -119,8 +114,6 @@ export function draw(p5: p5Types) {
     draw_color_leaf(
       p5,
       rng,
-      CANVAS_SIZE_X,
-      CANVAS_SIZE_Y,
       dist_strat,
       jitter,
       palette,
@@ -367,8 +360,6 @@ function inherited_depth(rng: RNG, min_depth: number): DepthStrategy {
 function draw_color_leaf(
   p5: p5Types,
   rng: RNG,
-  size_x: number,
-  size_y: number,
   distance: DistanceMetric,
   jitter: Jitter,
   palette: (t: number) => p5Types.Color,
@@ -377,12 +368,12 @@ function draw_color_leaf(
 ) {
   return (smartTree: SmartTree) => {
     if (smartTree.isLeaf()) {
-      let x1 = smartTree.triangle.a.x * size_x;
-      let x2 = smartTree.triangle.b.x * size_x;
-      let x3 = smartTree.triangle.c.x * size_x;
-      let y1 = smartTree.triangle.a.y * size_y;
-      let y2 = smartTree.triangle.b.y * size_y;
-      let y3 = smartTree.triangle.c.y * size_y;
+      let x1 = smartTree.triangle.a.x * p5.width;
+      let x2 = smartTree.triangle.b.x * p5.width;
+      let x3 = smartTree.triangle.c.x * p5.width;
+      let y1 = smartTree.triangle.a.y * p5.height;
+      let y2 = smartTree.triangle.b.y * p5.height;
+      let y3 = smartTree.triangle.c.y * p5.height;
 
       let color = palette(jitter(distance(smartTree.triangle)) * 3);
 

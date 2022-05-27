@@ -13,5 +13,11 @@ export default function StainedGlass() {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
   };
 
-  return <Sketch setup={Algorithm.setup} draw={Algorithm.draw} />;
+  return (
+    <Sketch
+      setup={Algorithm.setup}
+      draw={Algorithm.draw}
+      windowResized={windowResized}
+    />
+  );
 }
