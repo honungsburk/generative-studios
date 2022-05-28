@@ -287,19 +287,59 @@ type DepthStrategyFn = (currentDepth: number) => {
 };
 
 export type DepthStrategy =
-  | {
-      kind: "Max Depth";
-      maxDepth: number;
-    }
-  | {
-      kind: "Flip Depth";
-      p: number;
-      depth: number;
-    }
-  | {
-      kind: "Inherited Depth";
-      depth: number;
-    };
+  | MaxDepthStrategy
+  | FlipDepthStrategy
+  | InheritedDepthStrategy;
+export type MaxDepthStrategy = {
+  kind: "Max Depth";
+  maxDepth: number;
+};
+
+export function MaxDepthStrategy(maxDepth: number): MaxDepthStrategy {
+  return {
+    kind: "Max Depth",
+    maxDepth: maxDepth,
+  };
+}
+
+export type FlipDepthStrategy = {
+  kind: "Flip Depth";
+  p: number;
+  depth: number;
+};
+
+export function FlipDepthStrategy(p: number, depth: number): FlipDepthStrategy {
+  return {
+    kind: "Flip Depth",
+    p: p,
+    depth: depth,
+  };
+}
+
+export type InheritedDepthStrategy = {
+  kind: "Inherited Depth";
+  depth: number;
+};
+
+export function InheritedDepthStrategy(depth: number): InheritedDepthStrategy {
+  return {
+    kind: "Inherited Depth",
+    depth: depth,
+  };
+}
+
+export const getDepthStrategy = (
+  strat: "Max Depth" | "Flip Depth" | "Inherited Depth"
+) => {
+  switch (strat) {
+    case "Max Depth":
+      return MaxDepthStrategy(10);
+    case "Flip Depth":
+      return FlipDepthStrategy(0.01, 6);
+    case "Inherited Depth":
+      return InheritedDepthStrategy(4);
+  }
+};
 
 const getDepthStrategyFn = (rng: RNG, strat: DepthStrategy) => {
   switch (strat.kind) {
@@ -539,9 +579,16 @@ export function getDistanceStrategy(
 }
 
 export type DistanceStrategy =
-  | { kind: "X Centroid" }
-  | { kind: "Y Centroid" }
-  | { kind: "Dist to Point"; x: number; y: number };
+  | XCentroidStrategy
+  | YCentroidStrategy
+  | DistanceToPointStrategy;
+export type XCentroidStrategy = { kind: "X Centroid" };
+export type YCentroidStrategy = { kind: "Y Centroid" };
+export type DistanceToPointStrategy = {
+  kind: "Dist to Point";
+  x: number;
+  y: number;
+};
 
 function getDistStrategyFn(strat: DistanceStrategy): DistanceStrategyFn {
   switch (strat.kind) {

@@ -35,3 +35,13 @@ export function cosine(
     return a + b * Math.cos(c * t + d);
   };
 }
+
+/**
+ *
+ * @param n the number to round
+ * @param step the step to round
+ * @returns a number that has been rounded off
+ */
+export function round(n: number, step: number) {
+  return Math.round(n / step) * step;
+}
