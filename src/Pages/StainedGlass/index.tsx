@@ -78,15 +78,6 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
           <Tab>
             <Icon.Home boxSize={6} />
           </Tab>
-          <Tab>
-            <Icon.Permissions boxSize={6} />
-          </Tab>
-          <Tab>
-            <Icon.Debug boxSize={6} />
-          </Tab>
-          <Tab>
-            <Icon.Share boxSize={6} />
-          </Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
