@@ -16,7 +16,7 @@ export default function Home() {
     <Stack align="center" mt={32} spacing={8}>
       <Stack align="center">
         <Heading>Generative Studios</Heading>;
-        <Text>Anyone can make art. We do.</Text>
+        <Text>Generative art for the masses.</Text>
       </Stack>
       <SimpleGrid
         px={8}
