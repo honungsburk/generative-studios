@@ -3,6 +3,7 @@ import Theme from "src/Theme";
 
 import * as ThemeTools from "@chakra-ui/theme-tools";
 import { useEffect, useRef } from "react";
+import * as CanvasExtra from "src/Libraries/CanvasExtra";
 
 type CoordinateInputProps = {
   width: number;
@@ -23,6 +24,10 @@ export default function CoordinateInput(
   const positionRef = useRef([0, 0]);
   const cursorInsideCanvasRef = useRef(false);
 
+  useEffect(() => {
+    positionRef.current = [props.x, props.y];
+  }, [props.x, props.y, props.width, props.height]);
+
   const draw = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const [cursorX, cursorY] = cursorPositionRef.current;
@@ -39,10 +44,6 @@ export default function CoordinateInput(
     ctx.fillStyle = "#FF6A6A";
     ctx.fill();
   };
-
-  useEffect(() => {
-    positionRef.current = [props.x, props.y];
-  }, [props.x, props.y]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -67,8 +68,8 @@ export default function CoordinateInput(
     <Box
       bgColor={props.bgColor}
       rounded={8}
-      width={props.width}
-      height={props.height}
+      width={`${props.width}px`}
+      height={`${props.height}px`}
     >
       <canvas
         ref={canvasRef}
@@ -80,14 +81,17 @@ export default function CoordinateInput(
         }}
         onMouseDown={(e) => {
           if (canvasRef.current) {
-            const [x, y] = getCursorPosition(canvasRef.current, e);
+            const [x, y] = CanvasExtra.getCursorPosition(canvasRef.current, e);
             props.onPosition(x, y);
           }
         }}
         onMouseMove={(e) => {
           if (canvasRef.current) {
             cursorInsideCanvasRef.current = true;
-            cursorPositionRef.current = getCursorPosition(canvasRef.current, e);
+            cursorPositionRef.current = CanvasExtra.getCursorPosition(
+              canvasRef.current,
+              e
+            );
           }
         }}
       >
@@ -95,19 +99,4 @@ export default function CoordinateInput(
       </canvas>
     </Box>
   );
-}
-/**
- *
- * @param canvas the canvas to get the position within
- * @param event the mouse click
- * @returns
- */
-function getCursorPosition(
-  canvas: HTMLCanvasElement,
-  event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-) {
-  const rect = canvas.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
-  return [x, y];
 }

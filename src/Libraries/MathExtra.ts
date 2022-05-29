@@ -45,3 +45,22 @@ export function cosine(
 export function round(n: number, step: number) {
   return Math.round(n / step) * step;
 }
+
+/**
+ *
+ * @param n a number between [0, 1]
+ * @param start start value
+ * @param start end value
+ * @returns a value between start and end
+ */
+export function map(n: number, start: number, end: number) {
+  if (n < 0) {
+    return start;
+  }
+
+  if (n > end) {
+    return start;
+  }
+
+  return start + (end - start) * n;
+}

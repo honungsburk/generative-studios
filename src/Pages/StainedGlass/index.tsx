@@ -28,7 +28,11 @@ import {
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as MathExtra from "src/Libraries/MathExtra";
-import CoordinateInput from "src/Components/Inputs/2DPoint";
+import CoordinateInput from "src/Components/Inputs/CoordinateInput";
+import {
+  CosineColorDisplay,
+  CosineColorPicker,
+} from "src/Components/Inputs/CosineColor";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -105,6 +109,14 @@ function TuneTab(props: TuneProps): JSX.Element {
 
   return (
     <VStack align={"left"}>
+      <CosineColorDisplay
+        width={300}
+        height={20}
+        colorFn={(t) => [t, t, t, 255]}
+        start={0}
+        end={255}
+      />
+      <CosineColorPicker width={300} height={100} bgColor="blackAlpha.200" />
       <Text fontSize="lg">Seed</Text>
       <HStack>
         <IconButton
@@ -331,7 +343,7 @@ function DistanceStrat(props: {
           width={size}
           height={size}
           bgColor="blackAlpha.200"
-          onPosition={(x, y) => {
+          onPosition={(x: number, y: number) => {
             const copy = {
               ...props.strategy,
             } as Algorithm.DistanceToPointStrategy;
