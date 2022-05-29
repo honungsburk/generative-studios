@@ -50,7 +50,6 @@ export default function CoordinateInput(
       const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
         let animationFrameId = 0;
-        console.log("hello");
         const render = () => {
           draw(ctx, canvas);
           animationFrameId = window.requestAnimationFrame(render);
