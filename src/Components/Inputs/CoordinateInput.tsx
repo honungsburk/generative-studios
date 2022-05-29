@@ -96,11 +96,6 @@ export default function CoordinateInput(
     </Box>
   );
 }
-
-const inRange = (low: number, high: number) => (n: number) => {
-  return low < n && n < high;
-};
-
 /**
  *
  * @param canvas the canvas to get the position within
