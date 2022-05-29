@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Sketch from "react-p5";
 import p5Types from "p5";
 import * as Algorithm from "./Algorithm";
@@ -28,6 +28,7 @@ import {
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as MathExtra from "src/Libraries/MathExtra";
+import CoordinateInput from "src/Components/Inputs/2DPoint";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -100,6 +101,8 @@ type TuneProps = {
 };
 
 function TuneTab(props: TuneProps): JSX.Element {
+  const [position, setPosition] = useState([100, 100]);
+
   return (
     <VStack align={"left"}>
       <Text fontSize="lg">Seed</Text>
@@ -305,6 +308,7 @@ function DistanceStrat(props: {
   strategy: Algorithm.DistanceStrategy;
   setStrategy: (strat: Algorithm.DistanceStrategy) => void;
 }) {
+  const size = 200;
   return (
     <VStack align={"left"}>
       <Select
@@ -323,41 +327,59 @@ function DistanceStrat(props: {
         </option>
       </Select>
       {props.strategy.kind === "Dist to Point" ? (
-        <>
-          <SliderWithLabel
-            label="X-Axis"
-            value={props.strategy.x as number}
-            min={0}
-            max={1}
-            step={0.01}
-            setValue={(x) => {
-              const copy = {
-                ...props.strategy,
-              } as Algorithm.DistanceToPointStrategy;
-              copy.x = x;
-              props.setStrategy(copy);
-            }}
-          />
-          <SliderWithLabel
-            label="Y-Axis"
-            value={props.strategy.y as number}
-            min={0}
-            max={1}
-            step={0.01}
-            setValue={(y) => {
-              const copy = {
-                ...props.strategy,
-              } as Algorithm.DistanceToPointStrategy;
-              copy.y = y;
-              props.setStrategy(copy);
-            }}
-          />
-        </>
+        <CoordinateInput
+          width={size}
+          height={size}
+          bgColor="blackAlpha.200"
+          onPosition={(x, y) => {
+            const copy = {
+              ...props.strategy,
+            } as Algorithm.DistanceToPointStrategy;
+            copy.x = x / size;
+            copy.y = y / size;
+            props.setStrategy(copy);
+          }}
+          x={(props.strategy.x * size) as number}
+          y={(props.strategy.y * size) as number}
+        />
       ) : (
         <></>
       )}
     </VStack>
   );
+}
+
+{
+  /* <>
+<SliderWithLabel
+  label="X-Axis"
+  value={props.strategy.x as number}
+  min={0}
+  max={1}
+  step={0.01}
+  setValue={(x) => {
+    const copy = {
+      ...props.strategy,
+    } as Algorithm.DistanceToPointStrategy;
+    copy.x = x;
+    props.setStrategy(copy);
+  }}
+/>
+<SliderWithLabel
+  label="Y-Axis"
+  value={props.strategy.y as number}
+  min={0}
+  max={1}
+  step={0.01}
+  setValue={(y) => {
+    const copy = {
+      ...props.strategy,
+    } as Algorithm.DistanceToPointStrategy;
+    copy.y = y;
+    props.setStrategy(copy);
+  }}
+/>
+</> */
 }
 
 function CosinePalette(props: {
