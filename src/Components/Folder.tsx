@@ -24,6 +24,8 @@ type Variant = "fat" | "normal" | "thin";
 export default function Folder(props: FolderProps): JSX.Element {
   const [flag, setFlag] = useBoolean(false);
 
+  // Should only be performer once!!!
+  // That is why array is empty
   useEffect(() => {
     if (props.startOpen) {
       setFlag.on();
