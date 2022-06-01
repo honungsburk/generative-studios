@@ -31,6 +31,7 @@ import * as MathExtra from "src/Libraries/MathExtra";
 import CoordinateInput from "src/Components/CoordinateInput";
 import CosineColorInput from "src/Components/CosineColorInput";
 import GradiantDisplay from "src/Components/GradiantDisplay";
+import Folder from "src/Components/Folder";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -132,23 +133,28 @@ function TuneTab(props: TuneProps): JSX.Element {
           }}
         />
       </HStack>
-      <Text fontSize="sm">Splitting Strategy</Text>
-      <RadioGroup
-        onChange={(strat) => {
-          const newSettings = { ...props.settings };
-          newSettings.splittingStrategy = strat as any;
-          props.setSettings(newSettings);
-        }}
-        value={props.settings.splittingStrategy}
+      <Folder
+        variant="fat"
+        label="Splitting Strategy"
+        info="Determines how a triangle is split into two new triangles"
       >
-        <VStack direction="row" align={"left"}>
-          <Radio value={Algorithm.SPLITRANDOM}>Split Randomly</Radio>
-          <Radio value={Algorithm.SPLITRANDOMBALANCED}>
-            Split Randomly (Balanced)
-          </Radio>
-          <Radio value={Algorithm.SPLITMIDDLE}>Split Middle</Radio>
-        </VStack>
-      </RadioGroup>
+        <RadioGroup
+          onChange={(strat) => {
+            const newSettings = { ...props.settings };
+            newSettings.splittingStrategy = strat as any;
+            props.setSettings(newSettings);
+          }}
+          value={props.settings.splittingStrategy}
+        >
+          <VStack direction="row" align={"left"}>
+            <Radio value={Algorithm.SPLITRANDOM}>Split Randomly</Radio>
+            <Radio value={Algorithm.SPLITRANDOMBALANCED}>
+              Split Randomly (Balanced)
+            </Radio>
+            <Radio value={Algorithm.SPLITMIDDLE}>Split Middle</Radio>
+          </VStack>
+        </RadioGroup>
+      </Folder>
       <Divider borderColor="blackAlpha.900" />
       <Text fontSize="sm">Depth Strategy</Text>
       <DepthStrat

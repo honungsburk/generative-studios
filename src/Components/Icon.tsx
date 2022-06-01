@@ -6,6 +6,10 @@ import {
   AiFillBug,
   AiOutlineLeft,
   AiOutlineRight,
+  AiFillCaretDown,
+  AiFillCaretUp,
+  AiFillCaretLeft,
+  AiFillCaretRight,
 } from "react-icons/ai";
 
 import {
@@ -17,6 +21,7 @@ import {
   MdLocationOn,
   MdFullscreen,
   MdFullscreenExit,
+  MdInfo,
 } from "react-icons/md";
 
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
@@ -53,6 +58,25 @@ export function Tune(props: IconProps) {
 
 export function Random(props: IconProps) {
   return <Icon {...props} as={GiPerspectiveDiceSixFacesRandom} />;
+}
+
+export function Info(props: IconProps) {
+  return <Icon {...props} as={MdInfo} />;
+}
+
+// Carret
+
+export function CaretDown(props: IconProps) {
+  return <Icon {...props} as={AiFillCaretDown} />;
+}
+export function CaretUp(props: IconProps) {
+  return <Icon {...props} as={AiFillCaretUp} />;
+}
+export function CaretLeft(props: IconProps) {
+  return <Icon {...props} as={AiFillCaretLeft} />;
+}
+export function CaretRight(props: IconProps) {
+  return <Icon {...props} as={AiFillCaretRight} />;
 }
 
 // Navigation
