@@ -2,64 +2,7 @@ import { Box } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import * as MathExtra from "src/Libraries/MathExtra";
 
-type CosineColorPickerProps = {
-  width: number;
-  height: number;
-  bgColor: string;
-};
-
-export function CosineColorPicker(props: CosineColorPickerProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const draw = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 4, 0, 2 * Math.PI, true);
-    ctx.fillStyle = "#FF6A6A";
-    ctx.fill();
-  };
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) {
-        let animationFrameId = 0;
-        const render = () => {
-          draw(ctx, canvas);
-          animationFrameId = window.requestAnimationFrame(render);
-        };
-        render();
-
-        return () => {
-          window.cancelAnimationFrame(animationFrameId);
-        };
-      }
-    }
-  }, []);
-
-  return (
-    <Box
-      bgColor={props.bgColor}
-      rounded={8}
-      width={`${props.width}px`}
-      height={`${props.height}px`}
-    >
-      <canvas
-        ref={canvasRef}
-        style={{ display: "inline-block" }}
-        width={props.width}
-        height={props.height}
-      >
-        Your browser does not support the HTML canvas tag.
-      </canvas>
-    </Box>
-  );
-}
-
-///////// Color Display
-
-type CosineColorDisplayProps = {
+type GradiantDisplayProps = {
   start: number;
   end: number;
   colorFn: ColorFn;
@@ -69,7 +12,7 @@ type CosineColorDisplayProps = {
 
 type ColorFn = (t: number) => [number, number, number, number];
 
-export function CosineColorDisplay(props: CosineColorDisplayProps) {
+export default function GradiantDisplay(props: GradiantDisplayProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const colorFnRef = useRef<ColorFn>(() => [0, 0, 0, 0]);
   const startRef = useRef<number>(0);

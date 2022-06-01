@@ -28,11 +28,9 @@ import {
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as MathExtra from "src/Libraries/MathExtra";
-import CoordinateInput from "src/Components/Inputs/CoordinateInput";
-import {
-  CosineColorDisplay,
-  CosineColorPicker,
-} from "src/Components/Inputs/CosineColor";
+import CoordinateInput from "src/Components/CoordinateInput";
+import CosineColorInput from "src/Components/CosineColorInput";
+import GradiantDisplay from "src/Components/GradiantDisplay";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -109,14 +107,14 @@ function TuneTab(props: TuneProps): JSX.Element {
 
   return (
     <VStack align={"left"}>
-      <CosineColorDisplay
+      <GradiantDisplay
         width={300}
         height={20}
-        colorFn={(t) => [t, t, t, 255]}
+        colorFn={(t: number) => [t, t, t, 255]}
         start={0}
         end={255}
       />
-      <CosineColorPicker width={300} height={100} bgColor="blackAlpha.200" />
+      <CosineColorInput width={300} height={100} bgColor="blackAlpha.200" />
       <Text fontSize="lg">Seed</Text>
       <HStack>
         <IconButton
