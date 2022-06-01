@@ -38,13 +38,14 @@ export default function Folder(props: FolderProps): JSX.Element {
   const isOpen = !flag;
 
   return (
-    <VStack width={"100%"} onClick={setFlag.toggle}>
+    <VStack width={"100%"}>
       <Flex
         width={"100%"}
         alignItems="center"
         cursor={"pointer"}
         borderTop={borderTop}
         pt={2}
+        onClick={setFlag.toggle}
       >
         <Text pointerEvents="none" fontSize={fontSize} fontWeight={fontWeight}>
           {props.label}
