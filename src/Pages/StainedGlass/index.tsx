@@ -134,7 +134,6 @@ function TuneTab(props: TuneProps): JSX.Element {
         />
       </HStack>
       <Folder
-        variant="fat"
         label="Splitting Strategy"
         info="Determines how a triangle is split into two new triangles"
       >
@@ -155,68 +154,77 @@ function TuneTab(props: TuneProps): JSX.Element {
           </VStack>
         </RadioGroup>
       </Folder>
-      <Divider borderColor="blackAlpha.900" />
-      <Text fontSize="sm">Depth Strategy</Text>
-      <DepthStrat
-        strategy={props.settings.depthStrategy}
-        setStrategy={(newStrat) => {
-          const newSettings = { ...props.settings };
-          newSettings.depthStrategy = newStrat;
-          props.setSettings(newSettings);
-        }}
-      />
+      <Folder
+        label="Depth Strategy"
+        info="Determines when a triangle is split into two"
+      >
+        <DepthStrat
+          strategy={props.settings.depthStrategy}
+          setStrategy={(newStrat) => {
+            const newSettings = { ...props.settings };
+            newSettings.depthStrategy = newStrat;
+            props.setSettings(newSettings);
+          }}
+        />
+      </Folder>
 
-      <Divider borderColor="blackAlpha.900" />
-      <Text fontSize="sm">Distance Strategy</Text>
-      <DistanceStrat
-        strategy={props.settings.distStrategy}
-        setStrategy={(newStrat) => {
-          const newSettings = { ...props.settings };
-          newSettings.distStrategy = newStrat;
-          props.setSettings(newSettings);
-        }}
-      />
-      <Divider borderColor="blackAlpha.900" />
-      <Text fontSize="sm">Jitter</Text>
-      <SliderThumbWithTooltip
-        value={props.settings.jitter}
-        min={0}
-        max={1}
-        step={0.01}
-        setValue={(jitter) => {
-          const copy = {
-            ...props.settings,
-          };
-          copy.jitter = jitter;
-          props.setSettings(copy);
-        }}
-      />
-      <Divider borderColor="blackAlpha.900" />
-      <Text fontSize="sm">Symmetry</Text>
-      <Switch
-        // colorScheme="blackAlpha"
-        isChecked={props.settings.symmetry}
-        value={props.settings.symmetry ? "false" : "true"}
-        onChange={(symmetry) => {
-          const copy = {
-            ...props.settings,
-          };
-          copy.symmetry = "true" === symmetry.target.value;
-          props.setSettings(copy);
-        }}
-      />
-      <Divider borderColor="blackAlpha.900" />
-      <Text fontSize="sm">Color</Text>
-      <CosinePalette
-        palette={props.settings.palette}
-        setPalette={(newPalette) => {
-          const copy = {
-            ...props.settings,
-          };
-          copy.palette = newPalette;
-          props.setSettings(copy);
-        }}
-      />
+      <Folder
+        label="Distance Strategy"
+        info="Determines the color of a triangle by taking taking the distance of the tringle to some other point on the canvas"
+      >
+        <DistanceStrat
+          strategy={props.settings.distStrategy}
+          setStrategy={(newStrat) => {
+            const newSettings = { ...props.settings };
+            newSettings.distStrategy = newStrat;
+            props.setSettings(newSettings);
+          }}
+        />
+      </Folder>
+      <Folder label="Jitter" info="Add randomness to the distance metric">
+        <SliderThumbWithTooltip
+          value={props.settings.jitter}
+          min={0}
+          max={1}
+          step={0.01}
+          setValue={(jitter) => {
+            const copy = {
+              ...props.settings,
+            };
+            copy.jitter = jitter;
+            props.setSettings(copy);
+          }}
+        />
+      </Folder>
+      <Folder label="Symmetry" info="Make it symmetric across the diagonal">
+        <Switch
+          // colorScheme="blackAlpha"
+          isChecked={props.settings.symmetry}
+          value={props.settings.symmetry ? "false" : "true"}
+          onChange={(symmetry) => {
+            const copy = {
+              ...props.settings,
+            };
+            copy.symmetry = "true" === symmetry.target.value;
+            props.setSettings(copy);
+          }}
+        />
+      </Folder>
+      <Folder
+        label="Color"
+        info="Three cosine waves are combined to create gradiants, one for each channel (red, green, blue a.k.a. rgb)"
+      >
+        <CosinePalette
+          palette={props.settings.palette}
+          setPalette={(newPalette) => {
+            const copy = {
+              ...props.settings,
+            };
+            copy.palette = newPalette;
+            props.setSettings(copy);
+          }}
+        />
+      </Folder>
     </VStack>
   );
 }
@@ -336,8 +344,8 @@ function DistanceStrat(props: {
         }}
         value={props.strategy.kind}
       >
-        <option value={Algorithm.XCentroid.kind}>X Centroid</option>
-        <option value={Algorithm.YCentroid.kind}>Y Centroid</option>
+        <option value={Algorithm.XCentroid.kind}>X-Axis</option>
+        <option value={Algorithm.YCentroid.kind}>Y-Axis</option>
         <option value={Algorithm.DistToPoint(0.5, 0.5).kind}>
           Distance To Point
         </option>

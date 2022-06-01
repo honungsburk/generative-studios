@@ -5,6 +5,7 @@ import {
   VStack,
   useBoolean,
   HStack,
+  Box,
 } from "@chakra-ui/react";
 import { ReactElement } from "react";
 import Info from "./Info";
@@ -13,11 +14,11 @@ import * as Icon from "./Icon";
 type FolderProps = {
   label: string;
   info?: string;
-  children?: ReactElement;
+  children?: ReactElement | ReactElement[];
   variant?: Variant;
 };
 
-type Variant = "fat" | "normal";
+type Variant = "fat" | "normal" | "thin";
 
 export default function Folder(props: FolderProps): JSX.Element {
   const [flag, setFlag] = useBoolean();
@@ -33,6 +34,13 @@ export default function Folder(props: FolderProps): JSX.Element {
     iconSize = 5;
     fontSize = "lg";
     fontWeight = "bold";
+  }
+
+  if (props.variant === "thin") {
+    borderTop = "1px";
+    iconSize = 4;
+    fontSize = "sm";
+    fontWeight = "light";
   }
 
   const isOpen = !flag;
@@ -60,7 +68,9 @@ export default function Folder(props: FolderProps): JSX.Element {
           <Info boxSize={iconSize}>{props.info}</Info>
         </HStack>
       </Flex>
-      {isOpen ? props.children : <></>}
+      <Box width={"100%"} px={2} style={{ display: isOpen ? "block" : "none" }}>
+        {props.children}
+      </Box>
     </VStack>
   );
 }
