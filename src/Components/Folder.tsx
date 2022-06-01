@@ -7,7 +7,7 @@ import {
   HStack,
   Box,
 } from "@chakra-ui/react";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import Info from "./Info";
 import * as Icon from "./Icon";
 
@@ -16,13 +16,19 @@ type FolderProps = {
   info?: string;
   children?: ReactElement | ReactElement[];
   variant?: Variant;
+  startOpen?: boolean;
 };
 
 type Variant = "fat" | "normal" | "thin";
 
 export default function Folder(props: FolderProps): JSX.Element {
-  const [flag, setFlag] = useBoolean();
-  const variant: Variant = props.variant ? props.variant : "normal";
+  const [flag, setFlag] = useBoolean(false);
+
+  useEffect(() => {
+    if (props.startOpen) {
+      setFlag.on();
+    }
+  }, []);
 
   let borderTop = "1px";
   let iconSize = 4;
@@ -43,8 +49,6 @@ export default function Folder(props: FolderProps): JSX.Element {
     fontWeight = "light";
   }
 
-  const isOpen = !flag;
-
   return (
     <VStack width={"100%"}>
       <Flex
@@ -60,7 +64,7 @@ export default function Folder(props: FolderProps): JSX.Element {
         </Text>
         <Spacer />
         <HStack alignItems="center">
-          {isOpen ? (
+          {flag ? (
             <Icon.CaretDown boxSize={iconSize} />
           ) : (
             <Icon.CaretUp boxSize={iconSize} />
@@ -68,7 +72,7 @@ export default function Folder(props: FolderProps): JSX.Element {
           <Info boxSize={iconSize}>{props.info}</Info>
         </HStack>
       </Flex>
-      <Box width={"100%"} px={2} style={{ display: isOpen ? "block" : "none" }}>
+      <Box width={"100%"} px={2} style={{ display: flag ? "block" : "none" }}>
         {props.children}
       </Box>
     </VStack>
