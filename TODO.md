@@ -55,3 +55,8 @@
   - [ ] Twitter
   - [ ] Instagram
   - [ ] TikTok
+
+## Backlog
+
+- Have a mode where the parameters change over time
+- Allow recordings of parameters changing
