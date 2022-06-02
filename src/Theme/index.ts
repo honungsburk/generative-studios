@@ -2,6 +2,7 @@ import { mode } from "@chakra-ui/theme-tools";
 import { Dict } from "@chakra-ui/utils";
 import { extendTheme } from "@chakra-ui/react";
 import colors from "./Colors";
+import tabs from "./component/tabs";
 
 const global = (props: Dict<any>) => ({
   body: {
@@ -33,7 +34,9 @@ export const Theme = extendTheme({
   styles: {
     global: global,
   },
-  components: {},
+  components: {
+    Tabs: tabs,
+  },
   colors: colors,
   initialColorMode: "light",
   useSystemColorMode: false,

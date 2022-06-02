@@ -74,7 +74,7 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
         Stained Glass
       </Heading>
 
-      <Tabs size="md" colorScheme={"blackAlpha"}>
+      <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist">
         <TabList>
           <Tab>
             <Icon.Tune boxSize={6} />
