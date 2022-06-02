@@ -4,6 +4,7 @@ import { extendTheme } from "@chakra-ui/react";
 import colors from "./Colors";
 import tabs from "./component/tabs";
 import input from "./component/input";
+import button from "./component/button";
 
 const global = (props: Dict<any>) => ({
   body: {
@@ -38,6 +39,10 @@ export const Theme = extendTheme({
   components: {
     Tabs: tabs,
     Input: input,
+    Button: button,
+  },
+  shadows: {
+    outline: "2px solid black",
   },
   colors: colors,
   initialColorMode: "light",

@@ -22,9 +22,8 @@ import {
   MdFullscreen,
   MdFullscreenExit,
   MdInfo,
+  MdRefresh,
 } from "react-icons/md";
-
-import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 
 // Menu
 
@@ -57,7 +56,7 @@ export function Tune(props: IconProps) {
 // Tune Tab
 
 export function Random(props: IconProps) {
-  return <Icon {...props} as={GiPerspectiveDiceSixFacesRandom} />;
+  return <Icon {...props} as={MdRefresh} />;
 }
 
 export function Info(props: IconProps) {

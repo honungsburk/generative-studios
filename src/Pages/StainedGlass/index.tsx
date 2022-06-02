@@ -118,6 +118,7 @@ function TuneTab(props: TuneProps): JSX.Element {
       <CosineColorInput width={300} height={100} bgColor="blackAlpha.200" />
       <HStack>
         <IconButton
+          variant={"brutalist"}
           colorScheme={"blackAlpha"}
           aria-label="Random Seed"
           icon={<Icon.Random />}
