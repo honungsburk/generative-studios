@@ -116,7 +116,6 @@ function TuneTab(props: TuneProps): JSX.Element {
         end={255}
       />
       <CosineColorInput width={300} height={100} bgColor="blackAlpha.200" />
-      <Text fontSize="lg">Seed</Text>
       <HStack>
         <IconButton
           colorScheme={"blackAlpha"}
@@ -125,7 +124,8 @@ function TuneTab(props: TuneProps): JSX.Element {
           onClick={() => props.setSeed(Algorithm.generateSeed())}
         />
         <Input
-          variant="filled"
+          variant="brutalist"
+          colorScheme={"blackAlpha"}
           placeholder="Seed"
           value={props.seed}
           onChange={(e) => {
