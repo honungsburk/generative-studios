@@ -18,11 +18,6 @@ import {
   RadioGroup,
   Radio,
   Select,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  Tooltip,
-  SliderThumb,
   Switch,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
@@ -32,6 +27,7 @@ import CoordinateInput from "src/Components/CoordinateInput";
 import CosineColorInput from "src/Components/CosineColorInput";
 import GradiantDisplay from "src/Components/GradiantDisplay";
 import Folder from "src/Components/Folder";
+import Slider from "src/Components/Slider";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -183,7 +179,9 @@ function TuneTab(props: TuneProps): JSX.Element {
         />
       </Folder>
       <Folder label="Jitter" info="Add randomness to the distance metric">
-        <SliderThumbWithTooltip
+        <Slider
+          info="The amount of jitter (randomness) to add"
+          label="Jitter"
           value={props.settings.jitter}
           min={0}
           max={1}
@@ -239,7 +237,8 @@ function DepthStrat(props: {
   if (props.strategy.kind === "Flip Depth") {
     extraOptions = (
       <>
-        <SliderWithLabel
+        <Slider
+          info="The probaility that there will be a flip"
           label="P"
           value={props.strategy.p}
           min={0}
@@ -253,7 +252,8 @@ function DepthStrat(props: {
             props.setStrategy(copy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="The maximum depth that can be flipped"
           label="Depth"
           value={props.strategy.depth}
           min={1}
@@ -271,7 +271,8 @@ function DepthStrat(props: {
     );
   } else if (props.strategy.kind === "Inherited Depth") {
     extraOptions = (
-      <SliderWithLabel
+      <Slider
+        info="The maximum number of times the triangles will be split"
         label="Depth"
         value={props.strategy.depth}
         min={1}
@@ -288,7 +289,8 @@ function DepthStrat(props: {
     );
   } else if (props.strategy.kind === "Max Depth") {
     extraOptions = (
-      <SliderWithLabel
+      <Slider
+        info="The maximum number of times the triangles will be split"
         label="Depth"
         value={props.strategy.maxDepth}
         min={1}
@@ -374,39 +376,6 @@ function DistanceStrat(props: {
   );
 }
 
-{
-  /* <>
-<SliderWithLabel
-  label="X-Axis"
-  value={props.strategy.x as number}
-  min={0}
-  max={1}
-  step={0.01}
-  setValue={(x) => {
-    const copy = {
-      ...props.strategy,
-    } as Algorithm.DistanceToPointStrategy;
-    copy.x = x;
-    props.setStrategy(copy);
-  }}
-/>
-<SliderWithLabel
-  label="Y-Axis"
-  value={props.strategy.y as number}
-  min={0}
-  max={1}
-  step={0.01}
-  setValue={(y) => {
-    const copy = {
-      ...props.strategy,
-    } as Algorithm.DistanceToPointStrategy;
-    copy.y = y;
-    props.setStrategy(copy);
-  }}
-/>
-</> */
-}
-
 function CosinePalette(props: {
   palette: Palette.CosinePalette;
   setPalette: (palette: Palette.CosinePalette) => void;
@@ -417,7 +386,8 @@ function CosinePalette(props: {
         <Text fontSize="sm" whiteSpace={"nowrap"}>
           {key}
         </Text>
-        <SliderWithLabel
+        <Slider
+          info="The mean value of the cosinus wave"
           label="a"
           value={props.palette[key].a}
           min={0}
@@ -436,7 +406,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="The amplitude of cosiuns wave"
           label="b"
           value={props.palette[key].b}
           min={0}
@@ -455,7 +426,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="the frequency of the cosinus wave"
           label="c"
           value={props.palette[key].c}
           min={0}
@@ -474,7 +446,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="the shift of the cosinus wave"
           label="d"
           value={props.palette[key].d}
           min={0}
@@ -517,66 +490,5 @@ function CosinePalette(props: {
         </VStack>
       </RadioGroup>
     </VStack>
-  );
-}
-
-/////////////// Components
-
-function SliderWithLabel(
-  props: {
-    label: string;
-  } & SliderThumbWithTooltipProps
-) {
-  const { label, ...rest } = props;
-  return (
-    <HStack>
-      <Text fontSize="sm" whiteSpace={"nowrap"}>
-        {label}
-      </Text>
-      <SliderThumbWithTooltip {...rest} />
-    </HStack>
-  );
-}
-
-type SliderThumbWithTooltipProps = {
-  value: number;
-  setValue: (value: number) => void;
-  min: number;
-  max: number;
-  step: number;
-};
-
-function SliderThumbWithTooltip(props: SliderThumbWithTooltipProps) {
-  const [showTooltip, setShowTooltip] = React.useState(false);
-  const value = MathExtra.round(props.value, 0.01);
-  return (
-    <Slider
-      width={"100%"}
-      value={value}
-      min={props.min}
-      max={props.max}
-      step={props.step}
-      variant="brutalist"
-      colorScheme="blackAlpha"
-      onChange={(v) => {
-        props.setValue(v);
-      }}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <SliderTrack bg="blackAlpha.400">
-        <SliderFilledTrack bg="blackAlpha.900" />
-      </SliderTrack>
-      <Tooltip
-        hasArrow
-        bg="teal.500"
-        color="white"
-        placement="top"
-        isOpen={showTooltip}
-        label={`${value}`}
-      >
-        <SliderThumb />
-      </Tooltip>
-    </Slider>
   );
 }
