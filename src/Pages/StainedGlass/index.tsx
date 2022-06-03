@@ -556,6 +556,7 @@ function SliderThumbWithTooltip(props: SliderThumbWithTooltipProps) {
       min={props.min}
       max={props.max}
       step={props.step}
+      variant="brutalist"
       colorScheme="blackAlpha"
       onChange={(v) => {
         props.setValue(v);
@@ -563,8 +564,8 @@ function SliderThumbWithTooltip(props: SliderThumbWithTooltipProps) {
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      <SliderTrack>
-        <SliderFilledTrack />
+      <SliderTrack bg="blackAlpha.400">
+        <SliderFilledTrack bg="blackAlpha.900" />
       </SliderTrack>
       <Tooltip
         hasArrow

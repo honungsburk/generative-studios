@@ -10,12 +10,27 @@ type CosineColorPickerProps = {
 export default function CosineColorInput(props: CosineColorPickerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const a = 0.5;
+  const b = 0.2;
+  const c = 2;
+  const d = 0;
+
   const draw = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 4, 0, 2 * Math.PI, true);
-    ctx.fillStyle = "#FF6A6A";
-    ctx.fill();
+
+    const pixelOffset = (1 - a) * canvas.height;
+    const pixelAmplitude = b * canvas.height;
+
+    const stepSize = 360 / canvas.width;
+
+    ctx.moveTo(0, pixelOffset); // back to the left before drawing the sine
+
+    for (let x = 0; x <= 360; x += stepSize) {
+      // 360 steps (degrees) for entire sine period
+      let y = pixelOffset - Math.sin((x * Math.PI) / 180) * pixelAmplitude; // calculate y flipped horizontally, converting from DEG to RADIAN
+      ctx.lineTo(x, y); // draw the point
+    }
+    ctx.stroke();
   };
 
   useEffect(() => {
