@@ -5,7 +5,6 @@ import colors from "./Colors";
 import tabs from "./component/tabs";
 import input from "./component/input";
 import button from "./component/button";
-import slider from "./component/slider";
 
 const global = (props: Dict<any>) => ({
   body: {
