@@ -14,7 +14,7 @@ import {
   Heading,
   Input,
   IconButton,
-  Divider,
+  Box,
   RadioGroup,
   Radio,
   Select,
@@ -35,42 +35,53 @@ const initSettings = Algorithm.generateSettings(initSeed);
 export default function StainedGlass() {
   const [seed, setSeed] = React.useState(initSeed);
   const [settings, setSettings] = React.useState(initSettings);
+  const [height, setHeight] = React.useState(0);
 
   // TODO: make dynamic!
   const sidebarWidth = 400;
 
   const windowResized = (p5: p5Types) => {
+    setHeight(p5.windowHeight);
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
-
   return (
-    <HStack align={"top"} spacing={0}>
-      <Sidebar
-        width={sidebarWidth}
-        tuneProps={{
-          seed: seed,
-          setSeed: setSeed,
-          settings: settings,
-          setSettings: setSettings,
-        }}
-      />
-      <Sketch
-        setup={Algorithm.setup(sidebarWidth)}
-        draw={Algorithm.draw(seed, settings)}
-        windowResized={windowResized}
-      />
-    </HStack>
+    <Box height={`${height}px`}>
+      <HStack align="stretch" spacing={0}>
+        <Sidebar
+          width={sidebarWidth}
+          tuneProps={{
+            seed: seed,
+            setSeed: setSeed,
+            settings: settings,
+            setSettings: setSettings,
+          }}
+        />
+        <Sketch
+          setup={(p5: p5Types, canvasParentRef: Element) => {
+            setHeight(p5.windowHeight);
+            Algorithm.setup(sidebarWidth)(p5, canvasParentRef);
+          }}
+          draw={Algorithm.draw(seed, settings)}
+          windowResized={windowResized}
+        />
+      </HStack>
+    </Box>
   );
 }
 
 function Sidebar(props: { width: number; tuneProps: TuneProps }) {
   return (
-    <VStack alignItems={"left"} width={`${props.width}px`}>
+    <VStack alignItems={"left"} width={`${props.width}px`} height="100%">
       <Heading fontSize={28} m={4}>
         Stained Glass
       </Heading>
 
-      <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist">
+      <Tabs
+        size="md"
+        colorScheme={"blackAlpha"}
+        variant="brutalist"
+        height="100%"
+      >
         <TabList>
           <Tab>
             <Icon.Tune boxSize={6} />
@@ -79,14 +90,16 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
             <Icon.Home boxSize={6} />
           </Tab>
         </TabList>
-        <TabPanels>
-          <TabPanel>
-            <TuneTab {...props.tuneProps} />
-          </TabPanel>
-          <TabPanel>
-            <p>two!</p>
-          </TabPanel>
-        </TabPanels>
+        <Box position="relative" overflowY={"scroll"} height="100%">
+          <TabPanels>
+            <TabPanel>
+              <TuneTab {...props.tuneProps} />
+            </TabPanel>
+            <TabPanel>
+              <p>two!</p>
+            </TabPanel>
+          </TabPanels>
+        </Box>
       </Tabs>
     </VStack>
   );
