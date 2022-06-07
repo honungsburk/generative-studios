@@ -3,7 +3,6 @@ import type {
   SystemStyleFunction,
 } from "@chakra-ui/theme-tools";
 
-import { tabsAnatomy as parts } from "@chakra-ui/anatomy";
 import { mode } from "@chakra-ui/theme-tools";
 import { ComponentStyleConfig } from "@chakra-ui/react";
 

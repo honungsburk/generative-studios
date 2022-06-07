@@ -14,15 +14,10 @@ import {
   Heading,
   Input,
   IconButton,
-  Divider,
+  Box,
   RadioGroup,
   Radio,
   Select,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  Tooltip,
-  SliderThumb,
   Switch,
   Box,
 } from "@chakra-ui/react";
@@ -33,7 +28,11 @@ import CoordinateInput from "src/Components/CoordinateInput";
 import CosineColorInput from "src/Components/CosineColorInput";
 import GradiantDisplay from "src/Components/GradiantDisplay";
 import Folder from "src/Components/Folder";
+<<<<<<< HEAD
 import Drawer from "src/Components/Drawer";
+=======
+import Slider from "src/Components/Slider";
+>>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -43,19 +42,27 @@ const initSettings = Algorithm.generateSettings(initSeed);
 export default function StainedGlass() {
   const [seed, setSeed] = React.useState(initSeed);
   const [settings, setSettings] = React.useState(initSettings);
+  const [height, setHeight] = React.useState(0);
 
   // TODO: make dynamic!
   const sidebarWidth = 0;
 
   const windowResized = (p5: p5Types) => {
+    setHeight(p5.windowHeight);
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
-
   return (
+<<<<<<< HEAD
     <Drawer
       drawer={
         <Sidebar
           width={400}
+=======
+    <Box height={`${height}px`}>
+      <HStack align="stretch" spacing={0}>
+        <Sidebar
+          width={sidebarWidth}
+>>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
           tuneProps={{
             seed: seed,
             setSeed: setSeed,
@@ -63,6 +70,7 @@ export default function StainedGlass() {
             setSettings: setSettings,
           }}
         />
+<<<<<<< HEAD
       }
     >
       <Box backgroundColor={"red.500"} width="100%" height={"100%"}>
@@ -74,17 +82,34 @@ export default function StainedGlass() {
         windowResized={windowResized}
       /> */}
     </Drawer>
+=======
+        <Sketch
+          setup={(p5: p5Types, canvasParentRef: Element) => {
+            setHeight(p5.windowHeight);
+            Algorithm.setup(sidebarWidth)(p5, canvasParentRef);
+          }}
+          draw={Algorithm.draw(seed, settings)}
+          windowResized={windowResized}
+        />
+      </HStack>
+    </Box>
+>>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
   );
 }
 
 function Sidebar(props: { width: number; tuneProps: TuneProps }) {
   return (
-    <VStack alignItems={"left"} width={`${props.width}px`}>
+    <VStack alignItems={"left"} width={`${props.width}px`} height="100%">
       <Heading fontSize={28} m={4}>
         Stained Glass
       </Heading>
 
-      <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist">
+      <Tabs
+        size="md"
+        colorScheme={"blackAlpha"}
+        variant="brutalist"
+        height="100%"
+      >
         <TabList>
           <Tab>
             <Icon.Tune boxSize={6} />
@@ -93,14 +118,16 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
             <Icon.Home boxSize={6} />
           </Tab>
         </TabList>
-        <TabPanels>
-          <TabPanel>
-            <TuneTab {...props.tuneProps} />
-          </TabPanel>
-          <TabPanel>
-            <p>two!</p>
-          </TabPanel>
-        </TabPanels>
+        <Box position="relative" overflowY={"scroll"} height="100%">
+          <TabPanels>
+            <TabPanel>
+              <TuneTab {...props.tuneProps} />
+            </TabPanel>
+            <TabPanel>
+              <p>two!</p>
+            </TabPanel>
+          </TabPanels>
+        </Box>
       </Tabs>
     </VStack>
   );
@@ -193,7 +220,9 @@ function TuneTab(props: TuneProps): JSX.Element {
         />
       </Folder>
       <Folder label="Jitter" info="Add randomness to the distance metric">
-        <SliderThumbWithTooltip
+        <Slider
+          info="The amount of jitter (randomness) to add"
+          label="Jitter"
           value={props.settings.jitter}
           min={0}
           max={1}
@@ -249,7 +278,8 @@ function DepthStrat(props: {
   if (props.strategy.kind === "Flip Depth") {
     extraOptions = (
       <>
-        <SliderWithLabel
+        <Slider
+          info="The probaility that there will be a flip"
           label="P"
           value={props.strategy.p}
           min={0}
@@ -263,7 +293,8 @@ function DepthStrat(props: {
             props.setStrategy(copy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="The maximum depth that can be flipped"
           label="Depth"
           value={props.strategy.depth}
           min={1}
@@ -281,7 +312,8 @@ function DepthStrat(props: {
     );
   } else if (props.strategy.kind === "Inherited Depth") {
     extraOptions = (
-      <SliderWithLabel
+      <Slider
+        info="The maximum number of times the triangles will be split"
         label="Depth"
         value={props.strategy.depth}
         min={1}
@@ -298,7 +330,8 @@ function DepthStrat(props: {
     );
   } else if (props.strategy.kind === "Max Depth") {
     extraOptions = (
-      <SliderWithLabel
+      <Slider
+        info="The maximum number of times the triangles will be split"
         label="Depth"
         value={props.strategy.maxDepth}
         min={1}
@@ -384,39 +417,6 @@ function DistanceStrat(props: {
   );
 }
 
-{
-  /* <>
-<SliderWithLabel
-  label="X-Axis"
-  value={props.strategy.x as number}
-  min={0}
-  max={1}
-  step={0.01}
-  setValue={(x) => {
-    const copy = {
-      ...props.strategy,
-    } as Algorithm.DistanceToPointStrategy;
-    copy.x = x;
-    props.setStrategy(copy);
-  }}
-/>
-<SliderWithLabel
-  label="Y-Axis"
-  value={props.strategy.y as number}
-  min={0}
-  max={1}
-  step={0.01}
-  setValue={(y) => {
-    const copy = {
-      ...props.strategy,
-    } as Algorithm.DistanceToPointStrategy;
-    copy.y = y;
-    props.setStrategy(copy);
-  }}
-/>
-</> */
-}
-
 function CosinePalette(props: {
   palette: Palette.CosinePalette;
   setPalette: (palette: Palette.CosinePalette) => void;
@@ -427,7 +427,8 @@ function CosinePalette(props: {
         <Text fontSize="sm" whiteSpace={"nowrap"}>
           {key}
         </Text>
-        <SliderWithLabel
+        <Slider
+          info="The mean value of the cosinus wave"
           label="a"
           value={props.palette[key].a}
           min={0}
@@ -446,7 +447,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="The amplitude of cosiuns wave"
           label="b"
           value={props.palette[key].b}
           min={0}
@@ -465,7 +467,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="the frequency of the cosinus wave"
           label="c"
           value={props.palette[key].c}
           min={0}
@@ -484,7 +487,8 @@ function CosinePalette(props: {
             props.setPalette(palleteCopy);
           }}
         />
-        <SliderWithLabel
+        <Slider
+          info="the shift of the cosinus wave"
           label="d"
           value={props.palette[key].d}
           min={0}
@@ -527,65 +531,5 @@ function CosinePalette(props: {
         </VStack>
       </RadioGroup>
     </VStack>
-  );
-}
-
-/////////////// Components
-
-function SliderWithLabel(
-  props: {
-    label: string;
-  } & SliderThumbWithTooltipProps
-) {
-  const { label, ...rest } = props;
-  return (
-    <HStack>
-      <Text fontSize="sm" whiteSpace={"nowrap"}>
-        {label}
-      </Text>
-      <SliderThumbWithTooltip {...rest} />
-    </HStack>
-  );
-}
-
-type SliderThumbWithTooltipProps = {
-  value: number;
-  setValue: (value: number) => void;
-  min: number;
-  max: number;
-  step: number;
-};
-
-function SliderThumbWithTooltip(props: SliderThumbWithTooltipProps) {
-  const [showTooltip, setShowTooltip] = React.useState(false);
-  const value = MathExtra.round(props.value, 0.01);
-  return (
-    <Slider
-      width={"100%"}
-      value={value}
-      min={props.min}
-      max={props.max}
-      step={props.step}
-      colorScheme="blackAlpha"
-      onChange={(v) => {
-        props.setValue(v);
-      }}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <SliderTrack>
-        <SliderFilledTrack />
-      </SliderTrack>
-      <Tooltip
-        hasArrow
-        bg="teal.500"
-        color="white"
-        placement="top"
-        isOpen={showTooltip}
-        label={`${value}`}
-      >
-        <SliderThumb />
-      </Tooltip>
-    </Slider>
   );
 }
