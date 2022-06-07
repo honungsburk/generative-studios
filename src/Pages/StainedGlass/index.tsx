@@ -24,6 +24,7 @@ import {
   Tooltip,
   SliderThumb,
   Switch,
+  Box,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
@@ -32,38 +33,47 @@ import CoordinateInput from "src/Components/CoordinateInput";
 import CosineColorInput from "src/Components/CosineColorInput";
 import GradiantDisplay from "src/Components/GradiantDisplay";
 import Folder from "src/Components/Folder";
+import Drawer from "src/Components/Drawer";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
+
+// TODO: add ResizeObserver
 
 export default function StainedGlass() {
   const [seed, setSeed] = React.useState(initSeed);
   const [settings, setSettings] = React.useState(initSettings);
 
   // TODO: make dynamic!
-  const sidebarWidth = 400;
+  const sidebarWidth = 0;
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
 
   return (
-    <HStack align={"top"} spacing={0}>
-      <Sidebar
-        width={sidebarWidth}
-        tuneProps={{
-          seed: seed,
-          setSeed: setSeed,
-          settings: settings,
-          setSettings: setSettings,
-        }}
-      />
-      <Sketch
+    <Drawer
+      drawer={
+        <Sidebar
+          width={400}
+          tuneProps={{
+            seed: seed,
+            setSeed: setSeed,
+            settings: settings,
+            setSettings: setSettings,
+          }}
+        />
+      }
+    >
+      <Box backgroundColor={"red.500"} width="100%" height={"100%"}>
+        <Text>Hello, World!</Text>
+      </Box>
+      {/* <Sketch
         setup={Algorithm.setup(sidebarWidth)}
         draw={Algorithm.draw(seed, settings)}
         windowResized={windowResized}
-      />
-    </HStack>
+      /> */}
+    </Drawer>
   );
 }
 
