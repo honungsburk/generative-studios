@@ -19,7 +19,6 @@ import {
   Radio,
   Select,
   Switch,
-  Box,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
@@ -28,11 +27,8 @@ import CoordinateInput from "src/Components/CoordinateInput";
 import CosineColorInput from "src/Components/CosineColorInput";
 import GradiantDisplay from "src/Components/GradiantDisplay";
 import Folder from "src/Components/Folder";
-<<<<<<< HEAD
 import Drawer from "src/Components/Drawer";
-=======
 import Slider from "src/Components/Slider";
->>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -52,17 +48,10 @@ export default function StainedGlass() {
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
   return (
-<<<<<<< HEAD
     <Drawer
       drawer={
         <Sidebar
           width={400}
-=======
-    <Box height={`${height}px`}>
-      <HStack align="stretch" spacing={0}>
-        <Sidebar
-          width={sidebarWidth}
->>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
           tuneProps={{
             seed: seed,
             setSeed: setSeed,
@@ -70,7 +59,6 @@ export default function StainedGlass() {
             setSettings: setSettings,
           }}
         />
-<<<<<<< HEAD
       }
     >
       <Box backgroundColor={"red.500"} width="100%" height={"100%"}>
@@ -82,18 +70,6 @@ export default function StainedGlass() {
         windowResized={windowResized}
       /> */}
     </Drawer>
-=======
-        <Sketch
-          setup={(p5: p5Types, canvasParentRef: Element) => {
-            setHeight(p5.windowHeight);
-            Algorithm.setup(sidebarWidth)(p5, canvasParentRef);
-          }}
-          draw={Algorithm.draw(seed, settings)}
-          windowResized={windowResized}
-        />
-      </HStack>
-    </Box>
->>>>>>> 205b27db71b149b3ef27b6d90b329ecd58b2a201
   );
 }
 
