@@ -49,6 +49,8 @@ export default function StainedGlass() {
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
 
+  // To prevent the body element from overflowing when the content of the sidebar
+  // becomes to large
   useEffect(() => {
     document.body.style.scrollBehavior = "hidden";
 
