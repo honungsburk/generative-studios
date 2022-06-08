@@ -28,7 +28,7 @@ export default function Drawer(props: DrawerProps): JSX.Element {
   //     ? `${forwardAnimation} 0.2s linear forwards`
   //     : `${reverseAnimation} 0.2s linear forwards`,
   // };
-  console.log(getDisclosureProps());
+
   return (
     <Box h="100vh">
       <IconButton
@@ -38,41 +38,20 @@ export default function Drawer(props: DrawerProps): JSX.Element {
         right={4}
         aria-label="Expand"
         icon={isOpen ? <Icon.CaretLeft /> : <Icon.CaretRight />}
-        // css={buttonCss}
+        zIndex={100}
       />
-      <Box>
-        <motion.div
-          {...getDisclosureProps()}
-          hidden={hidden}
-          initial={false}
-          onAnimationStart={() => setHidden(false)}
-          onAnimationComplete={() => setHidden(!isOpen)}
-          animate={{ width: isOpen ? 400 : 0 }}
-          style={{
-            backgroundColor: Theme["colors"]["background"]["light"],
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            position: "absolute",
-            left: "0",
-            height: "100vh",
-            top: "0",
-          }}
+      <Flex>
+        <Box
+          display={isOpen ? "block" : "none"}
+          bgColor="background.light"
+          maxHeight={"100vh"}
         >
           {props.drawer}
-        </motion.div>
-        <motion.div
-          initial={false}
-          animate={{ width: isOpen ? "100%" : "50%" }}
-          style={{
-            position: "absolute",
-            right: "0",
-            height: "100vh",
-            top: "0",
-          }}
-        >
+        </Box>
+        <Box height={"100vh"} flex="1">
           {props.children}
-        </motion.div>
-      </Box>
+        </Box>
+      </Flex>
     </Box>
   );
 }

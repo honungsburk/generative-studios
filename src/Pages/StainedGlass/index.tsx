@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sketch from "react-p5";
 import p5Types from "p5";
 import * as Algorithm from "./Algorithm";
@@ -19,6 +19,7 @@ import {
   Radio,
   Select,
   Switch,
+  Flex,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
@@ -47,6 +48,15 @@ export default function StainedGlass() {
     setHeight(p5.windowHeight);
     p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
   };
+
+  useEffect(() => {
+    document.body.style.scrollBehavior = "hidden";
+
+    return () => {
+      document.body.style.scrollBehavior = "auto";
+    };
+  });
+
   return (
     <Drawer
       drawer={
@@ -75,17 +85,18 @@ export default function StainedGlass() {
 
 function Sidebar(props: { width: number; tuneProps: TuneProps }) {
   return (
-    <VStack alignItems={"left"} width={`${props.width}px`} height="100%">
+    <Flex
+      alignItems={"left"}
+      width={`${props.width}px`}
+      height="100vh"
+      direction={"column"}
+      overflow={"hidden"}
+    >
       <Heading fontSize={28} m={4}>
         Stained Glass
       </Heading>
 
-      <Tabs
-        size="md"
-        colorScheme={"blackAlpha"}
-        variant="brutalist"
-        height="100%"
-      >
+      <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist" flex="1">
         <TabList>
           <Tab>
             <Icon.Tune boxSize={6} />
@@ -94,18 +105,16 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
             <Icon.Home boxSize={6} />
           </Tab>
         </TabList>
-        <Box position="relative" overflowY={"scroll"} height="100%">
-          <TabPanels>
-            <TabPanel>
-              <TuneTab {...props.tuneProps} />
-            </TabPanel>
-            <TabPanel>
-              <p>two!</p>
-            </TabPanel>
-          </TabPanels>
-        </Box>
+        <TabPanels>
+          <TabPanel overflowY={"scroll"} height="100vh" padding={0}>
+            <TuneTab {...props.tuneProps} />
+          </TabPanel>
+          <TabPanel overflowY={"scroll"} height="100vh">
+            <p>two!</p>
+          </TabPanel>
+        </TabPanels>
       </Tabs>
-    </VStack>
+    </Flex>
   );
 }
 
@@ -121,14 +130,6 @@ function TuneTab(props: TuneProps): JSX.Element {
 
   return (
     <VStack align={"left"}>
-      <GradiantDisplay
-        width={300}
-        height={20}
-        colorFn={(t: number) => [t, t, t, 255]}
-        start={0}
-        end={255}
-      />
-      <CosineColorInput width={300} height={100} bgColor="blackAlpha.200" />
       <HStack>
         <IconButton
           variant={"brutalist"}
