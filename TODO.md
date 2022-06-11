@@ -3,26 +3,27 @@
 ## 1.0.0
 
 - [ ] GUI Styling
-  - [ ] Light/Dark mode
   - [ ] Custom components
-- [ ] Fullscreen support
+  - [ ] Color scheme
 - [ ] About page
-- [ ] License page
 - [ ] Social Media links
 - [ ] Mobile GUI
-- [ ] Performance when redering
-
+- [ x ] Performance when redering
 - [ ] Project Info Page
-- [ ] Encode variables in URL
+- [ x ] Encode variables in URL
+- [ ] navigate home
 
 ## 1.1.0
 
+- [ ] Cos Color Component
+- [ ] Fullscreen support
 - [ ] AlgoMarble
   - [ ] Port AlgoMarble to the web
   - [ ] Add Audio
 
 ## 1.2.0
 
+- [ ] License page
 - [ ] MOTION
   - [ ] Port Motion to the web
   - [ ] Add Audio
