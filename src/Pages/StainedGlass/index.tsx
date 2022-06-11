@@ -73,11 +73,6 @@ export default function StainedGlass() {
     }
   }, []);
 
-  // const windowResized = (p5: p5Types) => {
-  //   setHeight(p5.windowHeight);
-  //   p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
-  // };
-
   return (
     <Drawer
       onOpen={() => setSidebarWidth(400)}
