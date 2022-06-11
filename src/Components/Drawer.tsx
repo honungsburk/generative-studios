@@ -33,20 +33,13 @@ export default function Drawer(props: DrawerProps): JSX.Element {
     }
   }, [hidden]);
 
-  // const buttonCss: any = {
-  //   overflowX: "hidden",
-  //   animation: isOpen
-  //     ? `${forwardAnimation} 0.2s linear forwards`
-  //     : `${reverseAnimation} 0.2s linear forwards`,
-  // };
-
   return (
     <Box h="100vh">
       <IconButton
         {...getButtonProps()}
         position={"absolute"}
         top={4}
-        right={4}
+        left={isOpen ? 80 : 4}
         aria-label="Expand"
         icon={isOpen ? <Icon.CaretLeft /> : <Icon.CaretRight />}
         zIndex={100}

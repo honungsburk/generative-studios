@@ -35,13 +35,10 @@ import Info from "src/Components/Info";
 import * as ArtLink from "src/Libraries/ArtLink";
 import { useSearchParams } from "react-router-dom";
 
-const initSeed = Algorithm.generateSeed();
-const initSettings = Algorithm.generateSettings(initSeed);
-
-// TODO: add ResizeObserver
-
 export default function StainedGlass() {
-  const [settings, setSettings] = React.useState(initSettings);
+  const [settings, setSettings] = React.useState(() =>
+    Algorithm.generateSettings(Algorithm.generateSeed())
+  );
   const [sidebarWidth, setSidebarWidth] = React.useState(400);
   const [canvasWidth, setCanvasWidth] = React.useState(400);
   const [canvasHeight, setCanvasHeight] = React.useState(400);
@@ -110,6 +107,16 @@ export default function StainedGlass() {
         maxHeight={"100vh"}
         maxWidth="100%"
       >
+        <IconButton
+          position="absolute"
+          top={4}
+          right={4}
+          aria-label="Random Seed"
+          icon={<Icon.Random />}
+          onClick={() =>
+            setSettings(Algorithm.generateSettings(Algorithm.generateSeed()))
+          }
+        />
         <Sketch
           setup={Algorithm.setup(canvasWidth, canvasHeight)}
           draw={Algorithm.draw()(settings, canvasWidth, canvasHeight)}
@@ -118,16 +125,6 @@ export default function StainedGlass() {
       </Box>
     </Drawer>
   );
-}
-
-{
-  /* <IconButton
-variant={"brutalist"}
-colorScheme={"blackAlpha"}
-aria-label="Random Seed"
-icon={<Icon.Random />}
-onClick={() => props.setSeed(Algorithm.generateSeed())}
-/> */
 }
 
 function Sidebar(props: { width: number; tuneProps: TuneProps }) {
