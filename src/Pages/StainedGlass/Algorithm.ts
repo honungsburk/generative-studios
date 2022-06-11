@@ -64,9 +64,9 @@ export const setup =
   };
 
 export const draw = () => {
-  const lastSettings: Settings | undefined = undefined;
-  const lastWidth: number = 0;
-  const lastHeight: number = 0;
+  let lastSettings: Settings | undefined = undefined;
+  let lastWidth: number = 0;
+  let lastHeight: number = 0;
 
   return (settings: Settings, width: number, height: number) =>
     (p5: p5Types) => {
@@ -76,6 +76,9 @@ export const draw = () => {
         width !== lastWidth ||
         height !== lastHeight
       ) {
+        lastSettings = settings;
+        lastWidth = width;
+        lastHeight = height;
         /**
          * We start by defining some pre-requisites for the split triangle algorithm.
          * An immediate problem occurs: an image is a rectangle but our algorithm can only
