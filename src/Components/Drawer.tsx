@@ -13,14 +13,25 @@ import * as Icon from "./Icon";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Theme from "src/Theme";
+import React from "react";
 export type DrawerProps = {
   drawer?: React.ReactElement | React.ReactElement[];
   children?: React.ReactElement | React.ReactElement[];
+  onOpen?: () => void;
+  onClose?: () => void;
 };
 
 export default function Drawer(props: DrawerProps): JSX.Element {
   const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure();
-  const [hidden, setHidden] = useState(!isOpen);
+  const [hidden, setHidden] = useState(isOpen);
+
+  React.useEffect(() => {
+    if (hidden) {
+      props.onClose && props.onClose();
+    } else {
+      props.onOpen && props.onOpen();
+    }
+  }, [hidden]);
 
   // const buttonCss: any = {
   //   overflowX: "hidden",
@@ -48,7 +59,7 @@ export default function Drawer(props: DrawerProps): JSX.Element {
         >
           {props.drawer}
         </Box>
-        <Box height={"100vh"} flex="1">
+        <Box height={"100vh"} flex="1" overflowY={"hidden"}>
           {props.children}
         </Box>
       </Flex>

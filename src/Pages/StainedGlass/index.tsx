@@ -30,6 +30,7 @@ import GradiantDisplay from "src/Components/GradiantDisplay";
 import Folder from "src/Components/Folder";
 import Drawer from "src/Components/Drawer";
 import Slider from "src/Components/Slider";
+import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -41,29 +42,48 @@ export default function StainedGlass() {
   const [settings, setSettings] = React.useState(initSettings);
   const [height, setHeight] = React.useState(0);
 
-  // TODO: make dynamic!
-  const sidebarWidth = 0;
+  const sidebarWidthRef = React.useRef;
+  const [sidebarWidth, setSidebarWidth] = React.useState(400);
+  const [canvasWidth, setCanvasWidth] = React.useState(400);
+  const [canvasHeight, setCanvasHeight] = React.useState(400);
 
-  const windowResized = (p5: p5Types) => {
-    setHeight(p5.windowHeight);
-    p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
-  };
+  useNoBodyOverflow();
 
-  // To prevent the body element from overflowing when the content of the sidebar
-  // becomes to large
   useEffect(() => {
-    document.body.style.scrollBehavior = "hidden";
+    const canvasWrapper = document.getElementById("wrapped-canvas-resizer");
+    const canvases = document.getElementsByClassName("p5Canvas");
+    const canvas = canvases.item(0) as HTMLCanvasElement | null;
 
-    return () => {
-      document.body.style.scrollBehavior = "auto";
-    };
-  });
+    if (canvasWrapper && canvas) {
+      const resize = () => {
+        setCanvasHeight(canvasWrapper.clientHeight);
+        setCanvasWidth(canvasWrapper.clientWidth);
+        canvas.width = canvasWrapper.clientWidth;
+        canvas.height = canvasWrapper.clientHeight;
+        canvas.style.width = `${canvasWrapper.clientWidth}px`;
+        canvas.style.height = `${canvasWrapper.clientHeight}px`;
+      };
+
+      resize();
+      const observer = new ResizeObserver(resize);
+      observer.observe(canvasWrapper);
+
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  // const windowResized = (p5: p5Types) => {
+  //   setHeight(p5.windowHeight);
+  //   p5.resizeCanvas(p5.windowWidth - sidebarWidth, p5.windowHeight);
+  // };
 
   return (
     <Drawer
+      onOpen={() => setSidebarWidth(400)}
+      onClose={() => setSidebarWidth(0)}
       drawer={
         <Sidebar
-          width={400}
+          width={sidebarWidth}
           tuneProps={{
             seed: seed,
             setSeed: setSeed,
@@ -73,14 +93,19 @@ export default function StainedGlass() {
         />
       }
     >
-      <Box backgroundColor={"red.500"} width="100%" height={"100%"}>
-        <Text>Hello, World!</Text>
+      <Box
+        id="wrapped-canvas-resizer"
+        width={"100%"}
+        height="100vh"
+        maxHeight={"100vh"}
+        maxWidth="100%"
+      >
+        <Sketch
+          setup={Algorithm.setup(canvasWidth, canvasHeight)}
+          draw={Algorithm.draw()(seed, settings, canvasWidth, canvasHeight)}
+          // windowResized={windowResized}
+        />
       </Box>
-      {/* <Sketch
-        setup={Algorithm.setup(sidebarWidth)}
-        draw={Algorithm.draw(seed, settings)}
-        windowResized={windowResized}
-      /> */}
     </Drawer>
   );
 }
