@@ -59,6 +59,7 @@ export default function Folder(props: FolderProps): JSX.Element {
         cursor={"pointer"}
         borderTop={borderTop}
         pt={2}
+        px={2}
         onClick={setFlag.toggle}
       >
         <Text pointerEvents="none" fontSize={fontSize} fontWeight={fontWeight}>
@@ -74,7 +75,7 @@ export default function Folder(props: FolderProps): JSX.Element {
           <Info boxSize={iconSize}>{props.info}</Info>
         </HStack>
       </Flex>
-      <Box width={"100%"} px={2} style={{ display: flag ? "block" : "none" }}>
+      <Box width={"100%"} p={2} style={{ display: flag ? "block" : "none" }}>
         {props.children}
       </Box>
     </VStack>
