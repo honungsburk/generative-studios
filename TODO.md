@@ -46,6 +46,7 @@
   - [ ] Twitter
   - [ ] Phone
   - [ ] Custom
+- [ ] Creating gifs showing going through the artworks
 
 ## 1.5.0 Social Media
 
