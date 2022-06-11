@@ -31,6 +31,7 @@ import Folder from "src/Components/Folder";
 import Drawer from "src/Components/Drawer";
 import Slider from "src/Components/Slider";
 import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
+import Info from "src/Components/Info";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -157,24 +158,30 @@ function TuneTab(props: TuneProps): JSX.Element {
 
   return (
     <VStack align={"left"}>
-      <HStack>
-        <IconButton
-          variant={"brutalist"}
-          colorScheme={"blackAlpha"}
-          aria-label="Random Seed"
-          icon={<Icon.Random />}
-          onClick={() => props.setSeed(Algorithm.generateSeed())}
-        />
-        <Input
-          variant="brutalist"
-          colorScheme={"blackAlpha"}
-          placeholder="Seed"
-          value={props.seed}
-          onChange={(e) => {
-            props.setSeed(e.target.value);
-          }}
-        />
-      </HStack>
+      <VStack pt={2} px={2} align={"left"}>
+        <Text fontWeight={"bold"}>Seed</Text>
+        <HStack>
+          <IconButton
+            variant={"brutalist"}
+            colorScheme={"blackAlpha"}
+            aria-label="Random Seed"
+            icon={<Icon.Random />}
+            onClick={() => props.setSeed(Algorithm.generateSeed())}
+          />
+          <Input
+            variant="brutalist"
+            colorScheme={"blackAlpha"}
+            placeholder="Seed"
+            value={props.seed}
+            onChange={(e) => {
+              props.setSeed(e.target.value);
+            }}
+          />
+          <Info boxSize={4}>
+            Generate a random 'Stained Glass' artwork using a given seed
+          </Info>
+        </HStack>
+      </VStack>
       <Folder
         label="Splitting Strategy"
         info="Determines how a triangle is split into two new triangles"
