@@ -32,6 +32,8 @@ import Drawer from "src/Components/Drawer";
 import Slider from "src/Components/Slider";
 import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
 import Info from "src/Components/Info";
+import * as ArtLink from "src/Libraries/ArtLink";
+import { useSearchParams } from "react-router-dom";
 
 const initSeed = Algorithm.generateSeed();
 const initSettings = Algorithm.generateSettings(initSeed);
@@ -39,17 +41,31 @@ const initSettings = Algorithm.generateSettings(initSeed);
 // TODO: add ResizeObserver
 
 export default function StainedGlass() {
-  const [seed, setSeed] = React.useState(initSeed);
   const [settings, setSettings] = React.useState(initSettings);
-  const [height, setHeight] = React.useState(0);
-
-  const sidebarWidthRef = React.useRef;
   const [sidebarWidth, setSidebarWidth] = React.useState(400);
   const [canvasWidth, setCanvasWidth] = React.useState(400);
   const [canvasHeight, setCanvasHeight] = React.useState(400);
 
   useNoBodyOverflow();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const configBase64 = searchParams.get("artwork");
+    if (configBase64) {
+      const config = ArtLink.decode(configBase64);
+      // TODO: add a typecheck here!
+      if (config) {
+        setSettings(config);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setSearchParams({ version: "1", artwork: ArtLink.encode(settings) });
+  }, [settings]);
+
+  // TODO: create hook for this effect
   useEffect(() => {
     const canvasWrapper = document.getElementById("wrapped-canvas-resizer");
     const canvases = document.getElementsByClassName("p5Canvas");
@@ -81,8 +97,6 @@ export default function StainedGlass() {
         <Sidebar
           width={sidebarWidth}
           tuneProps={{
-            seed: seed,
-            setSeed: setSeed,
             settings: settings,
             setSettings: setSettings,
           }}
@@ -98,12 +112,22 @@ export default function StainedGlass() {
       >
         <Sketch
           setup={Algorithm.setup(canvasWidth, canvasHeight)}
-          draw={Algorithm.draw()(seed, settings, canvasWidth, canvasHeight)}
+          draw={Algorithm.draw()(settings, canvasWidth, canvasHeight)}
           // windowResized={windowResized}
         />
       </Box>
     </Drawer>
   );
+}
+
+{
+  /* <IconButton
+variant={"brutalist"}
+colorScheme={"blackAlpha"}
+aria-label="Random Seed"
+icon={<Icon.Random />}
+onClick={() => props.setSeed(Algorithm.generateSeed())}
+/> */
 }
 
 function Sidebar(props: { width: number; tuneProps: TuneProps }) {
@@ -142,8 +166,6 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
 }
 
 type TuneProps = {
-  setSeed: (seed: string) => void;
-  seed: string;
   settings: Algorithm.Settings;
   setSettings: (settings: Algorithm.Settings) => void;
 };
@@ -153,30 +175,6 @@ function TuneTab(props: TuneProps): JSX.Element {
 
   return (
     <VStack align={"left"}>
-      <VStack pt={2} px={2} align={"left"}>
-        <Text fontWeight={"bold"}>Seed</Text>
-        <HStack>
-          <IconButton
-            variant={"brutalist"}
-            colorScheme={"blackAlpha"}
-            aria-label="Random Seed"
-            icon={<Icon.Random />}
-            onClick={() => props.setSeed(Algorithm.generateSeed())}
-          />
-          <Input
-            variant="brutalist"
-            colorScheme={"blackAlpha"}
-            placeholder="Seed"
-            value={props.seed}
-            onChange={(e) => {
-              props.setSeed(e.target.value);
-            }}
-          />
-          <Info boxSize={4}>
-            Generate a random 'Stained Glass' artwork using a given seed
-          </Info>
-        </HStack>
-      </VStack>
       <Folder
         label="Splitting Strategy"
         info="Determines how a triangle is split into two new triangles"

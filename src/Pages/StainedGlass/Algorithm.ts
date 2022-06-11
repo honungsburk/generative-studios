@@ -3,6 +3,7 @@ import Point2D from "./Point2D";
 import Triangle from "./Triangle";
 import p5Types from "p5";
 import * as Palette from "../../Libraries/P5Extra/Palette";
+import * as ArtLink from "src/Libraries/ArtLink";
 
 // P5.js Hooks
 
@@ -18,6 +19,7 @@ export function generateSeed(): string {
  * Settings you can play with to influence the algorithm
  */
 export type Settings = {
+  seed: string;
   splittingStrategy: SplitStrategy;
   depthStrategy: DepthStrategy;
   distStrategy: DistanceStrategy;
@@ -34,6 +36,7 @@ export type Settings = {
 export function generateSettings(seed: string): Settings {
   let rng = new RNG(seed);
   return {
+    seed: seed,
     splittingStrategy: generateSplitStrat(rng),
     depthStrategy: generateDepthStrategy(rng),
     distStrategy: generateDistStrategy(rng),
@@ -61,16 +64,14 @@ export const setup =
   };
 
 export const draw = () => {
-  const lastSeed: string | undefined = undefined;
   const lastSettings: Settings | undefined = undefined;
   const lastWidth: number = 0;
   const lastHeight: number = 0;
 
-  return (seed: string, settings: Settings, width: number, height: number) =>
+  return (settings: Settings, width: number, height: number) =>
     (p5: p5Types) => {
       // Only update if any dependency has changed
       if (
-        lastSeed !== seed ||
         lastSettings !== settings ||
         width !== lastWidth ||
         height !== lastHeight
@@ -91,7 +92,7 @@ export const draw = () => {
         let t1 = new Triangle(a, b, c);
         let t2 = new Triangle(d, b, c);
 
-        let rng = new RNG(seed);
+        let rng = new RNG(settings.seed);
 
         let split_strat = getSplitStratFn(rng, settings.splittingStrategy);
         let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
@@ -121,7 +122,7 @@ export const draw = () => {
          * to the correct state when it builds the image and draws the tree.
          */
         if (settings.symmetry) {
-          rng = new RNG(seed);
+          rng = new RNG(settings.seed);
           split_strat = getSplitStratFn(rng, settings.splittingStrategy);
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
           dist_strat = getDistStrategyFn(settings.distStrategy);
