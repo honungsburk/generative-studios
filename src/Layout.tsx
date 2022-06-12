@@ -15,7 +15,7 @@ import * as Icon from "src/Components/Icon";
 export default function Layout() {
   return (
     <Box>
-      <HStack position="absolute" top={4} right={4}>
+      <HStack position="fixed" top={4} right={4}>
         <Menu>
           <MenuButton
             as={Button}
