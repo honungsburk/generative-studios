@@ -7,7 +7,7 @@
   - [ ] Custom components
   - [ ] Color scheme
 - [ x ] About page
-- [ ] Social Media links
+- [ x ] Social Media links
 - [ ] Mobile GUI
 - [ x ] Performance when redering
 - [ ] Project Info Page

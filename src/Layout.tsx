@@ -15,10 +15,20 @@ import * as Icon from "src/Components/Icon";
 export default function Layout() {
   return (
     <Box>
-      <HStack position="fixed" top={4} right={4}>
+      <HStack
+        position="fixed"
+        top={4}
+        right={4}
+        bg={"background.light"}
+        py={1}
+        px={2}
+        rounded={8}
+      >
         <Menu>
           <MenuButton
             as={Button}
+            variant="brutalist-ghost"
+            colorScheme={"blackAlpha"}
             rightIcon={<Icon.CaretDown />}
             aria-label="Social Media Links"
           >
@@ -54,7 +64,13 @@ export default function Layout() {
             </Link>
           </MenuList>
         </Menu>
-        <IconButtonLink to="/home" aria-label="Home" icon={<Icon.Home />} />
+        <IconButtonLink
+          variant="brutalist-ghost"
+          colorScheme={"blackAlpha"}
+          to="/home"
+          aria-label="Home"
+          icon={<Icon.Home />}
+        />
       </HStack>
       <Outlet />
     </Box>
