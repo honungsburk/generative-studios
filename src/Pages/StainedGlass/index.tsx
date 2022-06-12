@@ -26,7 +26,6 @@ import About from "./About";
 
 export default function StainedGlass() {
   const hasSidebar = useBreakpointValue({ md: true, base: false });
-  console.log(hasSidebar);
   const [isOpen, setIsOpen] = useBoolean(false);
 
   const [settings, setSettings] = React.useState(() =>
@@ -135,6 +134,8 @@ function Sidebar(props: {
   tuneProps: TuneTabProps;
   close: () => void;
 }) {
+  const totalHeight = 116; //headerHeight + tabListHeight + 32; // add margin as well
+
   return (
     <Flex
       alignItems={"left"}
@@ -164,11 +165,14 @@ function Sidebar(props: {
             <Icon.Home boxSize={6} />
           </Tab>
         </TabList>
-        <TabPanels>
-          <TabPanel overflowY={"scroll"} height="100vh" padding={0}>
+        <TabPanels
+          style={{ height: `calc(100vh - ${totalHeight}px)` }}
+          overflowY={"auto"}
+        >
+          <TabPanel padding={0}>
             <TuneTab {...props.tuneProps} />
           </TabPanel>
-          <TabPanel overflowY={"scroll"} height="100vh">
+          <TabPanel>
             <About />
           </TabPanel>
         </TabPanels>
