@@ -10,7 +10,14 @@ import * as Palette from "src/Libraries/P5Extra/Palette";
 import CoordinateInput from "src/Components/CoordinateInput";
 import Folder from "src/Components/Folder";
 import Slider from "src/Components/Slider";
+
+// Algorithm Imports
 import * as Algorithm from "./Algorithm";
+import * as DepthStrategy from "./Algorithm/Strategy/Depth";
+import * as DistanceStrategy from "./Algorithm/Strategy/Distance";
+import * as JitterStrategy from "./Algorithm/Strategy/Jitter";
+import * as PaletteStrategy from "./Algorithm/Strategy/Palette";
+import * as SplitStrategy from "./Algorithm/Strategy/Split";
 
 export type TuneTabProps = {
   settings: Algorithm.Settings;
@@ -33,11 +40,11 @@ export function TuneTab(props: TuneTabProps): JSX.Element {
           value={props.settings.splittingStrategy}
         >
           <VStack direction="row" align={"left"}>
-            <Radio value={Algorithm.SPLITRANDOM}>Split Randomly</Radio>
-            <Radio value={Algorithm.SPLITRANDOMBALANCED}>
+            <Radio value={SplitStrategy.SPLITRANDOM}>Split Randomly</Radio>
+            <Radio value={SplitStrategy.SPLITRANDOMBALANCED}>
               Split Randomly (Balanced)
             </Radio>
-            <Radio value={Algorithm.SPLITMIDDLE}>Split Middle</Radio>
+            <Radio value={SplitStrategy.SPLITMIDDLE}>Split Middle</Radio>
           </VStack>
         </RadioGroup>
       </Folder>
@@ -119,8 +126,8 @@ export function TuneTab(props: TuneTabProps): JSX.Element {
 }
 
 function DepthStrat(props: {
-  strategy: Algorithm.DepthStrategy;
-  setStrategy: (strat: Algorithm.DepthStrategy) => void;
+  strategy: DepthStrategy.DepthStrategy;
+  setStrategy: (strat: DepthStrategy.DepthStrategy) => void;
 }) {
   let extraOptions = <></>;
 
@@ -137,7 +144,7 @@ function DepthStrat(props: {
           setValue={(p) => {
             const copy = {
               ...props.strategy,
-            } as Algorithm.FlipDepthStrategy;
+            } as DepthStrategy.FlipDepthStrategy;
             copy.p = p;
             props.setStrategy(copy);
           }}
@@ -152,7 +159,7 @@ function DepthStrat(props: {
           setValue={(depth) => {
             const copy = {
               ...props.strategy,
-            } as Algorithm.FlipDepthStrategy;
+            } as DepthStrategy.FlipDepthStrategy;
             copy.depth = depth;
             props.setStrategy(copy);
           }}
@@ -171,7 +178,7 @@ function DepthStrat(props: {
         setValue={(depth) => {
           const copy = {
             ...props.strategy,
-          } as Algorithm.InheritedDepthStrategy;
+          } as DepthStrategy.InheritedDepthStrategy;
           copy.depth = depth;
           props.setStrategy(copy);
         }}
@@ -189,7 +196,7 @@ function DepthStrat(props: {
         setValue={(maxDepth) => {
           const copy = {
             ...props.strategy,
-          } as Algorithm.MaxDepthStrategy;
+          } as DepthStrategy.MaxDepthStrategy;
           copy.maxDepth = maxDepth;
           props.setStrategy(copy);
         }}
@@ -203,16 +210,18 @@ function DepthStrat(props: {
         variant="filled"
         onChange={(strat) => {
           props.setStrategy(
-            Algorithm.getDepthStrategy(strat.target.value as any)
+            DepthStrategy.getDepthStrategy(strat.target.value as any)
           );
         }}
         value={props.strategy.kind}
       >
-        <option value={Algorithm.MaxDepthStrategy(9).kind}>Max Depth</option>
-        <option value={Algorithm.FlipDepthStrategy(0.03, 5).kind}>
+        <option value={DepthStrategy.MaxDepthStrategy(9).kind}>
+          Max Depth
+        </option>
+        <option value={DepthStrategy.FlipDepthStrategy(0.03, 5).kind}>
           Coin Flip Depth
         </option>
-        <option value={Algorithm.InheritedDepthStrategy(4).kind}>
+        <option value={DepthStrategy.InheritedDepthStrategy(4).kind}>
           Inherited Depth
         </option>
       </Select>
@@ -222,8 +231,8 @@ function DepthStrat(props: {
 }
 
 function DistanceStrat(props: {
-  strategy: Algorithm.DistanceStrategy;
-  setStrategy: (strat: Algorithm.DistanceStrategy) => void;
+  strategy: DistanceStrategy.DistanceStrategy;
+  setStrategy: (strat: DistanceStrategy.DistanceStrategy) => void;
 }) {
   const size = 200;
   return (
@@ -232,14 +241,14 @@ function DistanceStrat(props: {
         variant="filled"
         onChange={(strat) => {
           props.setStrategy(
-            Algorithm.getDistanceStrategy(strat.target.value as any)
+            DistanceStrategy.getDistanceStrategy(strat.target.value as any)
           );
         }}
         value={props.strategy.kind}
       >
-        <option value={Algorithm.XCentroid.kind}>X-Axis</option>
-        <option value={Algorithm.YCentroid.kind}>Y-Axis</option>
-        <option value={Algorithm.DistToPoint(0.5, 0.5).kind}>
+        <option value={DistanceStrategy.XCentroid.kind}>X-Axis</option>
+        <option value={DistanceStrategy.YCentroid.kind}>Y-Axis</option>
+        <option value={DistanceStrategy.DistToPoint(0.5, 0.5).kind}>
           Distance To Point
         </option>
       </Select>
@@ -251,7 +260,7 @@ function DistanceStrat(props: {
           onPosition={(x: number, y: number) => {
             const copy = {
               ...props.strategy,
-            } as Algorithm.DistanceToPointStrategy;
+            } as DistanceStrategy.DistanceToPointStrategy;
             copy.x = x / size;
             copy.y = y / size;
             props.setStrategy(copy);
