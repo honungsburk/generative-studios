@@ -5,13 +5,16 @@
 - [ ] GUI Styling
   - [ ] Custom components
   - [ ] Color scheme
-- [ ] About page
+- [ x ] About page
 - [ ] Social Media links
 - [ ] Mobile GUI
 - [ x ] Performance when redering
 - [ ] Project Info Page
 - [ x ] Encode variables in URL
-- [ ] navigate home
+  - [ ] make encodings fit into twitter (<200chars)
+- [ x ] navigate home
+- [ ] Fix flickering
+- [ x ] Remove unused algorithm
 
 ## 1.1.0
 
@@ -31,6 +34,7 @@
 
 ## 1.3.0 Saving Works
 
+- [ ] Add a heart tab
 - [ ] Save settings of pieces you have discovered and be able to browse them
   - [ ] store them locally
   - [ ] Page to view and filter/search them
