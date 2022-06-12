@@ -160,7 +160,6 @@ export const draw = () => {
          * to the correct state when it builds the image and draws the tree.
          */
         if (settings.symmetry) {
-          console.log("symmetric");
           rng = new RNG(settings.seed);
           split_strat = getSplitStratFn(rng, settings.splittingStrategy);
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
