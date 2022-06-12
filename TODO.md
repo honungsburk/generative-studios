@@ -8,14 +8,18 @@
   - [ ] Color scheme
 - [ x ] About page
 - [ x ] Social Media links
-- [ ] Mobile GUI
+- [ x ] Mobile GUI
+  - [ x ] Hide side bar
+  - [ x ] Fix canvas size...
 - [ x ] Performance when redering
-- [ ] Project Info Page
+- [ x ] Project Info Page
 - [ x ] Encode variables in URL
   - [ ] make encodings fit into twitter (<200chars)
 - [ x ] navigate home
 - [ ] Fix flickering
 - [ x ] Remove unused algorithm
+- [ ] don't throw error on touch event + scroll
+- [ ] deploy
 
 ## 1.1.0
 
