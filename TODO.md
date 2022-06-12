@@ -1,6 +1,6 @@
 # TODO
 
-## 1.0.0
+## 0.1.0
 
 - [ ] Icon
 - [ ] GUI Styling
@@ -19,17 +19,20 @@
 - [ ] Fix flickering
 - [ x ] Remove unused algorithm
 - [ ] don't throw error on touch event + scroll
-- [ ] deploy
+- [ x ] deploy
 
-## 1.1.0
+## 0.2.0
 
+- [ ] Start using immutable datastructures
+- [ ] pull out code into helper hooks...
+- [ ] Show tip on click...
 - [ ] Cos Color Component
 - [ ] Fullscreen support
 - [ ] AlgoMarble
   - [ ] Port AlgoMarble to the web
   - [ ] Add Audio
 
-## 1.2.0
+## 0.3.0
 
 - [ ] License page
 - [ ] MOTION
@@ -37,14 +40,14 @@
   - [ ] Add Audio
 - [ ] Generate Art Settings
 
-## 1.3.0 Saving Works
+## 0.4.0 Saving Works
 
 - [ ] Add a heart tab
 - [ ] Save settings of pieces you have discovered and be able to browse them
   - [ ] store them locally
   - [ ] Page to view and filter/search them
 
-## 1.4.0 Saving Works
+## 0.5.0 Saving Works
 
 - [ ] Save canvas
   - [ ] Save as png
@@ -57,7 +60,7 @@
   - [ ] Custom
 - [ ] Creating gifs showing going through the artworks
 
-## 1.5.0 Social Media
+## 0.6.0 Social Media
 
 - [ ] Fix Auto/Quick Sharing
   - [ ] Facebook
