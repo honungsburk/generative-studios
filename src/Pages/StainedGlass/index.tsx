@@ -1,43 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Sketch from "react-p5";
-import p5Types from "p5";
 import * as Algorithm from "./Algorithm";
 import {
-  Text,
-  VStack,
-  HStack,
   Tabs,
   TabList,
   Tab,
   TabPanels,
   TabPanel,
   Heading,
-  Input,
   IconButton,
   Box,
-  RadioGroup,
-  Radio,
-  Select,
-  Switch,
   Flex,
   useBoolean,
   Spacer,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
-import * as Palette from "src/Libraries/P5Extra/Palette";
-import * as MathExtra from "src/Libraries/MathExtra";
-import CoordinateInput from "src/Components/CoordinateInput";
-import CosineColorInput from "src/Components/CosineColorInput";
-import GradiantDisplay from "src/Components/GradiantDisplay";
-import Folder from "src/Components/Folder";
-import Slider from "src/Components/Slider";
-import Info from "src/Components/Info";
 import Drawer from "src/Components/Drawer";
 import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
 import * as ArtLink from "src/Libraries/ArtLink";
 import { useSearchParams } from "react-router-dom";
 import Hidden from "src/Components/Hidden";
 import { TuneTabProps, TuneTab } from "./TuneTab";
+import About from "./About";
 
 export default function StainedGlass() {
   const [isOpen, setIsOpen] = useBoolean(false);
@@ -182,7 +166,7 @@ function Sidebar(props: {
             <TuneTab {...props.tuneProps} />
           </TabPanel>
           <TabPanel overflowY={"scroll"} height="100vh">
-            <p>two!</p>
+            <About />
           </TabPanel>
         </TabPanels>
       </Tabs>
