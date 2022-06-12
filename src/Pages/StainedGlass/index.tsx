@@ -13,7 +13,7 @@ import {
   Flex,
   useBoolean,
   Spacer,
-  Link,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import Drawer from "src/Components/Drawer";
@@ -23,9 +23,10 @@ import { useSearchParams } from "react-router-dom";
 import Hidden from "src/Components/Hidden";
 import { TuneTabProps, TuneTab } from "./TuneTab";
 import About from "./About";
-import IconButtonLink from "src/Components/IconButtonLink";
 
 export default function StainedGlass() {
+  const hasSidebar = useBreakpointValue({ md: true, base: false });
+  console.log(hasSidebar);
   const [isOpen, setIsOpen] = useBoolean(false);
 
   const [settings, setSettings] = React.useState(() =>
@@ -79,7 +80,7 @@ export default function StainedGlass() {
 
   return (
     <Drawer
-      isOpen={isOpen}
+      isOpen={isOpen && hasSidebar}
       drawer={
         <Sidebar
           close={setIsOpen.off}
@@ -98,7 +99,7 @@ export default function StainedGlass() {
         maxHeight={"100vh"}
         maxWidth="100%"
       >
-        <Hidden isHidden={isOpen}>
+        <Hidden isHidden={isOpen || !hasSidebar}>
           <IconButton
             position="absolute"
             top={4}
