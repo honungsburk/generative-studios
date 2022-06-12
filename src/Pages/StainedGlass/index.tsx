@@ -109,15 +109,6 @@ export default function StainedGlass() {
           />
         </Hidden>
 
-        <IconButtonLink
-          to="/home"
-          position="absolute"
-          top={4}
-          right={4}
-          aria-label="Home"
-          icon={<Icon.Home />}
-        />
-
         <IconButton
           position="absolute"
           bottom={4}

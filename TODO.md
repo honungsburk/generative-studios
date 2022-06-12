@@ -2,6 +2,7 @@
 
 ## 1.0.0
 
+- [ ] Icon
 - [ ] GUI Styling
   - [ ] Custom components
   - [ ] Color scheme

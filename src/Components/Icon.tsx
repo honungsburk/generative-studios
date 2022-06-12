@@ -10,6 +10,10 @@ import {
   AiFillCaretUp,
   AiFillCaretLeft,
   AiFillCaretRight,
+  AiFillGithub,
+  AiFillYoutube,
+  AiFillTwitterCircle,
+  AiFillInstagram,
 } from "react-icons/ai";
 
 import {
@@ -24,6 +28,30 @@ import {
   MdInfo,
   MdRefresh,
 } from "react-icons/md";
+
+import { CgWebsite } from "react-icons/cg";
+
+// Social Media
+
+export function Github(props: IconProps) {
+  return <Icon {...props} as={AiFillGithub} />;
+}
+
+export function Twitter(props: IconProps) {
+  return <Icon {...props} as={AiFillTwitterCircle} />;
+}
+
+export function Youtube(props: IconProps) {
+  return <Icon {...props} as={AiFillYoutube} />;
+}
+
+export function Instagram(props: IconProps) {
+  return <Icon {...props} as={AiFillInstagram} />;
+}
+
+export function Website(props: IconProps) {
+  return <Icon {...props} as={CgWebsite} />;
+}
 
 // Menu
 
