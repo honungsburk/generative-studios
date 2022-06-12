@@ -17,36 +17,15 @@ import React from "react";
 export type DrawerProps = {
   drawer?: React.ReactElement | React.ReactElement[];
   children?: React.ReactElement | React.ReactElement[];
-  onOpen?: () => void;
-  onClose?: () => void;
+  isOpen?: boolean;
 };
 
 export default function Drawer(props: DrawerProps): JSX.Element {
-  const { getButtonProps, getDisclosureProps, isOpen } = useDisclosure();
-  const [hidden, setHidden] = useState(isOpen);
-
-  React.useEffect(() => {
-    if (hidden) {
-      props.onClose && props.onClose();
-    } else {
-      props.onOpen && props.onOpen();
-    }
-  }, [hidden]);
-
   return (
     <Box h="100vh">
-      <IconButton
-        {...getButtonProps()}
-        position={"absolute"}
-        top={4}
-        left={isOpen ? 80 : 4}
-        aria-label="Expand"
-        icon={isOpen ? <Icon.CaretLeft /> : <Icon.CaretRight />}
-        zIndex={100}
-      />
       <Flex>
         <Box
-          display={isOpen ? "block" : "none"}
+          display={props.isOpen ? "block" : "none"}
           bgColor="background.light"
           maxHeight={"100vh"}
         >

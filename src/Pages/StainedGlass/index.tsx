@@ -20,6 +20,8 @@ import {
   Select,
   Switch,
   Flex,
+  useBoolean,
+  Spacer,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import * as Palette from "src/Libraries/P5Extra/Palette";
@@ -34,12 +36,15 @@ import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
 import Info from "src/Components/Info";
 import * as ArtLink from "src/Libraries/ArtLink";
 import { useSearchParams } from "react-router-dom";
+import Hidden from "src/Components/Hidden";
 
 export default function StainedGlass() {
+  const [isOpen, setIsOpen] = useBoolean(false);
+
   const [settings, setSettings] = React.useState(() =>
     Algorithm.generateSettings(Algorithm.generateSeed())
   );
-  const [sidebarWidth, setSidebarWidth] = React.useState(400);
+  // const [sidebarWidth, setSidebarWidth] = React.useState(400);
   const [canvasWidth, setCanvasWidth] = React.useState(400);
   const [canvasHeight, setCanvasHeight] = React.useState(400);
 
@@ -88,11 +93,13 @@ export default function StainedGlass() {
 
   return (
     <Drawer
-      onOpen={() => setSidebarWidth(400)}
-      onClose={() => setSidebarWidth(0)}
+      // onOpen={() => setSidebarWidth(400)}
+      // onClose={() => setSidebarWidth(0)}
+      isOpen={isOpen}
       drawer={
         <Sidebar
-          width={sidebarWidth}
+          close={setIsOpen.off}
+          width={400}
           tuneProps={{
             settings: settings,
             setSettings: setSettings,
@@ -107,6 +114,17 @@ export default function StainedGlass() {
         maxHeight={"100vh"}
         maxWidth="100%"
       >
+        <Hidden isHidden={isOpen}>
+          <IconButton
+            position="absolute"
+            top={4}
+            left={4}
+            aria-label="Open Side bar"
+            icon={<Icon.Right />}
+            onClick={() => setIsOpen.on()}
+          />
+        </Hidden>
+
         <IconButton
           position="absolute"
           top={4}
@@ -127,7 +145,11 @@ export default function StainedGlass() {
   );
 }
 
-function Sidebar(props: { width: number; tuneProps: TuneProps }) {
+function Sidebar(props: {
+  width: number;
+  tuneProps: TuneProps;
+  close: () => void;
+}) {
   return (
     <Flex
       alignItems={"left"}
@@ -136,9 +158,17 @@ function Sidebar(props: { width: number; tuneProps: TuneProps }) {
       direction={"column"}
       overflow={"hidden"}
     >
-      <Heading fontSize={28} m={4}>
-        Stained Glass
-      </Heading>
+      <Flex align={"center"} m={4}>
+        <Heading fontSize={28}>Stained Glass</Heading>
+        <Spacer />
+        <IconButton
+          variant={"brutalist-ghost"}
+          colorScheme="blackAlpha"
+          aria-label="Close Side bar"
+          icon={<Icon.Left />}
+          onClick={() => props.close()}
+        />
+      </Flex>
 
       <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist" flex="1">
         <TabList>
