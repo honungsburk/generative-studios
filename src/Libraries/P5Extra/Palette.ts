@@ -129,41 +129,38 @@ export const complimentary =
     ];
   };
 
-export type CosinePalette = {
-  red: CosineColor;
-  green: CosineColor;
-  blue: CosineColor;
-  mode: ConsineMode;
-};
+export namespace Cosine {
+  export type Palette = {
+    red: Color;
+    green: Color;
+    blue: Color;
+    mode: Mode;
+  };
 
-export type CosineColor = {
-  a: number;
-  b: number;
-  c: number;
-  d: number;
-};
+  export type Color = {
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+  };
 
-export type ConsineMode = "MOD" | "SMOOTH";
+  export type Mode = "MOD" | "SMOOTH";
 
-/**
- * {
- *      red: {a: 0.5, b: 0.5, c: 1, d: 0},
- *      green: {a: 0.5, b: 0.5, c: 1, d: 0.33},
- *      blue: {a: 0.5, b: 0.5, c: 1, d: 0.67},
- * }
- *
- * @param {json} param0
- * @param {string} mode can be either "MOD" or "SMOOTH"/undefined
- * @returns a function that is a continuous color palette
- */
-export const cosine_palette =
-  (p5: p5Types) =>
-  (
-    red: CosineColor,
-    green: CosineColor,
-    blue: CosineColor,
-    mode: ConsineMode
-  ) => {
+  /**
+   * {
+   *      red: {a: 0.5, b: 0.5, c: 1, d: 0},
+   *      green: {a: 0.5, b: 0.5, c: 1, d: 0.33},
+   *      blue: {a: 0.5, b: 0.5, c: 1, d: 0.67},
+   * }
+   *
+   * @param {json} param0
+   * @param {string} mode can be either "MOD" or "SMOOTH"/undefined
+   * @returns a function that is a continuous color palette
+   */
+  export const apply = (p5: p5Types) => (palette: Palette) => {
+    const red = palette.red;
+    const green = palette.green;
+    const blue = palette.blue;
     let red_color = MathExtra.cosine(red.a, red.b, red.c, red.d);
     let green_color = MathExtra.cosine(green.a, green.b, green.c, green.d);
     let blue_color = MathExtra.cosine(blue.a, blue.b, blue.c, blue.d);
@@ -174,7 +171,7 @@ export const cosine_palette =
       let b = blue_color(t);
 
       // Creates a nice cut effect where we jump between colors
-      if (mode !== undefined && mode.toUpperCase() === "MOD") {
+      if (palette.mode !== undefined && palette.mode.toUpperCase() === "MOD") {
         r = MathExtra.mod(r, 1);
         g = MathExtra.mod(g, 1);
         b = MathExtra.mod(b, 1);
@@ -187,29 +184,4 @@ export const cosine_palette =
       return p5.color(p5.floor(r * 256), p5.floor(g * 256), p5.floor(b * 256));
     };
   };
-
-/**
- *
- * @param {Color} c1
- * @param {Color} c2
- * @returns returns a function that performs a cos interpolation between the two colors
- */
-// export const cos_gradient =   (p5: p5Types) => (c1: p5Types.Color, c2: p5Types.Color) => {
-//   let rgbf = function (t: number) {
-//     let w = 0.5 + 0.5 * Math.cos((t * p5.PI) / 2);
-//     let r = c1.getRed() * w + c2.getRed() * (1 - w);
-//     let g = c1.getGreen() * w + c2.getGreen() * (1 - w);
-//     let b = c1.getBlue() * w + c2.getBlue() * (1 - w);
-//     let c = p5.color(r, g, b);
-//     return c;
-//   };
-
-//   if (c1.mode === "rgb") {
-//     return rgbf;
-//   } else {
-//     throw Error(
-//       "Colors or not in RGB mode. Please finish implementation. Color mode: " +
-//         c1.mode
-//     );
-//   }
-// }
+}

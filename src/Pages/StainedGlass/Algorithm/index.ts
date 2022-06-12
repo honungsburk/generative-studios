@@ -69,7 +69,7 @@ export type Settings = {
   depthStrategy: DepthStrategy;
   distStrategy: DistanceStrategy;
   jitter: number;
-  palette: Palette.CosinePalette;
+  palette: Palette.Cosine.Palette;
   symmetry: boolean;
 };
 
@@ -136,12 +136,7 @@ export const draw = () => {
         let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
         let dist_strat = getDistStrategyFn(settings.distStrategy);
         let jitter = genJitterFn(rng, settings.jitter);
-        let palette = Palette.cosine_palette(p5)(
-          settings.palette.red,
-          settings.palette.green,
-          settings.palette.blue,
-          settings.palette.mode
-        );
+        let palette = Palette.Cosine.apply(p5)(settings.palette);
 
         // Construct the upper triangle of the image
         let st1 = new SmartTree(t1, split_strat, depth_strat, 0);
@@ -165,12 +160,7 @@ export const draw = () => {
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
           dist_strat = getDistStrategyFn(settings.distStrategy);
           jitter = genJitterFn(rng, settings.jitter);
-          palette = Palette.cosine_palette(p5)(
-            settings.palette.red,
-            settings.palette.green,
-            settings.palette.blue,
-            settings.palette.mode
-          );
+          palette = Palette.Cosine.apply(p5)(settings.palette);
         }
 
         // Construct the lower triangle of the image

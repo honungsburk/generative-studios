@@ -276,8 +276,8 @@ function DistanceStrat(props: {
 }
 
 function CosinePalette(props: {
-  palette: Palette.CosinePalette;
-  setPalette: (palette: Palette.CosinePalette) => void;
+  palette: Palette.Cosine.Palette;
+  setPalette: (palette: Palette.Cosine.Palette) => void;
 }) {
   const colorPicker = (key: "red" | "green" | "blue") => {
     return (
@@ -295,12 +295,12 @@ function CosinePalette(props: {
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.CosineColor;
+            } as Palette.Cosine.Color;
             colorCopy.a = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.CosinePalette;
+            } as Palette.Cosine.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -315,12 +315,12 @@ function CosinePalette(props: {
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.CosineColor;
+            } as Palette.Cosine.Color;
             colorCopy.b = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.CosinePalette;
+            } as Palette.Cosine.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -335,12 +335,12 @@ function CosinePalette(props: {
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.CosineColor;
+            } as Palette.Cosine.Color;
             colorCopy.c = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.CosinePalette;
+            } as Palette.Cosine.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -355,12 +355,12 @@ function CosinePalette(props: {
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.CosineColor;
+            } as Palette.Cosine.Color;
             colorCopy.d = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.CosinePalette;
+            } as Palette.Cosine.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -377,8 +377,8 @@ function CosinePalette(props: {
       </Text>
       <RadioGroup
         onChange={(newMode) => {
-          const newSettings = { ...props.palette } as Palette.CosinePalette;
-          newSettings.mode = newMode as Palette.ConsineMode;
+          const newSettings = { ...props.palette } as Palette.Cosine.Palette;
+          newSettings.mode = newMode as Palette.Cosine.Mode;
           props.setPalette(newSettings);
         }}
         value={props.palette.mode}
