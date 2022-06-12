@@ -20,6 +20,8 @@
 - [ x ] Remove unused algorithm
 - [ ] don't throw error on touch event + scroll
 - [ x ] deploy
+- [ ] Add tests to catch regressions in art code...
+- [ ] Fix symmetry not working?
 
 ## 0.2.0
 

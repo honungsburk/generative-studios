@@ -33,7 +33,6 @@ export default function StainedGlass() {
   );
   const [canvasWidth, setCanvasWidth] = React.useState(400);
   const [canvasHeight, setCanvasHeight] = React.useState(400);
-
   useNoBodyOverflow();
 
   const [searchParams, setSearchParams] = useSearchParams();
