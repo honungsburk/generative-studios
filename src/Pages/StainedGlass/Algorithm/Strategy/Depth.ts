@@ -9,6 +9,7 @@ export type DepthStrategy =
   | MaxDepthStrategy
   | FlipDepthStrategy
   | InheritedDepthStrategy;
+
 export type MaxDepthStrategy = {
   kind: "Max Depth";
   maxDepth: number;
