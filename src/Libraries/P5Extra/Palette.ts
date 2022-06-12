@@ -79,7 +79,7 @@ export const triad = (p5: p5Types) => (H: number, S: number, V: number) => {
     p5.color(H, S, V),
     p5.color(H + ((360 / 3) % 360), S, V),
     p5.color((H + (2 * 360) / 3) % 360, S, V),
-  ];
+  ] as [p5Types.Color, p5Types.Color, p5Types.Color];
 };
 
 /**
@@ -94,7 +94,7 @@ export const analogous = (p5: p5Types) => (H: number, S: number, V: number) => {
     p5.color(H, S, V),
     p5.color(H - 30 / 3, S, V),
     p5.color(H + 30, S, V),
-  ];
+  ] as [p5Types.Color, p5Types.Color, p5Types.Color];
 };
 
 /**
@@ -111,7 +111,7 @@ export const tetrad = (p5: p5Types) => (H: number, S: number, V: number) => {
     p5.color(H - shift, S, V),
     p5.color(H + (shift % 360), S, V),
     p5.color(H + ((shift * 2) % 360), S, V),
-  ];
+  ] as [p5Types.Color, p5Types.Color, p5Types.Color, p5Types.Color];
 };
 
 /**
@@ -123,7 +123,10 @@ export const tetrad = (p5: p5Types) => (H: number, S: number, V: number) => {
  */
 export const complimentary =
   (p5: p5Types) => (H: number, S: number, V: number) => {
-    return [p5.color(H, S, V), p5.color((H + 180) % 360, S, V)];
+    return [p5.color(H, S, V), p5.color((H + 180) % 360, S, V)] as [
+      p5Types.Color,
+      p5Types.Color
+    ];
   };
 
 export type CosinePalette = {
