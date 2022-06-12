@@ -13,6 +13,7 @@ import {
   Flex,
   useBoolean,
   Spacer,
+  Link,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
 import Drawer from "src/Components/Drawer";
@@ -22,6 +23,7 @@ import { useSearchParams } from "react-router-dom";
 import Hidden from "src/Components/Hidden";
 import { TuneTabProps, TuneTab } from "./TuneTab";
 import About from "./About";
+import IconButtonLink from "src/Components/IconButtonLink";
 
 export default function StainedGlass() {
   const [isOpen, setIsOpen] = useBoolean(false);
@@ -107,9 +109,18 @@ export default function StainedGlass() {
           />
         </Hidden>
 
-        <IconButton
+        <IconButtonLink
+          to="/home"
           position="absolute"
           top={4}
+          right={4}
+          aria-label="Home"
+          icon={<Icon.Home />}
+        />
+
+        <IconButton
+          position="absolute"
+          bottom={4}
           right={4}
           aria-label="Random Seed"
           icon={<Icon.Random />}
