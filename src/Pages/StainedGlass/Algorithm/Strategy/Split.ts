@@ -1,6 +1,11 @@
 import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
+import * as P from "parsimmon";
+
+////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////
 
 export type Tactic = (triangle: Triangle) => [Triangle, Triangle];
 
@@ -12,6 +17,10 @@ export type Strategy =
   | "Split Random"
   | "Split Random Balanced"
   | "Split Middle";
+
+////////////////////////////////////////////////////////////////////////////////
+// Core
+////////////////////////////////////////////////////////////////////////////////
 
 export function factory(rng: RNG, strat: Strategy): Tactic {
   switch (strat) {
@@ -31,6 +40,36 @@ export function generate(rng: RNG): Strategy {
     { weight: 1, value: "Split Random Balanced" },
   ]);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// encoding
+////////////////////////////////////////////////////////////////////////////////
+
+export const encode = (strat: Strategy) => {
+  if (strat === RANDOM) {
+    return "1";
+  } else if (strat === RANDOM_BALANCED) {
+    return "2";
+  } else {
+    return "3";
+  }
+};
+
+export const decode: P.Parser<Strategy> = P.digit.chain((d) => {
+  if (d === "1") {
+    return P.succeed(RANDOM);
+  } else if (d === "2") {
+    return P.succeed(RANDOM_BALANCED);
+  } else if (d === "3") {
+    return P.succeed(MIDDLE);
+  } else {
+    return P.fail(`${d} is not a valid Split.Strategy`);
+  }
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// Execution
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  *
