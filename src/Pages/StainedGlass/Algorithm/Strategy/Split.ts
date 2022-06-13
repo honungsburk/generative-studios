@@ -2,21 +2,18 @@ import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
 
-export type SplitStrategyFn = (triangle: Triangle) => [Triangle, Triangle];
+export type Tactic = (triangle: Triangle) => [Triangle, Triangle];
 
-export const SPLITRANDOM: SplitStrategy = "Split Random";
-export const SPLITRANDOMBALANCED: SplitStrategy = "Split Random Balanced";
-export const SPLITMIDDLE: SplitStrategy = "Split Middle";
+export const RANDOM: Strategy = "Split Random";
+export const RANDOM_BALANCED: Strategy = "Split Random Balanced";
+export const MIDDLE: Strategy = "Split Middle";
 
-export type SplitStrategy =
+export type Strategy =
   | "Split Random"
   | "Split Random Balanced"
   | "Split Middle";
 
-export function getSplitStratFn(
-  rng: RNG,
-  strat: SplitStrategy
-): SplitStrategyFn {
+export function factory(rng: RNG, strat: Strategy): Tactic {
   switch (strat) {
     case "Split Random":
       return split_random(rng);
@@ -27,7 +24,7 @@ export function getSplitStratFn(
   }
 }
 
-export function generateSplitStrat(rng: RNG): SplitStrategy {
+export function generate(rng: RNG): Strategy {
   return rng.pickFromWeightedList([
     { weight: 1, value: "Split Random" },
     { weight: 2, value: "Split Random Balanced" },
@@ -41,7 +38,7 @@ export function generateSplitStrat(rng: RNG): SplitStrategy {
  *
  * @param {json} triangle
  */
-const split_middle: SplitStrategyFn = (triangle) => {
+const split_middle: Tactic = (triangle) => {
   //find the longest side
   let origin = new Point2D(0, 0);
   let lab = triangle.a.minus(triangle.b).distance_to(origin);
@@ -78,7 +75,7 @@ const split_middle: SplitStrategyFn = (triangle) => {
  * @param {RNG} rng
  * @returns
  */
-const split_random: (rng: RNG) => SplitStrategyFn = (rng) => (triangle) => {
+const split_random: (rng: RNG) => Tactic = (rng) => (triangle) => {
   let cut = rng.truncated_gaussian(0.5, 1, 0.1, 0.9);
   let choice = rng.random();
   if (choice < 1 / 3) {
@@ -112,34 +109,33 @@ const split_random: (rng: RNG) => SplitStrategyFn = (rng) => (triangle) => {
  * @param {RNG} rng
  * @returns
  */
-const split_random_balanced: (rng: RNG) => SplitStrategyFn =
-  (rng) => (triangle) => {
-    let cut = rng.truncated_gaussian(0.5, 1, 0.1, 0.9);
-    //find the longest side
-    let origin = new Point2D(0, 0);
-    let lab = triangle.a.minus(triangle.b).distance_to(origin);
-    let lac = triangle.a.minus(triangle.c).distance_to(origin);
-    let lbc = triangle.b.minus(triangle.c).distance_to(origin);
+const split_random_balanced: (rng: RNG) => Tactic = (rng) => (triangle) => {
+  let cut = rng.truncated_gaussian(0.5, 1, 0.1, 0.9);
+  //find the longest side
+  let origin = new Point2D(0, 0);
+  let lab = triangle.a.minus(triangle.b).distance_to(origin);
+  let lac = triangle.a.minus(triangle.c).distance_to(origin);
+  let lbc = triangle.b.minus(triangle.c).distance_to(origin);
 
-    if (lab > lac && lab > lbc) {
-      let d = triangle.a.minus(triangle.b).scale(cut).add(triangle.b);
-      return [
-        new Triangle(triangle.c, triangle.a, d),
-        new Triangle(triangle.c, triangle.b, d),
-      ];
-    }
-
-    if (lac > lab && lac > lbc) {
-      let d = triangle.a.minus(triangle.c).scale(cut).add(triangle.c);
-      return [
-        new Triangle(triangle.b, triangle.a, d),
-        new Triangle(triangle.b, triangle.c, d),
-      ];
-    }
-    let d = triangle.b.minus(triangle.c).scale(cut).add(triangle.c);
-    //find the middle point on the other side
+  if (lab > lac && lab > lbc) {
+    let d = triangle.a.minus(triangle.b).scale(cut).add(triangle.b);
     return [
-      new Triangle(triangle.a, triangle.b, d),
-      new Triangle(triangle.a, triangle.c, d),
+      new Triangle(triangle.c, triangle.a, d),
+      new Triangle(triangle.c, triangle.b, d),
     ];
-  };
+  }
+
+  if (lac > lab && lac > lbc) {
+    let d = triangle.a.minus(triangle.c).scale(cut).add(triangle.c);
+    return [
+      new Triangle(triangle.b, triangle.a, d),
+      new Triangle(triangle.b, triangle.c, d),
+    ];
+  }
+  let d = triangle.b.minus(triangle.c).scale(cut).add(triangle.c);
+  //find the middle point on the other side
+  return [
+    new Triangle(triangle.a, triangle.b, d),
+    new Triangle(triangle.a, triangle.c, d),
+  ];
+};

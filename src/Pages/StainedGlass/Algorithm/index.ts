@@ -12,12 +12,7 @@ import {
   getDistStrategyFn,
 } from "./Strategy/Distance";
 import { genJitterFn, JitterFn } from "./Strategy/Jitter";
-import {
-  generateSplitStrat,
-  getSplitStratFn,
-  SplitStrategy,
-  SplitStrategyFn,
-} from "./Strategy/Split";
+import { generate, factory, Strategy, Tactic } from "./Strategy/Split";
 import {
   DepthStrategy,
   DepthStrategyFn,
@@ -47,7 +42,7 @@ export function generateSettings(seed: string): Settings {
   let rng = new RNG(seed);
   return {
     seed: seed,
-    splittingStrategy: generateSplitStrat(rng),
+    splittingStrategy: generate(rng),
     depthStrategy: generateDepthStrategy(rng),
     distStrategy: generateDistStrategy(rng),
     jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
@@ -65,7 +60,7 @@ export function generateSettings(seed: string): Settings {
  */
 export type Settings = {
   seed: string;
-  splittingStrategy: SplitStrategy;
+  splittingStrategy: Strategy;
   depthStrategy: DepthStrategy;
   distStrategy: DistanceStrategy;
   jitter: number;
@@ -132,7 +127,7 @@ export const draw = () => {
 
         let rng = new RNG(settings.seed);
 
-        let split_strat = getSplitStratFn(rng, settings.splittingStrategy);
+        let split_strat = factory(rng, settings.splittingStrategy);
         let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
         let dist_strat = getDistStrategyFn(settings.distStrategy);
         let jitter = genJitterFn(rng, settings.jitter);
@@ -156,7 +151,7 @@ export const draw = () => {
          */
         if (settings.symmetry) {
           rng = new RNG(settings.seed);
-          split_strat = getSplitStratFn(rng, settings.splittingStrategy);
+          split_strat = factory(rng, settings.splittingStrategy);
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
           dist_strat = getDistStrategyFn(settings.distStrategy);
           jitter = genJitterFn(rng, settings.jitter);
@@ -234,13 +229,13 @@ function draw_color_leaf(
 class SmartTree {
   children: SmartTree[] = [];
   triangle: Triangle;
-  split_strategy: SplitStrategyFn;
+  split_strategy: Tactic;
   depth_strategy: DepthStrategyFn;
   depth: number;
 
   constructor(
     triangle: Triangle,
-    split_strategy: SplitStrategyFn,
+    split_strategy: Tactic,
     depth_strategy: DepthStrategyFn,
     depth: number
   ) {

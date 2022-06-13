@@ -40,11 +40,11 @@ export function TuneTab(props: TuneTabProps): JSX.Element {
           value={props.settings.splittingStrategy}
         >
           <VStack direction="row" align={"left"}>
-            <Radio value={SplitStrategy.SPLITRANDOM}>Split Randomly</Radio>
-            <Radio value={SplitStrategy.SPLITRANDOMBALANCED}>
+            <Radio value={SplitStrategy.RANDOM}>Split Randomly</Radio>
+            <Radio value={SplitStrategy.RANDOM_BALANCED}>
               Split Randomly (Balanced)
             </Radio>
-            <Radio value={SplitStrategy.SPLITMIDDLE}>Split Middle</Radio>
+            <Radio value={SplitStrategy.MIDDLE}>Split Middle</Radio>
           </VStack>
         </RadioGroup>
       </Folder>
