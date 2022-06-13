@@ -22,19 +22,30 @@ export type Strategy =
 // Core
 ////////////////////////////////////////////////////////////////////////////////
 
-export function factory(rng: RNG, strat: Strategy): Tactic {
-  switch (strat) {
+/**
+ *
+ * @param prng the psuedo random number generator
+ * @param strategy the strategy to create the tactic from
+ * @returns a specific Split.Tactic
+ */
+export function factory(prng: RNG, strategy: Strategy): Tactic {
+  switch (strategy) {
     case "Split Random":
-      return split_random(rng);
+      return split_random(prng);
     case "Split Random Balanced":
-      return split_random_balanced(rng);
+      return split_random_balanced(prng);
     case "Split Middle":
       return split_middle;
   }
 }
 
-export function generate(rng: RNG): Strategy {
-  return rng.pickFromWeightedList([
+/**
+ *
+ * @param prng the psuedo random number generator
+ * @returns a random strategy
+ */
+export function generate(prng: RNG): Strategy {
+  return prng.pickFromWeightedList([
     { weight: 1, value: "Split Random" },
     { weight: 2, value: "Split Random Balanced" },
     { weight: 1, value: "Split Random Balanced" },
@@ -45,6 +56,11 @@ export function generate(rng: RNG): Strategy {
 // encoding
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * This encoding must be as small as possible so we can store it in the URL
+ *
+ * Encode a Split.Strategy value
+ */
 export const encode = (strat: Strategy) => {
   if (strat === RANDOM) {
     return "1";
@@ -55,6 +71,11 @@ export const encode = (strat: Strategy) => {
   }
 };
 
+/**
+ * This encoding must be as small as possible so we can store it in the URL
+ *
+ * Decode a Split.Strategy value
+ */
 export const decode: P.Parser<Strategy> = P.digit.chain((d) => {
   if (d === "1") {
     return P.succeed(RANDOM);
