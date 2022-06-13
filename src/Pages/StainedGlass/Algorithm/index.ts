@@ -5,14 +5,9 @@ import p5Types from "p5";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as P from "parsimmon";
 
-import {
-  DistanceStrategy,
-  DistanceStrategyFn,
-  generateDistStrategy,
-  getDistStrategyFn,
-} from "./Strategy/Distance";
+import * as Distance from "./Strategy/Distance";
 import { genJitterFn, JitterFn } from "./Strategy/Jitter";
-import { generate, factory, Strategy, Tactic } from "./Strategy/Split";
+import * as Split from "./Strategy/Split";
 import {
   DepthStrategy,
   DepthStrategyFn,
@@ -42,9 +37,9 @@ export function generateSettings(seed: string): Settings {
   let rng = new RNG(seed);
   return {
     seed: seed,
-    splittingStrategy: generate(rng),
+    splittingStrategy: Split.generate(rng),
     depthStrategy: generateDepthStrategy(rng),
-    distStrategy: generateDistStrategy(rng),
+    distStrategy: Distance.generate(rng),
     jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
     palette: generatePalette(rng),
     symmetry: rng.bernoulli(0.3),
@@ -60,9 +55,9 @@ export function generateSettings(seed: string): Settings {
  */
 export type Settings = {
   seed: string;
-  splittingStrategy: Strategy;
+  splittingStrategy: Split.Strategy;
   depthStrategy: DepthStrategy;
-  distStrategy: DistanceStrategy;
+  distStrategy: Distance.Strategy.Type;
   jitter: number;
   palette: Palette.Cosine.Palette;
   symmetry: boolean;
@@ -127,9 +122,9 @@ export const draw = () => {
 
         let rng = new RNG(settings.seed);
 
-        let split_strat = factory(rng, settings.splittingStrategy);
+        let split_strat = Split.factory(rng, settings.splittingStrategy);
         let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
-        let dist_strat = getDistStrategyFn(settings.distStrategy);
+        let dist_strat = Distance.factory(settings.distStrategy);
         let jitter = genJitterFn(rng, settings.jitter);
         let palette = Palette.Cosine.apply(p5)(settings.palette);
 
@@ -151,9 +146,9 @@ export const draw = () => {
          */
         if (settings.symmetry) {
           rng = new RNG(settings.seed);
-          split_strat = factory(rng, settings.splittingStrategy);
+          split_strat = Split.factory(rng, settings.splittingStrategy);
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
-          dist_strat = getDistStrategyFn(settings.distStrategy);
+          dist_strat = Distance.factory(settings.distStrategy);
           jitter = genJitterFn(rng, settings.jitter);
           palette = Palette.Cosine.apply(p5)(settings.palette);
         }
@@ -170,10 +165,6 @@ export const draw = () => {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Split Strategy
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
 // Draw
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -183,7 +174,7 @@ export const draw = () => {
  * @param {RNG} rng the random number generator
  * @param {number} size_x the pixel size of the final image in the x direction
  * @param {number} size_y the pixel size of the final image in the y direction
- * @param {DistanceStrategyFn} distance the function used to calculate the distance which decides the color
+ * @param {Tactic} distance the function used to calculate the distance which decides the color
  * @param {JitterFn} jitter adds jitter to the distance
  * @param {*} palette call back that given a number spits out a color
  * @param {Color} strokeColor given a color returns a color
@@ -192,7 +183,7 @@ export const draw = () => {
  */
 function draw_color_leaf(
   p5: p5Types,
-  distance: DistanceStrategyFn,
+  distance: Distance.Tactic,
   jitter: JitterFn,
   palette: (t: number) => p5Types.Color,
   width: number,
@@ -229,13 +220,13 @@ function draw_color_leaf(
 class SmartTree {
   children: SmartTree[] = [];
   triangle: Triangle;
-  split_strategy: Tactic;
+  split_strategy: Split.Tactic;
   depth_strategy: DepthStrategyFn;
   depth: number;
 
   constructor(
     triangle: Triangle,
-    split_strategy: Tactic,
+    split_strategy: Split.Tactic,
     depth_strategy: DepthStrategyFn,
     depth: number
   ) {

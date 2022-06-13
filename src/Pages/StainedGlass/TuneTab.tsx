@@ -231,8 +231,8 @@ function DepthStrat(props: {
 }
 
 function DistanceStrat(props: {
-  strategy: DistanceStrategy.DistanceStrategy;
-  setStrategy: (strat: DistanceStrategy.DistanceStrategy) => void;
+  strategy: DistanceStrategy.Strategy.Type;
+  setStrategy: (strat: DistanceStrategy.Strategy.Type) => void;
 }) {
   const size = 200;
   return (
@@ -241,14 +241,16 @@ function DistanceStrat(props: {
         variant="filled"
         onChange={(strat) => {
           props.setStrategy(
-            DistanceStrategy.getDistanceStrategy(strat.target.value as any)
+            DistanceStrategy.Kind.toStrategy(
+              strat.target.value as DistanceStrategy.Kind.Type
+            )
           );
         }}
         value={props.strategy.kind}
       >
-        <option value={DistanceStrategy.XCentroid.kind}>X-Axis</option>
-        <option value={DistanceStrategy.YCentroid.kind}>Y-Axis</option>
-        <option value={DistanceStrategy.DistToPoint(0.5, 0.5).kind}>
+        <option value={DistanceStrategy.Kind.XCentroid}>X-Axis</option>
+        <option value={DistanceStrategy.Kind.YCentroid}>Y-Axis</option>
+        <option value={DistanceStrategy.Kind.DistanceToPoint}>
           Distance To Point
         </option>
       </Select>
@@ -260,7 +262,7 @@ function DistanceStrat(props: {
           onPosition={(x: number, y: number) => {
             const copy = {
               ...props.strategy,
-            } as DistanceStrategy.DistanceToPointStrategy;
+            } as DistanceStrategy.Strategy.DistanceToPoint;
             copy.x = x / size;
             copy.y = y / size;
             props.setStrategy(copy);

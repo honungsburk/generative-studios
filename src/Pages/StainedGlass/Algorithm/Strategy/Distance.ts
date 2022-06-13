@@ -1,44 +1,66 @@
 import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
+import * as P from "parsimmon";
+import * as PExtra from "src/Libraries/ParsimmonExtra";
 
-export type DistanceStrategyFn = (triangle: Triangle) => number;
+////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////
 
-export const XCentroid: DistanceStrategy = { kind: "X Centroid" };
-export const YCentroid: DistanceStrategy = { kind: "Y Centroid" };
-export const DistToPoint: (x: number, y: number) => DistanceStrategy = (
-  x,
-  y
-) => {
-  return { kind: "Dist to Point", x: x, y: y };
-};
+export type Tactic = (triangle: Triangle) => number;
 
-export function getDistanceStrategy(
-  kind: "X Centroid" | "Y Centroid" | "Dist to Point"
-): DistanceStrategy {
-  switch (kind) {
-    case "X Centroid":
-      return XCentroid;
-    case "Y Centroid":
-      return YCentroid;
-    case "Dist to Point":
-      return DistToPoint(Math.random(), Math.random());
+export namespace Kind {
+  // Types
+  export type Type = XCentroid | YCentroid | DistanceToPoint;
+  export type XCentroid = "X Centroid";
+  export type YCentroid = "Y Centroid";
+  export type DistanceToPoint = "Dist to Point";
+  // Constructors
+  export const XCentroid: XCentroid = "X Centroid";
+  export const YCentroid: YCentroid = "Y Centroid";
+  export const DistanceToPoint: DistanceToPoint = "Dist to Point";
+  //
+  export function toStrategy(
+    kind: "X Centroid" | "Y Centroid" | "Dist to Point"
+  ): Strategy.Type {
+    switch (kind) {
+      case "X Centroid":
+        return Strategy.XCentroid;
+      case "Y Centroid":
+        return Strategy.YCentroid;
+      case "Dist to Point":
+        return Strategy.DistanceToPoint(0.5, 0.5);
+    }
   }
 }
+export namespace Strategy {
+  // Types
+  export type Type = XCentroid | YCentroid | DistanceToPoint;
+  export type XCentroid = { kind: Kind.XCentroid };
+  export type YCentroid = { kind: Kind.YCentroid };
+  export type DistanceToPoint = {
+    kind: Kind.DistanceToPoint;
+    x: number;
+    y: number;
+  };
 
-export type DistanceStrategy =
-  | XCentroidStrategy
-  | YCentroidStrategy
-  | DistanceToPointStrategy;
-export type XCentroidStrategy = { kind: "X Centroid" };
-export type YCentroidStrategy = { kind: "Y Centroid" };
-export type DistanceToPointStrategy = {
-  kind: "Dist to Point";
-  x: number;
-  y: number;
-};
+  // Constructors
+  export const XCentroid: XCentroid = { kind: Kind.XCentroid };
+  export const YCentroid: YCentroid = { kind: Kind.YCentroid };
+  export const DistanceToPoint: (x: number, y: number) => DistanceToPoint = (
+    x,
+    y
+  ) => {
+    return { kind: Kind.DistanceToPoint, x: x, y: y };
+  };
+}
 
-export function getDistStrategyFn(strat: DistanceStrategy): DistanceStrategyFn {
+////////////////////////////////////////////////////////////////////////////////
+// Core
+////////////////////////////////////////////////////////////////////////////////
+
+export function factory(strat: Strategy.Type): Tactic {
   switch (strat.kind) {
     case "X Centroid":
       return x_centroid;
@@ -49,21 +71,70 @@ export function getDistStrategyFn(strat: DistanceStrategy): DistanceStrategyFn {
   }
 }
 
-export function generateDistStrategy(rng: RNG): DistanceStrategy {
-  return rng.pickUniform([
-    XCentroid,
-    YCentroid,
-    DistToPoint(rng.random(), rng.random()),
-    DistToPoint(0.5, 0.5),
+export function generate(prng: RNG): Strategy.Type {
+  return prng.pickUniform([
+    Strategy.XCentroid,
+    Strategy.YCentroid,
+    Strategy.DistanceToPoint(prng.random(), prng.random()),
+    Strategy.DistanceToPoint(0.5, 0.5),
   ]);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// encoding
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This encoding must be as small as possible so we can store it in the URL
+ *
+ * Encode a Distance.Strategy value
+ */
+export const encode = (strat: Strategy.Type) => {
+  if (strat.kind === Kind.XCentroid) {
+    return "X";
+  } else if (strat.kind === Kind.YCentroid) {
+    return "Y";
+  } else {
+    return `D${strat.x}:${strat.y}`;
+  }
+};
+
+const xDecoder: P.Parser<Strategy.XCentroid> = P.string("X").map(
+  () => Strategy.XCentroid
+);
+const yDecoder: P.Parser<Strategy.YCentroid> = P.string("Y").map(
+  () => Strategy.YCentroid
+);
+
+const dDecoder: P.Parser<Strategy.DistanceToPoint> = P.seqMap(
+  P.string("D"),
+  PExtra.floating,
+  P.string(":"),
+  PExtra.floating,
+  (_d, x, _v, y) => Strategy.DistanceToPoint(x, y)
+);
+
+/**
+ * This encoding must be as small as possible so we can store it in the URL
+ *
+ * Decode a Distance.Strategy value
+ */
+export const decode: P.Parser<Strategy.Type> = P.alt(
+  xDecoder,
+  yDecoder,
+  dDecoder
+);
+
+////////////////////////////////////////////////////////////////////////////////
+// Impl
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  *
  * @param {triangle} triangle
  * @returns returns the x coordinate of the triangle's centroid
  */
-const x_centroid: DistanceStrategyFn = (triangle) => {
+const x_centroid: Tactic = (triangle) => {
   return triangle.center().x;
 };
 
@@ -72,7 +143,7 @@ const x_centroid: DistanceStrategyFn = (triangle) => {
  * @param {triangle} triangle
  * @returns returns the y coordinate of the triangle's centroid
  */
-const y_centroid: DistanceStrategyFn = (triangle) => {
+const y_centroid: Tactic = (triangle) => {
   return triangle.center().y;
 };
 
@@ -82,7 +153,6 @@ const y_centroid: DistanceStrategyFn = (triangle) => {
  * @returns a function that calculates the euclidean distance between a triangle
  * and the given Point.
  */
-const dist_to_centroid: (other: Point2D) => DistanceStrategyFn =
-  (other) => (triangle) => {
-    return triangle.center().distance_to(other);
-  };
+const dist_to_centroid: (other: Point2D) => Tactic = (other) => (triangle) => {
+  return triangle.center().distance_to(other);
+};

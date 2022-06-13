@@ -1,5 +1,4 @@
 import { expect, test } from "vitest";
-import * as StainedGlassAlg from "src/Pages/StainedGlass/Algorithm";
 import * as Split from "./Split";
 
 test(`Can encode & decode Split.RANDOM`, () => {
