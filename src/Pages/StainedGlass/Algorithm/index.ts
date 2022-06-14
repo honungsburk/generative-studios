@@ -4,16 +4,12 @@ import Triangle from "./Triangle";
 import p5Types from "p5";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as P from "parsimmon";
+import * as PExtra from "src/Libraries/ParsimmonExtra";
 
 import * as Distance from "./Strategy/Distance";
 import { factory, Tactic } from "./Strategy/Jitter";
 import * as Split from "./Strategy/Split";
-import {
-  DepthStrategy,
-  DepthStrategyFn,
-  generateDepthStrategy,
-  getDepthStrategyFn,
-} from "./Strategy/Depth";
+import * as Depth from "./Strategy/Depth";
 import { generatePalette } from "./Strategy/Palette";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +34,7 @@ export function generateSettings(seed: string): Settings {
   return {
     seed: seed,
     splittingStrategy: Split.generate(rng),
-    depthStrategy: generateDepthStrategy(rng),
+    depthStrategy: Depth.generate(rng),
     distStrategy: Distance.generate(rng),
     jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
     palette: generatePalette(rng),
@@ -56,7 +52,7 @@ export function generateSettings(seed: string): Settings {
 export type Settings = {
   seed: string;
   splittingStrategy: Split.Strategy;
-  depthStrategy: DepthStrategy;
+  depthStrategy: Depth.Strategy;
   distStrategy: Distance.Strategy.Type;
   jitter: number;
   palette: Palette.Cosine.Palette;
@@ -64,8 +60,43 @@ export type Settings = {
 };
 
 export function encode(settings: Settings): string {
-  return "";
+  const parts = [
+    settings.seed,
+    Split.encode(settings.splittingStrategy),
+    Depth.encode(settings.depthStrategy),
+    Distance.encode(settings.distStrategy),
+    `${settings.jitter}`,
+    Palette.Cosine.encode(settings.palette),
+    PExtra.booleanE(settings.symmetry),
+  ];
+
+  return parts.join(":");
 }
+
+const decodeSeed: P.Parser<string> = P.regexp(/[a-zA-Z0-9]+/);
+
+function firstP<T>(p: P.Parser<T>): P.Parser<T> {
+  return P.seqMap(p, P.string(","), (v) => v);
+}
+
+export const decode: P.Parser<Settings> = P.seqMap(
+  firstP(decodeSeed),
+  firstP(Split.decode),
+  firstP(Depth.decode),
+  firstP(Distance.decode),
+  firstP(PExtra.floating),
+  firstP(Palette.Cosine.decode),
+  PExtra.booleanP,
+  (seed, split, depth, dist, jitter, color, sym) => ({
+    seed: seed,
+    splittingStrategy: split,
+    depthStrategy: depth,
+    distStrategy: dist,
+    jitter: jitter,
+    palette: color,
+    symmetry: sym,
+  })
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Entry Points
@@ -123,7 +154,7 @@ export const draw = () => {
         let rng = new RNG(settings.seed);
 
         let split_strat = Split.factory(rng, settings.splittingStrategy);
-        let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
+        let depth_strat = settings.depthStrategy.run(rng);
         let dist_strat = Distance.factory(settings.distStrategy);
         let jitter = factory(rng, settings.jitter);
         let palette = Palette.Cosine.apply(p5)(settings.palette);
@@ -147,7 +178,7 @@ export const draw = () => {
         if (settings.symmetry) {
           rng = new RNG(settings.seed);
           split_strat = Split.factory(rng, settings.splittingStrategy);
-          depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
+          depth_strat = settings.depthStrategy.run(rng);
           dist_strat = Distance.factory(settings.distStrategy);
           jitter = factory(rng, settings.jitter);
           palette = Palette.Cosine.apply(p5)(settings.palette);
@@ -221,13 +252,13 @@ class SmartTree {
   children: SmartTree[] = [];
   triangle: Triangle;
   split_strategy: Split.Tactic;
-  depth_strategy: DepthStrategyFn;
+  depth_strategy: Depth.Tactic;
   depth: number;
 
   constructor(
     triangle: Triangle,
     split_strategy: Split.Tactic,
-    depth_strategy: DepthStrategyFn,
+    depth_strategy: Depth.Tactic,
     depth: number
   ) {
     this.triangle = triangle;

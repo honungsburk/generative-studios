@@ -18,7 +18,7 @@ import {
 import * as Icon from "src/Components/Icon";
 import Drawer from "src/Components/Drawer";
 import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
-import * as ArtLink from "src/Libraries/ArtLink";
+import * as Base64 from "src/Libraries/Base64";
 import { useSearchParams } from "react-router-dom";
 import Hidden from "src/Components/Hidden";
 import { TuneTabProps, TuneTab } from "./TuneTab";
@@ -40,7 +40,7 @@ export default function StainedGlass() {
   useEffect(() => {
     const configBase64 = searchParams.get("artwork");
     if (configBase64) {
-      const config = ArtLink.decode(configBase64);
+      const config = Algorithm.decode.tryParse(Base64.decode(configBase64));
       // TODO: add a typecheck here!
       if (config) {
         setSettings(config);
@@ -49,7 +49,10 @@ export default function StainedGlass() {
   }, []);
 
   useEffect(() => {
-    setSearchParams({ version: "1", artwork: ArtLink.encode(settings) });
+    setSearchParams({
+      version: "1",
+      artwork: Base64.encode(Algorithm.encode(settings)),
+    });
   }, [settings]);
 
   // TODO: create hook for this effect

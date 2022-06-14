@@ -1,5 +1,7 @@
 import p5Types from "p5";
 import * as MathExtra from "../MathExtra";
+import * as P from "parsimmon";
+import * as PExtra from "src/Libraries/ParsimmonExtra";
 /**
  * When doing color choices there are a few tips
  *
@@ -145,6 +147,48 @@ export namespace Cosine {
   };
 
   export type Mode = "MOD" | "SMOOTH";
+
+  function encodeMode(mode: Mode): string {
+    return mode === "MOD" ? "M" : "S";
+  }
+
+  const decodeMode: P.Parser<Mode> = P.oneOf("MS").map((s) =>
+    s === "M" ? ("Mod" as Mode) : "SMOOTH"
+  );
+
+  function encodeC(color: Color): string {
+    const parts = [color.a + "", color.b + "", color.c + "", color.d + ""];
+    return parts.join(":");
+  }
+
+  const decodeC: P.Parser<Color> = P.seqMap(
+    PExtra.floating,
+    P.string(":"),
+    PExtra.floating,
+    P.string(":"),
+    PExtra.floating,
+    P.string(":"),
+    PExtra.floating,
+    (a, x, b, y, c, z, d) => ({ a: a, b: b, c: c, d: d })
+  );
+
+  export function encode(palette: Palette): string {
+    return `b${encodeC(palette.blue)}r${encodeC(palette.red)}g${encodeC(
+      palette.green
+    )}:${encodeMode(palette.mode)}`;
+  }
+
+  export const decode: P.Parser<Palette> = P.seqMap(
+    P.string("b"),
+    decodeC,
+    P.string("r"),
+    decodeC,
+    P.string("g"),
+    decodeC,
+    P.string(":"),
+    decodeMode,
+    (x, b, y, r, z, g, v, m) => ({ red: r, green: g, blue: b, mode: m })
+  );
 
   /**
    * {

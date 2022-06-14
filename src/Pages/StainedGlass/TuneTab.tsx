@@ -13,7 +13,7 @@ import Slider from "src/Components/Slider";
 
 // Algorithm Imports
 import * as Algorithm from "./Algorithm";
-import * as DepthStrategy from "./Algorithm/Strategy/Depth";
+import * as Depth from "./Algorithm/Strategy/Depth";
 import * as DistanceStrategy from "./Algorithm/Strategy/Distance";
 import * as JitterStrategy from "./Algorithm/Strategy/Jitter";
 import * as PaletteStrategy from "./Algorithm/Strategy/Palette";
@@ -126,12 +126,13 @@ export function TuneTab(props: TuneTabProps): JSX.Element {
 }
 
 function DepthStrat(props: {
-  strategy: DepthStrategy.DepthStrategy;
-  setStrategy: (strat: DepthStrategy.DepthStrategy) => void;
+  strategy: Depth.Strategy;
+  setStrategy: (strat: Depth.Strategy) => void;
 }) {
   let extraOptions = <></>;
 
-  if (props.strategy.kind === "Flip Depth") {
+  if (Depth.isFlipDepthStrategy(props.strategy)) {
+    const strategy = props.strategy;
     extraOptions = (
       <>
         <Slider
@@ -142,49 +143,39 @@ function DepthStrat(props: {
           max={1}
           step={0.01}
           setValue={(p) => {
-            const copy = {
-              ...props.strategy,
-            } as DepthStrategy.FlipDepthStrategy;
-            copy.p = p;
-            props.setStrategy(copy);
+            props.setStrategy(strategy.update(p));
           }}
         />
         <Slider
           info="The maximum depth that can be flipped"
           label="Depth"
-          value={props.strategy.depth}
+          value={strategy.maxDepth}
           min={1}
           max={7}
           step={1}
           setValue={(depth) => {
-            const copy = {
-              ...props.strategy,
-            } as DepthStrategy.FlipDepthStrategy;
-            copy.depth = depth;
-            props.setStrategy(copy);
+            props.setStrategy(strategy.update(undefined, depth));
           }}
         />
       </>
     );
-  } else if (props.strategy.kind === "Inherited Depth") {
+  } else if (Depth.isInheritedDepthStrategy(props.strategy)) {
+    const strategy = props.strategy;
     extraOptions = (
       <Slider
-        info="The maximum number of times the triangles will be split"
+        info="The minimum number of times the triangles will be split"
         label="Depth"
-        value={props.strategy.depth}
+        value={strategy.minDepth}
         min={1}
         max={4}
         step={1}
         setValue={(depth) => {
-          const copy = {
-            ...props.strategy,
-          } as DepthStrategy.InheritedDepthStrategy;
-          copy.depth = depth;
-          props.setStrategy(copy);
+          props.setStrategy(strategy.update(depth));
         }}
       />
     );
-  } else if (props.strategy.kind === "Max Depth") {
+  } else if (Depth.isMaxDepthStrategy(props.strategy)) {
+    const strategy = props.strategy;
     extraOptions = (
       <Slider
         info="The maximum number of times the triangles will be split"
@@ -194,11 +185,7 @@ function DepthStrat(props: {
         max={12}
         step={1}
         setValue={(maxDepth) => {
-          const copy = {
-            ...props.strategy,
-          } as DepthStrategy.MaxDepthStrategy;
-          copy.maxDepth = maxDepth;
-          props.setStrategy(copy);
+          props.setStrategy(strategy.update(maxDepth));
         }}
       />
     );
@@ -209,21 +196,19 @@ function DepthStrat(props: {
       <Select
         variant="filled"
         onChange={(strat) => {
-          props.setStrategy(
-            DepthStrategy.getDepthStrategy(strat.target.value as any)
-          );
+          if (strat.target.value === Depth.Kind.Max) {
+            props.setStrategy(new Depth.MaxDepthStrategy(7));
+          } else if (strat.target.value === Depth.Kind.Flip) {
+            props.setStrategy(new Depth.FlipDepthStrategy(0.1, 4));
+          } else if (strat.target.value === Depth.Kind.Inherited) {
+            props.setStrategy(new Depth.InheritedDepthStrategy(2));
+          }
         }}
         value={props.strategy.kind}
       >
-        <option value={DepthStrategy.MaxDepthStrategy(9).kind}>
-          Max Depth
-        </option>
-        <option value={DepthStrategy.FlipDepthStrategy(0.03, 5).kind}>
-          Coin Flip Depth
-        </option>
-        <option value={DepthStrategy.InheritedDepthStrategy(4).kind}>
-          Inherited Depth
-        </option>
+        <option value={Depth.Kind.Max}>{Depth.Kind.Max}</option>
+        <option value={Depth.Kind.Flip}>{Depth.Kind.Flip}</option>
+        <option value={Depth.Kind.Inherited}>{Depth.Kind.Inherited}</option>
       </Select>
       {extraOptions}
     </VStack>

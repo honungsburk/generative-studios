@@ -22,6 +22,14 @@
 - [ x ] deploy
 - [ ] Add tests to catch regressions in art code...
 - [ x ] Fix symmetry not working?
+- [ ] A really good object compression parse/decode library
+  - It takes a description of all setters and getters and autogenerates the layout
+  - You should be able to add new keys but they must always be added to the back
+  - Just restrict number of decimals?
+  - compress bools?
+  - we want to give mappings.... from
+  - use enums instead of strings... auto use numbers???
+  - I want to write a bidirectional flow... not specify parser and encoder seperatly
 
 ## 0.2.0
 
