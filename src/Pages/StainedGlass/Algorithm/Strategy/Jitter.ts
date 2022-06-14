@@ -1,6 +1,6 @@
 import { RNG } from "src/Libraries/Random";
 
-export type JitterFn = (val: number) => number;
+export type Tactic = (val: number) => number;
 
 /**
  *
@@ -11,7 +11,7 @@ export type JitterFn = (val: number) => number;
  * @param {number} magnitude number between 0-1
  * @returns a function that jitters its inputs
  */
-export function genJitterFn(rng: RNG, magnitude: number): JitterFn {
+export function factory(rng: RNG, magnitude: number): Tactic {
   return function (val: number) {
     let lower = val - magnitude;
     if (lower < 0) {

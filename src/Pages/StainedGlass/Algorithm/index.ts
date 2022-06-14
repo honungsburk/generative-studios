@@ -6,7 +6,7 @@ import * as Palette from "src/Libraries/P5Extra/Palette";
 import * as P from "parsimmon";
 
 import * as Distance from "./Strategy/Distance";
-import { genJitterFn, JitterFn } from "./Strategy/Jitter";
+import { factory, Tactic } from "./Strategy/Jitter";
 import * as Split from "./Strategy/Split";
 import {
   DepthStrategy,
@@ -125,7 +125,7 @@ export const draw = () => {
         let split_strat = Split.factory(rng, settings.splittingStrategy);
         let depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
         let dist_strat = Distance.factory(settings.distStrategy);
-        let jitter = genJitterFn(rng, settings.jitter);
+        let jitter = factory(rng, settings.jitter);
         let palette = Palette.Cosine.apply(p5)(settings.palette);
 
         // Construct the upper triangle of the image
@@ -149,7 +149,7 @@ export const draw = () => {
           split_strat = Split.factory(rng, settings.splittingStrategy);
           depth_strat = getDepthStrategyFn(rng, settings.depthStrategy);
           dist_strat = Distance.factory(settings.distStrategy);
-          jitter = genJitterFn(rng, settings.jitter);
+          jitter = factory(rng, settings.jitter);
           palette = Palette.Cosine.apply(p5)(settings.palette);
         }
 
@@ -175,7 +175,7 @@ export const draw = () => {
  * @param {number} size_x the pixel size of the final image in the x direction
  * @param {number} size_y the pixel size of the final image in the y direction
  * @param {Tactic} distance the function used to calculate the distance which decides the color
- * @param {JitterFn} jitter adds jitter to the distance
+ * @param {Tactic} jitter adds jitter to the distance
  * @param {*} palette call back that given a number spits out a color
  * @param {Color} strokeColor given a color returns a color
  * @param {number} strokeW the stroke width of each triangle
@@ -184,7 +184,7 @@ export const draw = () => {
 function draw_color_leaf(
   p5: p5Types,
   distance: Distance.Tactic,
-  jitter: JitterFn,
+  jitter: Tactic,
   palette: (t: number) => p5Types.Color,
   width: number,
   height: number
