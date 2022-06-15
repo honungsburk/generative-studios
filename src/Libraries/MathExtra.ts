@@ -42,8 +42,8 @@ export function cosine(
  * @param step the step to round
  * @returns a number that has been rounded off
  */
-export function round(n: number, step: number) {
-  return Math.round(n / step) * step;
+export function round(step: number): (n: number) => number {
+  return (n) => Math.round(n / step) * step;
 }
 
 /**
@@ -53,14 +53,34 @@ export function round(n: number, step: number) {
  * @param start end value
  * @returns a value between start and end
  */
-export function map(n: number, start: number, end: number) {
-  if (n < 0) {
-    return start;
-  }
+export function map(start: number, end: number): (n: number) => number {
+  return (n) => {
+    if (n < 0) {
+      return start;
+    }
 
-  if (n > end) {
-    return start;
-  }
+    if (n > end) {
+      return end;
+    }
 
-  return start + (end - start) * n;
+    return start + (end - start) * n;
+  };
+}
+
+/**
+ *
+ * @param min the minimum value the number can have
+ * @param max the maximum value the number can have
+ * @returns a function that bounds a number between min and max
+ */
+export function bound(min: number, max: number): (n: number) => number {
+  return (n) => {
+    if (n < min) {
+      return min;
+    } else if (n > max) {
+      return max;
+    } else {
+      return n;
+    }
+  };
 }
