@@ -1,6 +1,5 @@
 import { RNG } from "src/Libraries/Random";
-import * as P from "parsimmon";
-import * as PExtra from "src/Libraries/ParsimmonExtra";
+import * as CN from "src/Libraries/ConstrainedNumber";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types
@@ -27,58 +26,109 @@ export namespace Kind {
 export type Kind = Kind.Depth | Kind.Flip | Kind.Inherited;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Constraints
+////////////////////////////////////////////////////////////////////////////////
+
+export namespace Constraints {
+  export namespace MaxDepth {
+    export const maxDepthConstraint: CN.Constraint<1, 1, 12> = {
+      step: 1,
+      min: 1,
+      max: 12,
+    };
+    export type MaxDepth = CN.ConstrainedNumber<1, 1, 12>;
+    export const mkMaxDepth = CN.fromNumber(maxDepthConstraint);
+  }
+  export namespace FlipDepth {
+    export const maxDepthConstraint: CN.Constraint<1, 1, 7> = {
+      step: 1,
+      min: 1,
+      max: 7,
+    };
+    export type MaxDepth = CN.ConstrainedNumber<1, 1, 7>;
+    export const mkMaxDepth = CN.fromNumber(maxDepthConstraint);
+
+    export const pConstraint: CN.Constraint<0.01, 0, 1> = {
+      step: 0.01,
+      min: 0,
+      max: 1,
+    };
+    export type P = CN.ConstrainedNumber<0.01, 0, 1>;
+    export const mkP = CN.fromNumber(pConstraint);
+  }
+
+  export namespace InheritedDepth {
+    export const minDepthConstraint: CN.Constraint<1, 1, 4> = {
+      step: 1,
+      min: 1,
+      max: 4,
+    };
+    export type MinDepth = CN.ConstrainedNumber<1, 1, 4>;
+    export const mkMinDepth = CN.fromNumber(minDepthConstraint);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Strategies
 ////////////////////////////////////////////////////////////////////////////////
 export class MaxDepthStrategy implements Strategy {
   kind = Kind.Max;
-  readonly maxDepth: number;
+  readonly maxDepth: Constraints.MaxDepth.MaxDepth;
 
-  update(maxDepth: number): MaxDepthStrategy {
+  update(maxDepth: Constraints.MaxDepth.MaxDepth): MaxDepthStrategy {
     return new MaxDepthStrategy(maxDepth);
   }
 
-  constructor(maxDepth: number) {
+  constructor(maxDepth: Constraints.MaxDepth.MaxDepth) {
     this.maxDepth = maxDepth;
   }
 
   run(prng: RNG): Tactic {
-    return max_depth(this.maxDepth);
+    return max_depth(this.maxDepth.value);
   }
 }
 
 export class FlipDepthStrategy implements Strategy {
   kind = Kind.Flip;
-  readonly maxDepth: number;
-  readonly p: number;
+  readonly maxDepth: Constraints.FlipDepth.MaxDepth;
+  readonly p: Constraints.FlipDepth.P;
 
-  constructor(p: number, maxDepth: number) {
+  constructor(
+    p: Constraints.FlipDepth.P,
+    maxDepth: Constraints.FlipDepth.MaxDepth
+  ) {
     this.maxDepth = maxDepth;
     this.p = p;
   }
 
   run(prng: RNG): Tactic {
-    return coin_flip_depth(prng, this.p, this.maxDepth);
+    return coin_flip_depth(prng, this.p.value, this.maxDepth.value);
   }
 
-  update(p?: number, maxDepth?: number): FlipDepthStrategy {
+  update(
+    p?: Constraints.FlipDepth.P,
+    maxDepth?: Constraints.FlipDepth.MaxDepth
+  ): FlipDepthStrategy {
     return new FlipDepthStrategy(p || this.p, maxDepth || this.maxDepth);
   }
 }
 
 export class InheritedDepthStrategy implements Strategy {
   kind = Kind.Inherited;
-  readonly minDepth: number;
+  readonly minDepth: Constraints.InheritedDepth.MinDepth;
 
-  update(minDepth: number): MaxDepthStrategy {
-    return new MaxDepthStrategy(minDepth);
+  update(
+    minDepth: Constraints.InheritedDepth.MinDepth
+  ): InheritedDepthStrategy {
+    return new InheritedDepthStrategy(minDepth);
   }
 
-  constructor(minDepth: number) {
+  constructor(minDepth: Constraints.InheritedDepth.MinDepth) {
     this.minDepth = minDepth;
   }
 
   run(prng: RNG): Tactic {
-    return inherited_depth(prng, this.minDepth);
+    return inherited_depth(prng, this.minDepth.value);
   }
 }
 
@@ -104,53 +154,6 @@ export function isInheritedDepthStrategy(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Encode
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Encode a Depth.Strategy value
- */
-export const encode = (strat: Strategy) => {
-  if (isMaxDepthStrategy(strat)) {
-    return `M${strat.maxDepth}`;
-  } else if (isFlipDepthStrategy(strat)) {
-    return `F${strat.maxDepth}:${strat.p}`;
-  } else {
-    const s = strat as InheritedDepthStrategy;
-    return `I${s.minDepth}`;
-  }
-};
-
-const mDecoder: P.Parser<MaxDepthStrategy> = P.seqMap(
-  P.string("M"),
-  PExtra.floating,
-  (_d, maxDepth) => new MaxDepthStrategy(maxDepth)
-);
-
-const fDecoder: P.Parser<FlipDepthStrategy> = P.seqMap(
-  P.string("F"),
-  PExtra.floating,
-  P.string(":"),
-  PExtra.floating,
-  (_d, maxDepth, _s, p) => new FlipDepthStrategy(p, maxDepth)
-);
-
-const iDecoder: P.Parser<InheritedDepthStrategy> = P.seqMap(
-  P.string("I"),
-  PExtra.floating,
-  (_d, minDepth) => new InheritedDepthStrategy(minDepth)
-);
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Decode a Depth.Strategy value
- */
-export const decode: P.Parser<Strategy> = P.alt(mDecoder, fDecoder, iDecoder);
-
-////////////////////////////////////////////////////////////////////////////////
 // Core
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -162,9 +165,12 @@ export function generate(rng: RNG): Strategy {
 
   let depth3 = rng.uniformInteger(3, 5);
   return rng.pickUniform<Strategy>([
-    new MaxDepthStrategy(m_depth),
-    new FlipDepthStrategy(p, depth2),
-    new InheritedDepthStrategy(depth3),
+    new MaxDepthStrategy(Constraints.MaxDepth.mkMaxDepth(m_depth)),
+    new FlipDepthStrategy(
+      Constraints.FlipDepth.mkP(p),
+      Constraints.FlipDepth.mkMaxDepth(depth2)
+    ),
+    new InheritedDepthStrategy(Constraints.InheritedDepth.mkMinDepth(depth3)),
   ]);
 }
 

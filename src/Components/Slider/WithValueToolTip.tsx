@@ -7,31 +7,34 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import * as MathExtra from "src/Libraries/MathExtra";
+import { ConstrainedNumber } from "src/Libraries/ConstrainedNumber";
 
-export type SliderThumbWithTooltipProps = {
-  value: number;
-  setValue: (value: number) => void;
-  min: number;
-  max: number;
-  step: number;
+export type SliderThumbWithTooltipProps<
+  STEP extends number,
+  MIN extends number,
+  MAX extends number
+> = {
+  value: ConstrainedNumber<STEP, MIN, MAX>;
+  setValue: (value: ConstrainedNumber<STEP, MIN, MAX>) => void;
 };
 
-export default function SliderThumbWithTooltip(
-  props: SliderThumbWithTooltipProps
-) {
+export default function SliderThumbWithTooltip<
+  STEP extends number,
+  MIN extends number,
+  MAX extends number
+>(props: SliderThumbWithTooltipProps<STEP, MIN, MAX>) {
   const [showTooltip, setShowTooltip] = React.useState(false);
-  const value = MathExtra.round(props.value, 0.01);
   return (
     <Slider
       width={"100%"}
-      value={value}
-      min={props.min}
-      max={props.max}
-      step={props.step}
+      value={props.value.value}
+      min={props.value.min}
+      max={props.value.max}
+      step={props.value.step}
       variant="brutalist"
       colorScheme="blackAlpha"
       onChange={(v) => {
-        props.setValue(v);
+        props.setValue(props.value.update(v));
       }}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
@@ -45,7 +48,7 @@ export default function SliderThumbWithTooltip(
         color="white"
         placement="top"
         isOpen={showTooltip}
-        label={`${value}`}
+        label={`${props.value.value}`}
       >
         <SliderThumb />
       </Tooltip>

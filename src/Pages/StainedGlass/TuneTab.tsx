@@ -80,9 +80,6 @@ export function TuneTab(props: TuneTabProps): JSX.Element {
           info="The amount of jitter (randomness) to add"
           label="Jitter"
           value={props.settings.jitter}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(jitter) => {
             const copy = {
               ...props.settings,
@@ -139,9 +136,6 @@ function DepthStrat(props: {
           info="The probaility that there will be a flip"
           label="P"
           value={props.strategy.p}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(p) => {
             props.setStrategy(strategy.update(p));
           }}
@@ -150,9 +144,6 @@ function DepthStrat(props: {
           info="The maximum depth that can be flipped"
           label="Depth"
           value={strategy.maxDepth}
-          min={1}
-          max={7}
-          step={1}
           setValue={(depth) => {
             props.setStrategy(strategy.update(undefined, depth));
           }}
@@ -166,9 +157,6 @@ function DepthStrat(props: {
         info="The minimum number of times the triangles will be split"
         label="Depth"
         value={strategy.minDepth}
-        min={1}
-        max={4}
-        step={1}
         setValue={(depth) => {
           props.setStrategy(strategy.update(depth));
         }}
@@ -181,9 +169,6 @@ function DepthStrat(props: {
         info="The maximum number of times the triangles will be split"
         label="Depth"
         value={props.strategy.maxDepth}
-        min={1}
-        max={12}
-        step={1}
         setValue={(maxDepth) => {
           props.setStrategy(strategy.update(maxDepth));
         }}
@@ -197,11 +182,24 @@ function DepthStrat(props: {
         variant="filled"
         onChange={(strat) => {
           if (strat.target.value === Depth.Kind.Max) {
-            props.setStrategy(new Depth.MaxDepthStrategy(7));
+            props.setStrategy(
+              new Depth.MaxDepthStrategy(
+                Depth.Constraints.MaxDepth.mkMaxDepth(7)
+              )
+            );
           } else if (strat.target.value === Depth.Kind.Flip) {
-            props.setStrategy(new Depth.FlipDepthStrategy(0.1, 4));
+            props.setStrategy(
+              new Depth.FlipDepthStrategy(
+                Depth.Constraints.FlipDepth.mkP(0.1),
+                Depth.Constraints.FlipDepth.mkMaxDepth(7)
+              )
+            );
           } else if (strat.target.value === Depth.Kind.Inherited) {
-            props.setStrategy(new Depth.InheritedDepthStrategy(2));
+            props.setStrategy(
+              new Depth.InheritedDepthStrategy(
+                Depth.Constraints.InheritedDepth.mkMinDepth(2)
+              )
+            );
           }
         }}
         value={props.strategy.kind}
@@ -248,12 +246,12 @@ function DistanceStrat(props: {
             const copy = {
               ...props.strategy,
             } as DistanceStrategy.Strategy.DistanceToPoint;
-            copy.x = x / size;
-            copy.y = y / size;
+            copy.x = copy.x.update(x / size);
+            copy.y = copy.y.update(y / size);
             props.setStrategy(copy);
           }}
-          x={(props.strategy.x * size) as number}
-          y={(props.strategy.y * size) as number}
+          x={(props.strategy.x.value * size) as number}
+          y={(props.strategy.y.value * size) as number}
         />
       ) : (
         <></>
@@ -263,8 +261,8 @@ function DistanceStrat(props: {
 }
 
 function CosinePalette(props: {
-  palette: Palette.Cosine.Palette;
-  setPalette: (palette: Palette.Cosine.Palette) => void;
+  palette: Palette.Cosine.Constraints.Palette;
+  setPalette: (palette: Palette.Cosine.Constraints.Palette) => void;
 }) {
   const colorPicker = (key: "red" | "green" | "blue") => {
     return (
@@ -276,18 +274,15 @@ function CosinePalette(props: {
           info="The mean value of the cosinus wave"
           label="a"
           value={props.palette[key].a}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.Cosine.Color;
+            } as Palette.Cosine.Constraints.Color;
             colorCopy.a = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.Cosine.Palette;
+            } as Palette.Cosine.Constraints.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -296,18 +291,15 @@ function CosinePalette(props: {
           info="The amplitude of cosiuns wave"
           label="b"
           value={props.palette[key].b}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.Cosine.Color;
+            } as Palette.Cosine.Constraints.Color;
             colorCopy.b = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.Cosine.Palette;
+            } as Palette.Cosine.Constraints.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -316,18 +308,15 @@ function CosinePalette(props: {
           info="the frequency of the cosinus wave"
           label="c"
           value={props.palette[key].c}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.Cosine.Color;
+            } as Palette.Cosine.Constraints.Color;
             colorCopy.c = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.Cosine.Palette;
+            } as Palette.Cosine.Constraints.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -336,18 +325,15 @@ function CosinePalette(props: {
           info="the shift of the cosinus wave"
           label="d"
           value={props.palette[key].d}
-          min={0}
-          max={1}
-          step={0.01}
           setValue={(v) => {
             const colorCopy = {
               ...props.palette[key],
-            } as Palette.Cosine.Color;
+            } as Palette.Cosine.Constraints.Color;
             colorCopy.d = v;
 
             const palleteCopy = {
               ...props.palette,
-            } as Palette.Cosine.Palette;
+            } as Palette.Cosine.Constraints.Palette;
             palleteCopy[key] = colorCopy;
             props.setPalette(palleteCopy);
           }}
@@ -364,7 +350,9 @@ function CosinePalette(props: {
       </Text>
       <RadioGroup
         onChange={(newMode) => {
-          const newSettings = { ...props.palette } as Palette.Cosine.Palette;
+          const newSettings = {
+            ...props.palette,
+          } as Palette.Cosine.Constraints.Palette;
           newSettings.mode = newMode as Palette.Cosine.Mode;
           props.setPalette(newSettings);
         }}

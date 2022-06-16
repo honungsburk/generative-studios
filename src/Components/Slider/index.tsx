@@ -4,11 +4,15 @@ import SliderThumbWithTooltip, {
   SliderThumbWithTooltipProps,
 } from "./WithValueToolTip";
 
-export default function Slider(
+export default function Slider<
+  STEP extends number,
+  MIN extends number,
+  MAX extends number
+>(
   props: {
     label: string;
     info: string;
-  } & SliderThumbWithTooltipProps
+  } & SliderThumbWithTooltipProps<STEP, MIN, MAX>
 ) {
   const { label, info, ...rest } = props;
 

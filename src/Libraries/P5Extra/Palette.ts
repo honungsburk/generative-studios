@@ -1,7 +1,7 @@
 import p5Types from "p5";
 import * as MathExtra from "../MathExtra";
-import * as P from "parsimmon";
-import * as PExtra from "src/Libraries/ParsimmonExtra";
+import * as CN from "src/Libraries/ConstrainedNumber";
+
 /**
  * When doing color choices there are a few tips
  *
@@ -132,6 +132,70 @@ export const complimentary =
   };
 
 export namespace Cosine {
+  export namespace Constraints {
+    export const numberConstraint: CN.Constraint<0.01, 0, 1> = {
+      step: 0.01,
+      min: 0,
+      max: 1,
+    };
+    export type Number = CN.ConstrainedNumber<0.01, 0, 1>;
+    export const mkNumber = CN.fromNumber(numberConstraint);
+
+    export type Palette = {
+      red: Color;
+      green: Color;
+      blue: Color;
+      mode: Mode;
+    };
+
+    export type Color = {
+      a: Number;
+      b: Number;
+      c: Number;
+      d: Number;
+    };
+
+    export function unconstrainPalette(palette: Palette): Cosine.Palette {
+      return {
+        red: unconstrainColor(palette.red),
+        green: unconstrainColor(palette.green),
+        blue: unconstrainColor(palette.blue),
+        mode: palette.mode,
+      };
+    }
+
+    export function unconstrainColor(color: Color): Cosine.Color {
+      return {
+        a: color.a.value,
+        b: color.b.value,
+        c: color.c.value,
+        d: color.d.value,
+      };
+    }
+
+    export const apply = (p5: p5Types) => (palette: Palette) => {
+      return Cosine.apply(p5)(unconstrainPalette(palette));
+    };
+  }
+
+  export function constrainPalette(palette: Palette): Constraints.Palette {
+    return {
+      red: constrainColor(palette.red),
+      green: constrainColor(palette.green),
+      blue: constrainColor(palette.blue),
+      mode: palette.mode,
+    };
+  }
+
+  export function constrainColor(color: Color): Constraints.Color {
+    return {
+      a: Constraints.mkNumber(color.a),
+      b: Constraints.mkNumber(color.b),
+      c: Constraints.mkNumber(color.c),
+      d: Constraints.mkNumber(color.d),
+    };
+  }
+
   export type Palette = {
     red: Color;
     green: Color;
@@ -147,48 +211,6 @@ export namespace Cosine {
   };
 
   export type Mode = "MOD" | "SMOOTH";
-
-  function encodeMode(mode: Mode): string {
-    return mode === "MOD" ? "M" : "S";
-  }
-
-  const decodeMode: P.Parser<Mode> = P.oneOf("MS").map((s) =>
-    s === "M" ? ("Mod" as Mode) : "SMOOTH"
-  );
-
-  function encodeC(color: Color): string {
-    const parts = [color.a + "", color.b + "", color.c + "", color.d + ""];
-    return parts.join(":");
-  }
-
-  const decodeC: P.Parser<Color> = P.seqMap(
-    PExtra.floating,
-    P.string(":"),
-    PExtra.floating,
-    P.string(":"),
-    PExtra.floating,
-    P.string(":"),
-    PExtra.floating,
-    (a, x, b, y, c, z, d) => ({ a: a, b: b, c: c, d: d })
-  );
-
-  export function encode(palette: Palette): string {
-    return `b${encodeC(palette.blue)}r${encodeC(palette.red)}g${encodeC(
-      palette.green
-    )}:${encodeMode(palette.mode)}`;
-  }
-
-  export const decode: P.Parser<Palette> = P.seqMap(
-    P.string("b"),
-    decodeC,
-    P.string("r"),
-    decodeC,
-    P.string("g"),
-    decodeC,
-    P.string(":"),
-    decodeMode,
-    (x, b, y, r, z, g, v, m) => ({ red: r, green: g, blue: b, mode: m })
-  );
 
   /**
    * {

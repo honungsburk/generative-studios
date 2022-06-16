@@ -1,8 +1,7 @@
 import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
-import * as P from "parsimmon";
-import * as PExtra from "src/Libraries/ParsimmonExtra";
+import * as CN from "src/Libraries/ConstrainedNumber";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types
@@ -30,10 +29,26 @@ export namespace Kind {
       case "Y Centroid":
         return Strategy.YCentroid;
       case "Dist to Point":
-        return Strategy.DistanceToPoint(0.5, 0.5);
+        return Strategy.DistanceToPoint(
+          Constraints.DistanceToPoint.mkNumber(0.5),
+          Constraints.DistanceToPoint.mkNumber(0.5)
+        );
     }
   }
 }
+
+export namespace Constraints {
+  export namespace DistanceToPoint {
+    export const numberConstraint: CN.Constraint<0.01, 0, 1> = {
+      step: 0.01,
+      min: 0,
+      max: 1,
+    };
+    export type Number = CN.ConstrainedNumber<0.01, 0, 1>;
+    export const mkNumber = CN.fromNumber(numberConstraint);
+  }
+}
+
 export namespace Strategy {
   // Types
   export type Type = XCentroid | YCentroid | DistanceToPoint;
@@ -41,17 +56,17 @@ export namespace Strategy {
   export type YCentroid = { kind: Kind.YCentroid };
   export type DistanceToPoint = {
     kind: Kind.DistanceToPoint;
-    x: number;
-    y: number;
+    x: Constraints.DistanceToPoint.Number;
+    y: Constraints.DistanceToPoint.Number;
   };
 
   // Constructors
   export const XCentroid: XCentroid = { kind: Kind.XCentroid };
   export const YCentroid: YCentroid = { kind: Kind.YCentroid };
-  export const DistanceToPoint: (x: number, y: number) => DistanceToPoint = (
-    x,
-    y
-  ) => {
+  export const DistanceToPoint: (
+    x: Constraints.DistanceToPoint.Number,
+    y: Constraints.DistanceToPoint.Number
+  ) => DistanceToPoint = (x, y) => {
     return { kind: Kind.DistanceToPoint, x: x, y: y };
   };
 }
@@ -67,7 +82,7 @@ export function factory(strat: Strategy.Type): Tactic {
     case "Y Centroid":
       return y_centroid;
     case "Dist to Point":
-      return dist_to_centroid(new Point2D(strat.x, strat.y));
+      return dist_to_centroid(new Point2D(strat.x.value, strat.y.value));
   }
 }
 
@@ -75,55 +90,16 @@ export function generate(prng: RNG): Strategy.Type {
   return prng.pickUniform([
     Strategy.XCentroid,
     Strategy.YCentroid,
-    Strategy.DistanceToPoint(prng.random(), prng.random()),
-    Strategy.DistanceToPoint(0.5, 0.5),
+    Strategy.DistanceToPoint(
+      Constraints.DistanceToPoint.mkNumber(prng.random()),
+      Constraints.DistanceToPoint.mkNumber(prng.random())
+    ),
+    Strategy.DistanceToPoint(
+      Constraints.DistanceToPoint.mkNumber(0.5),
+      Constraints.DistanceToPoint.mkNumber(0.5)
+    ),
   ]);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// encoding
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Encode a Distance.Strategy value
- */
-export const encode = (strat: Strategy.Type) => {
-  if (strat.kind === Kind.XCentroid) {
-    return "X";
-  } else if (strat.kind === Kind.YCentroid) {
-    return "Y";
-  } else {
-    return `D${strat.x}:${strat.y}`;
-  }
-};
-
-const xDecoder: P.Parser<Strategy.XCentroid> = P.string("X").map(
-  () => Strategy.XCentroid
-);
-const yDecoder: P.Parser<Strategy.YCentroid> = P.string("Y").map(
-  () => Strategy.YCentroid
-);
-
-const dDecoder: P.Parser<Strategy.DistanceToPoint> = P.seqMap(
-  P.string("D"),
-  PExtra.floating,
-  P.string(":"),
-  PExtra.floating,
-  (_d, x, _v, y) => Strategy.DistanceToPoint(x, y)
-);
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Decode a Distance.Strategy value
- */
-export const decode: P.Parser<Strategy.Type> = P.alt(
-  xDecoder,
-  yDecoder,
-  dDecoder
-);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Impl

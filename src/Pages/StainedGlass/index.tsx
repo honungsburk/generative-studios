@@ -48,12 +48,12 @@ export default function StainedGlass() {
   //   }
   // }, []);
 
-  useEffect(() => {
-    setSearchParams({
-      version: "1",
-      artwork: Base64.encode(Algorithm.encode(settings)),
-    });
-  }, [settings]);
+  // useEffect(() => {
+  //   setSearchParams({
+  //     version: "1",
+  //     artwork: Base64.encode(Algorithm.encode(settings)),
+  //   });
+  // }, [settings]);
 
   // TODO: create hook for this effect
   useEffect(() => {

@@ -1,6 +1,14 @@
 import { RNG } from "src/Libraries/Random";
+import * as CN from "src/Libraries/ConstrainedNumber";
 
 export type Tactic = (val: number) => number;
+export const jitterConstraint: CN.Constraint<0.01, 0, 1> = {
+  step: 0.01,
+  min: 0,
+  max: 1,
+};
+export type Jitter = CN.ConstrainedNumber<0.01, 0, 1>;
+export const mkJitter = CN.fromNumber(jitterConstraint);
 
 /**
  *
@@ -11,13 +19,13 @@ export type Tactic = (val: number) => number;
  * @param {number} magnitude number between 0-1
  * @returns a function that jitters its inputs
  */
-export function factory(rng: RNG, magnitude: number): Tactic {
+export function factory(rng: RNG, magnitude: Jitter): Tactic {
   return function (val: number) {
-    let lower = val - magnitude;
+    let lower = val - magnitude.value;
     if (lower < 0) {
       lower = 0;
     }
-    let upper = val + magnitude;
+    let upper = val + magnitude.value;
     if (upper > 1) {
       upper = 1;
     }

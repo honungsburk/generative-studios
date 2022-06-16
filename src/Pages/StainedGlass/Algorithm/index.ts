@@ -2,15 +2,13 @@ import { RNG } from "src/Libraries/Random";
 import Point2D from "./Point2D";
 import Triangle from "./Triangle";
 import p5Types from "p5";
-import * as Palette from "src/Libraries/P5Extra/Palette";
-import * as P from "parsimmon";
-import * as PExtra from "src/Libraries/ParsimmonExtra";
+import * as PaletteP5 from "src/Libraries/P5Extra/Palette";
 
 import * as Distance from "./Strategy/Distance";
-import { factory, Tactic } from "./Strategy/Jitter";
+import * as Jitter from "./Strategy/Jitter";
 import * as Split from "./Strategy/Split";
 import * as Depth from "./Strategy/Depth";
-import { generatePalette } from "./Strategy/Palette";
+import * as Palette from "./Strategy/Palette";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Seed
@@ -36,8 +34,8 @@ export function generateSettings(seed: string): Settings {
     splittingStrategy: Split.generate(rng),
     depthStrategy: Depth.generate(rng),
     distStrategy: Distance.generate(rng),
-    jitter: rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4]),
-    palette: generatePalette(rng),
+    jitter: Jitter.mkJitter(rng.pickUniform([0, 0, 0, 0.05, 0.005, 0.1, 0.4])),
+    palette: Palette.generateConstrainedPalette(rng),
     symmetry: rng.bernoulli(0.3),
   };
 }
@@ -54,49 +52,49 @@ export type Settings = {
   splittingStrategy: Split.Strategy;
   depthStrategy: Depth.Strategy;
   distStrategy: Distance.Strategy.Type;
-  jitter: number;
-  palette: Palette.Cosine.Palette;
+  jitter: Jitter.Jitter;
+  palette: PaletteP5.Cosine.Constraints.Palette;
   symmetry: boolean;
 };
 
-export function encode(settings: Settings): string {
-  const parts = [
-    settings.seed,
-    Split.encode(settings.splittingStrategy),
-    Depth.encode(settings.depthStrategy),
-    Distance.encode(settings.distStrategy),
-    `${settings.jitter}`,
-    Palette.Cosine.encode(settings.palette),
-    PExtra.booleanE(settings.symmetry),
-  ];
+// export function encode(settings: Settings): string {
+//   const parts = [
+//     settings.seed,
+//     Split.encode(settings.splittingStrategy),
+//     Depth.encode(settings.depthStrategy),
+//     Distance.encode(settings.distStrategy),
+//     `${settings.jitter}`,
+//     Palette.Cosine.encode(settings.palette),
+//     PExtra.booleanE(settings.symmetry),
+//   ];
 
-  return parts.join(":");
-}
+//   return parts.join(":");
+// }
 
-const decodeSeed: P.Parser<string> = P.regexp(/[a-zA-Z0-9]+/);
+// const decodeSeed: P.Parser<string> = P.regexp(/[a-zA-Z0-9]+/);
 
-function firstP<T>(p: P.Parser<T>): P.Parser<T> {
-  return P.seqMap(p, P.string(","), (v) => v);
-}
+// function firstP<T>(p: P.Parser<T>): P.Parser<T> {
+//   return P.seqMap(p, P.string(","), (v) => v);
+// }
 
-export const decode: P.Parser<Settings> = P.seqMap(
-  firstP(decodeSeed),
-  firstP(Split.decode),
-  firstP(Depth.decode),
-  firstP(Distance.decode),
-  firstP(PExtra.floating),
-  firstP(Palette.Cosine.decode),
-  PExtra.booleanP,
-  (seed, split, depth, dist, jitter, color, sym) => ({
-    seed: seed,
-    splittingStrategy: split,
-    depthStrategy: depth,
-    distStrategy: dist,
-    jitter: jitter,
-    palette: color,
-    symmetry: sym,
-  })
-);
+// export const decode: P.Parser<Settings> = P.seqMap(
+//   firstP(decodeSeed),
+//   firstP(Split.decode),
+//   firstP(Depth.decode),
+//   firstP(Distance.decode),
+//   firstP(PExtra.floating),
+//   firstP(Palette.Cosine.decode),
+//   PExtra.booleanP,
+//   (seed, split, depth, dist, jitter, color, sym) => ({
+//     seed: seed,
+//     splittingStrategy: split,
+//     depthStrategy: depth,
+//     distStrategy: dist,
+//     jitter: jitter,
+//     palette: color,
+//     symmetry: sym,
+//   })
+// );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Entry Points
@@ -156,8 +154,8 @@ export const draw = () => {
         let split_strat = Split.factory(rng, settings.splittingStrategy);
         let depth_strat = settings.depthStrategy.run(rng);
         let dist_strat = Distance.factory(settings.distStrategy);
-        let jitter = factory(rng, settings.jitter);
-        let palette = Palette.Cosine.apply(p5)(settings.palette);
+        let jitter = Jitter.factory(rng, settings.jitter);
+        let palette = PaletteP5.Cosine.Constraints.apply(p5)(settings.palette);
 
         // Construct the upper triangle of the image
         let st1 = new SmartTree(t1, split_strat, depth_strat, 0);
@@ -180,8 +178,8 @@ export const draw = () => {
           split_strat = Split.factory(rng, settings.splittingStrategy);
           depth_strat = settings.depthStrategy.run(rng);
           dist_strat = Distance.factory(settings.distStrategy);
-          jitter = factory(rng, settings.jitter);
-          palette = Palette.Cosine.apply(p5)(settings.palette);
+          jitter = Jitter.factory(rng, settings.jitter);
+          palette = PaletteP5.Cosine.Constraints.apply(p5)(settings.palette);
         }
 
         // Construct the lower triangle of the image
@@ -215,7 +213,7 @@ export const draw = () => {
 function draw_color_leaf(
   p5: p5Types,
   distance: Distance.Tactic,
-  jitter: Tactic,
+  jitter: Jitter.Tactic,
   palette: (t: number) => p5Types.Color,
   width: number,
   height: number

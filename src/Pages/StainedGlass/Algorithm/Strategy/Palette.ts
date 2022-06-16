@@ -1,6 +1,12 @@
 import { RNG } from "src/Libraries/Random";
 import * as Palette from "src/Libraries/P5Extra/Palette";
 
+export function generateConstrainedPalette(
+  rng: RNG
+): Palette.Cosine.Constraints.Palette {
+  return Palette.Cosine.constrainPalette(generatePalette(rng));
+}
+
 /**
  *
  * @param {RNG} rng a random number generator
