@@ -16,6 +16,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "buffer": "^6.0.3",
+    "cbor-web": "^8.1.0",
     "framer-motion": "^6.3.4",
     "immutable": "^4.1.0",
     "parsimmon": "^1.18.1",
