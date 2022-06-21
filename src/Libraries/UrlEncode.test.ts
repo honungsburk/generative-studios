@@ -66,3 +66,27 @@ test("Validate a VObject schema", () => {
   ).false;
   expect(UrlEncode.validate(schema)(true)).false;
 });
+
+test("keyShrink can compress and expand", () => {
+  const schema = UrlEncode.VObject({
+    boolean: UrlEncode.VBoolean,
+    string: UrlEncode.VString,
+    number: UrlEncode.VNumber,
+    object: UrlEncode.VObject({
+      element: UrlEncode.VBoolean,
+    }),
+  });
+
+  const shrink = UrlEncode.keyShrink(schema);
+
+  const ex1 = {
+    boolean: true,
+    string: "hello",
+    number: 1.1238,
+    object: {
+      element: false,
+    },
+  };
+
+  expect(shrink.expand(shrink.compress(ex1))).toStrictEqual(ex1);
+});

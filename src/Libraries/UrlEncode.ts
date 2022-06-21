@@ -2,6 +2,7 @@ import cbor from "cbor-web";
 import { ConstrainedNumber } from "./ConstrainedNumber";
 import { Set } from "immutable";
 import * as Util from "src/Util";
+import KeyCharMap from "src/Util/KeyCharMap";
 
 // export type Settings = {
 //   seed: string;
@@ -123,6 +124,55 @@ export const validate = (schema: ValueSchema) => (value: Value) => {
   }
 };
 
+export function keyShrink(schema: ValueSchema): {
+  compress: (value: Value) => Value;
+  expand: (value: Value) => Value;
+} {
+  if (schema.kind === "VObject") {
+    const keys = Object.keys(schema.value).sort();
+    const compress: any = {};
+
+    for (let key of keys) {
+      compress[key] = keyShrink(schema.value[key]);
+    }
+
+    const compressor = new KeyCharMap(keys);
+
+    return {
+      compress: (v) => {
+        if (typeof v === "object" && !(v instanceof ConstrainedNumber)) {
+          const newV: any = {};
+          for (let key of keys) {
+            newV[compressor.keyToChar(key)] = compress[key].compress(v[key]);
+          }
+
+          return newV;
+        } else {
+          throw Error("Value doesn't match schema when trying to compress");
+        }
+      },
+      expand: (v) => {
+        if (typeof v === "object" && !(v instanceof ConstrainedNumber)) {
+          const newV: any = {};
+          for (let char in v) {
+            const key = compressor.charToKey(char);
+            newV[key] = compress[key].expand(v[char]);
+          }
+
+          return newV;
+        } else {
+          throw Error("Value doesn't match schema when trying to compress");
+        }
+      },
+    };
+  } else {
+    return {
+      compress: (e) => e,
+      expand: (e) => e,
+    };
+  }
+}
+
 /**
  * NOTE: will throw errors if you try to encode an Value not matching the ValueSchema
  *
@@ -133,8 +183,16 @@ export function construct(schema: ValueSchema): {
   encode: (value: Value) => string;
   decode: (s: string) => Value;
 } {
+  const validator = validate(schema);
+
   return {
-    encode: (value) => "",
+    encode: (value) => {
+      if (!validator(value)) {
+        throw Error("Value did not match the schema!");
+      }
+
+      return "";
+    },
     decode: (s) => true,
   };
 }
