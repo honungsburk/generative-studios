@@ -1,5 +1,6 @@
 import { RNG } from "src/Libraries/Random";
 import * as CN from "src/Libraries/ConstrainedNumber";
+import * as UrlEncode from "src/Libraries/UrlEncode";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types
@@ -7,6 +8,7 @@ import * as CN from "src/Libraries/ConstrainedNumber";
 export interface Strategy {
   readonly kind: Kind;
   run: (prng: RNG) => Tactic;
+  toValue(): UrlEncode.Value;
 }
 
 export type Tactic = (currentDepth: number) => {
@@ -68,9 +70,44 @@ export namespace Constraints {
   }
 }
 
+export function build(v: any): Strategy {
+  switch (v.kind) {
+    case Kind.Max:
+      return new MaxDepthStrategy(v.maxDepth);
+    case Kind.Flip:
+      return new FlipDepthStrategy(v.p, v.maxDepth);
+    case Kind.Inherited:
+      return new InheritedDepthStrategy(v.minDepth);
+  }
+  throw Error("I'm bad at coding, refactor please");
+}
+
+export const vSchema = UrlEncode.VOr([
+  UrlEncode.VObject({
+    kind: UrlEncode.VEnumString([Kind.Max]),
+    maxDepth: UrlEncode.VConstrainedNumber(
+      Constraints.MaxDepth.maxDepthConstraint
+    ),
+  }),
+  UrlEncode.VObject({
+    kind: UrlEncode.VEnumString([Kind.Flip]),
+    maxDepth: UrlEncode.VConstrainedNumber(
+      Constraints.FlipDepth.maxDepthConstraint
+    ),
+    p: UrlEncode.VConstrainedNumber(Constraints.FlipDepth.pConstraint),
+  }),
+  UrlEncode.VObject({
+    kind: UrlEncode.VEnumString([Kind.Inherited]),
+    minDepth: UrlEncode.VConstrainedNumber(
+      Constraints.InheritedDepth.minDepthConstraint
+    ),
+  }),
+]);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Strategies
 ////////////////////////////////////////////////////////////////////////////////
+
 export class MaxDepthStrategy implements Strategy {
   kind = Kind.Max;
   readonly maxDepth: Constraints.MaxDepth.MaxDepth;
@@ -85,6 +122,13 @@ export class MaxDepthStrategy implements Strategy {
 
   run(prng: RNG): Tactic {
     return max_depth(this.maxDepth.value);
+  }
+
+  toValue(): UrlEncode.Value {
+    return {
+      kind: this.kind,
+      maxDepth: this.maxDepth,
+    };
   }
 }
 
@@ -111,6 +155,14 @@ export class FlipDepthStrategy implements Strategy {
   ): FlipDepthStrategy {
     return new FlipDepthStrategy(p || this.p, maxDepth || this.maxDepth);
   }
+
+  toValue(): UrlEncode.Value {
+    return {
+      kind: this.kind,
+      p: this.p,
+      maxDepth: this.maxDepth,
+    };
+  }
 }
 
 export class InheritedDepthStrategy implements Strategy {
@@ -129,6 +181,13 @@ export class InheritedDepthStrategy implements Strategy {
 
   run(prng: RNG): Tactic {
     return inherited_depth(prng, this.minDepth.value);
+  }
+
+  toValue(): UrlEncode.Value {
+    return {
+      kind: this.kind,
+      minDepth: this.minDepth,
+    };
   }
 }
 

@@ -1,5 +1,6 @@
 import { RNG } from "src/Libraries/Random";
 import * as CN from "src/Libraries/ConstrainedNumber";
+import * as UrlEncode from "src/Libraries/UrlEncode";
 
 export type Tactic = (val: number) => number;
 export const jitterConstraint: CN.Constraint<0.01, 0, 1> = {
@@ -9,6 +10,7 @@ export const jitterConstraint: CN.Constraint<0.01, 0, 1> = {
 };
 export type Jitter = CN.ConstrainedNumber<0.01, 0, 1>;
 export const mkJitter = CN.fromNumber(jitterConstraint);
+export const vSchema = UrlEncode.VConstrainedNumber(jitterConstraint);
 
 /**
  *

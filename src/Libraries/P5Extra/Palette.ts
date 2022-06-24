@@ -1,7 +1,7 @@
 import p5Types from "p5";
 import * as MathExtra from "../MathExtra";
 import * as CN from "src/Libraries/ConstrainedNumber";
-
+import * as UrlEncode from "../UrlEncode";
 /**
  * When doing color choices there are a few tips
  *
@@ -140,6 +140,7 @@ export namespace Cosine {
     };
     export type Number = CN.ConstrainedNumber<0.01, 0, 1>;
     export const mkNumber = CN.fromNumber(numberConstraint);
+    const numberVSchema = UrlEncode.VConstrainedNumber(numberConstraint);
 
     export type Palette = {
       red: Color;
@@ -154,6 +155,20 @@ export namespace Cosine {
       c: Number;
       d: Number;
     };
+
+    export const colorVSchema = UrlEncode.VObject({
+      a: numberVSchema,
+      b: numberVSchema,
+      c: numberVSchema,
+      d: numberVSchema,
+    });
+
+    export const vSchema = UrlEncode.VObject({
+      red: colorVSchema,
+      green: colorVSchema,
+      blue: colorVSchema,
+      mode: UrlEncode.VEnumString(["MOD", "SMOOTH"]),
+    });
 
     export function unconstrainPalette(palette: Palette): Cosine.Palette {
       return {

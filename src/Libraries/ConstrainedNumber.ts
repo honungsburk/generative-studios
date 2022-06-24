@@ -62,8 +62,12 @@ export class ConstrainedNumber<
     return new ConstrainedNumber(this.value - other.value, this.constraint);
   }
 
-  update(value: number): ConstrainedNumber<STEP, MIN, MAX> {
+  fromNumber(value: number): ConstrainedNumber<STEP, MIN, MAX> {
     return new ConstrainedNumber(value, this.constraint);
+  }
+
+  fromInt(value: number): ConstrainedNumber<STEP, MIN, MAX> {
+    return new ConstrainedNumber(value * this.constraint.step, this.constraint);
   }
 
   public get value(): number {

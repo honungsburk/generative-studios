@@ -1,7 +1,7 @@
 export default class KeyCharMap {
   private _keyToChar: Map<string, string>;
   private _charToKey: Map<string, string>;
-  constructor(keys: string[]) {
+  constructor(keys: Iterable<string>) {
     const copy = [...keys].sort();
     this._charToKey = new Map();
     this._keyToChar = new Map();

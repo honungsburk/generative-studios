@@ -37,23 +37,27 @@ export default function StainedGlass() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // useEffect(() => {
-  //   const configBase64 = searchParams.get("artwork");
-  //   if (configBase64) {
-  //     const config = Algorithm.decode.tryParse(Base64.decode(configBase64));
-  //     // TODO: add a typecheck here!
-  //     if (config) {
-  //       setSettings(config);
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+    const run = async () => {
+      const configBase64 = searchParams.get("artwork");
+      if (configBase64) {
+        const config = await Algorithm.decode(configBase64);
+        // TODO: add a typecheck here!
+        if (config) {
+          setSettings(config);
+        }
+      }
+    };
+    run();
+  }, []);
 
-  // useEffect(() => {
-  //   setSearchParams({
-  //     version: "1",
-  //     artwork: Base64.encode(Algorithm.encode(settings)),
-  //   });
-  // }, [settings]);
+  useEffect(() => {
+    const encoding = Algorithm.encode(settings);
+    setSearchParams({
+      version: "1",
+      artwork: encoding,
+    });
+  }, [settings]);
 
   // TODO: create hook for this effect
   useEffect(() => {

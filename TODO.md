@@ -30,6 +30,9 @@
   - we want to give mappings.... from
   - use enums instead of strings... auto use numbers???
   - I want to write a bidirectional flow... not specify parser and encoder seperatly
+  - z85 encoding
+  - [] Need property based testing
+  - [] Need rewrite
 
 ## 0.2.0
 

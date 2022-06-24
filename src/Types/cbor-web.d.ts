@@ -1,4 +1,4 @@
-// https://hildjj.github.io/node-cbor/
+// // https://hildjj.github.io/node-cbor/
 declare module "cbor-web" {
   export type Value =
     | boolean

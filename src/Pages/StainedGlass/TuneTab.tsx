@@ -246,8 +246,8 @@ function DistanceStrat(props: {
             const copy = {
               ...props.strategy,
             } as DistanceStrategy.Strategy.DistanceToPoint;
-            copy.x = copy.x.update(x / size);
-            copy.y = copy.y.update(y / size);
+            copy.x = copy.x.fromNumber(x / size);
+            copy.y = copy.y.fromNumber(y / size);
             props.setStrategy(copy);
           }}
           x={(props.strategy.x.value * size) as number}

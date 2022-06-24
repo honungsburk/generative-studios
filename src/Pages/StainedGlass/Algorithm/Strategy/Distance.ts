@@ -2,6 +2,7 @@ import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
 import * as CN from "src/Libraries/ConstrainedNumber";
+import * as UrlEncode from "src/Libraries/UrlEncode";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types
@@ -59,6 +60,20 @@ export namespace Strategy {
     x: Constraints.DistanceToPoint.Number;
     y: Constraints.DistanceToPoint.Number;
   };
+
+  export const vSchema = UrlEncode.VOr([
+    UrlEncode.VObject({ kind: UrlEncode.VEnumString([Kind.XCentroid]) }),
+    UrlEncode.VObject({ kind: UrlEncode.VEnumString([Kind.YCentroid]) }),
+    UrlEncode.VObject({
+      kind: UrlEncode.VEnumString([Kind.DistanceToPoint]),
+      x: UrlEncode.VConstrainedNumber(
+        Constraints.DistanceToPoint.numberConstraint
+      ),
+      y: UrlEncode.VConstrainedNumber(
+        Constraints.DistanceToPoint.numberConstraint
+      ),
+    }),
+  ]);
 
   // Constructors
   export const XCentroid: XCentroid = { kind: Kind.XCentroid };

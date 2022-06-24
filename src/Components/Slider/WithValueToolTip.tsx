@@ -34,7 +34,7 @@ export default function SliderThumbWithTooltip<
       variant="brutalist"
       colorScheme="blackAlpha"
       onChange={(v) => {
-        props.setValue(props.value.update(v));
+        props.setValue(props.value.fromNumber(v));
       }}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}

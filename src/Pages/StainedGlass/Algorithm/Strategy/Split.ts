@@ -2,6 +2,7 @@ import { RNG } from "src/Libraries/Random";
 import Point2D from "../Point2D";
 import Triangle from "../Triangle";
 import * as P from "parsimmon";
+import * as UrlEncode from "src/Libraries/UrlEncode";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Types
@@ -17,6 +18,8 @@ export type Strategy =
   | "Split Random"
   | "Split Random Balanced"
   | "Split Middle";
+
+export const vSchema = UrlEncode.VEnumString([RANDOM, RANDOM_BALANCED, MIDDLE]);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Core

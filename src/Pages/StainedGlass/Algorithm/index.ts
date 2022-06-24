@@ -9,6 +9,7 @@ import * as Jitter from "./Strategy/Jitter";
 import * as Split from "./Strategy/Split";
 import * as Depth from "./Strategy/Depth";
 import * as Palette from "./Strategy/Palette";
+import * as UrlEncode from "src/Libraries/UrlEncode";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Seed
@@ -57,45 +58,28 @@ export type Settings = {
   symmetry: boolean;
 };
 
-// export function encode(settings: Settings): string {
-//   const parts = [
-//     settings.seed,
-//     Split.encode(settings.splittingStrategy),
-//     Depth.encode(settings.depthStrategy),
-//     Distance.encode(settings.distStrategy),
-//     `${settings.jitter}`,
-//     Palette.Cosine.encode(settings.palette),
-//     PExtra.booleanE(settings.symmetry),
-//   ];
+const vSchema = UrlEncode.VObject({
+  seed: UrlEncode.VString,
+  splittingStrategy: Split.vSchema,
+  depthStrategy: Depth.vSchema,
+  distStrategy: Distance.Strategy.vSchema,
+  jitter: Jitter.vSchema,
+  palette: PaletteP5.Cosine.Constraints.vSchema,
+  symmetry: UrlEncode.VBoolean,
+});
 
-//   return parts.join(":");
-// }
+const pairEnDecode = UrlEncode.construct(vSchema);
 
-// const decodeSeed: P.Parser<string> = P.regexp(/[a-zA-Z0-9]+/);
-
-// function firstP<T>(p: P.Parser<T>): P.Parser<T> {
-//   return P.seqMap(p, P.string(","), (v) => v);
-// }
-
-// export const decode: P.Parser<Settings> = P.seqMap(
-//   firstP(decodeSeed),
-//   firstP(Split.decode),
-//   firstP(Depth.decode),
-//   firstP(Distance.decode),
-//   firstP(PExtra.floating),
-//   firstP(Palette.Cosine.decode),
-//   PExtra.booleanP,
-//   (seed, split, depth, dist, jitter, color, sym) => ({
-//     seed: seed,
-//     splittingStrategy: split,
-//     depthStrategy: depth,
-//     distStrategy: dist,
-//     jitter: jitter,
-//     palette: color,
-//     symmetry: sym,
-//   })
-// );
-
+export function encode(settings: Settings): string {
+  const sett: any = { ...settings };
+  sett.depthStrategy = sett.depthStrategy.toValue();
+  return pairEnDecode.encode(sett);
+}
+export async function decode(s: string): Promise<Settings> {
+  const val: any = await pairEnDecode.decode(s);
+  val.depthStrategy = Depth.build(val.depthStrategy);
+  return val as Settings;
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Entry Points
 ////////////////////////////////////////////////////////////////////////////////
