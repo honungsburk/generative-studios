@@ -42,7 +42,7 @@ export default function GradiantDisplay(props: GradiantDisplayProps) {
     // for each x value
     for (let x = 0; x < canvas.width; x++) {
       const color = colorFnRef.current(
-        MathExtra.map(x / canvas.width, startRef.current, endRef.current)
+        MathExtra.map(startRef.current, endRef.current)(x / canvas.width)
       );
       for (let y = 0; y < canvas.height; y++) {
         const pos = y * 4;

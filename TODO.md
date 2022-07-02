@@ -14,7 +14,7 @@
 - [ x ] Performance when redering
 - [ x ] Project Info Page
 - [ x ] Encode variables in URL
-  - [ ] make encodings fit into twitter (<200chars)
+  - [ x ] make encodings fit into twitter (<200chars)
 - [ x ] navigate home
 - [ ] Fix flickering
 - [ x ] Remove unused algorithm
@@ -33,6 +33,21 @@
   - z85 encoding
   - [] Need property based testing
   - [] Need rewrite
+- [ ] Adaptable Canvas
+  - [ x ] Fullscreen
+  - [ x ] Custom resolution
+  - [ x] Rotate
+  - [ x ] Adapt to window size
+  - [ ] Handle ulra high resolution displays
+- [ x ] Download Button
+  - [ x ] Download whatever the resolution is put as
+  - [ x ] You can user more pixels then you have (Always show full canvas)
+- [ ] Frosted Glass Look
+- [ ] Remove P5js
+- [ x ] Hotkeys
+  - [ ] Have a list of all hotkeys
+  - [ x ] Command for each main action
+  - [ ] help hotkey
 
 ## 0.2.0
 
@@ -75,6 +90,7 @@
 
 ## 0.6.0 Social Media
 
+- [] Preview Links?
 - [ ] Fix Auto/Quick Sharing
   - [ ] Facebook
   - [ ] Pintrest

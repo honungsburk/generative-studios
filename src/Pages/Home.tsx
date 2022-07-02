@@ -48,7 +48,7 @@ function Project(props: { metadata: Projects.Metadata }) {
             rounded={8}
             objectFit="cover"
             src={props.metadata.thumbNailSrc}
-            alt="Dan Abramov"
+            alt={`Exampe of output from ${props.metadata.name}`}
             fallbackSrc="https://via.placeholder.com/300"
           />
         </Stack>

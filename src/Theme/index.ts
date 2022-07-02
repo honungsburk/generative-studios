@@ -33,6 +33,12 @@ const global = (props: Dict<any>) => ({
 });
 
 export const Theme = extendTheme({
+  layerStyles: {
+    frostedglass: {
+      backdropBlur: "8px",
+      bg: "rgba(240, 240, 240, 0.7)",
+    },
+  },
   styles: {
     global: global,
   },

@@ -14,6 +14,8 @@ import {
   AiFillYoutube,
   AiFillTwitterCircle,
   AiFillInstagram,
+  AiFillEyeInvisible,
+  AiFillEye,
 } from "react-icons/ai";
 
 import {
@@ -27,6 +29,8 @@ import {
   MdFullscreenExit,
   MdInfo,
   MdRefresh,
+  MdOutlineRotate90DegreesCcw,
+  MdFileDownload,
 } from "react-icons/md";
 
 import { CgWebsite } from "react-icons/cg";
@@ -134,7 +138,7 @@ export function Location(props: IconProps) {
   return <Icon {...props} as={MdLocationOn} />;
 }
 
-// Full Screen
+// Fullscreen
 
 export function Fullscreen(props: IconProps) {
   return <Icon {...props} as={MdFullscreen} />;
@@ -142,4 +146,22 @@ export function Fullscreen(props: IconProps) {
 
 export function FullscreenExit(props: IconProps) {
   return <Icon {...props} as={MdFullscreenExit} />;
+}
+
+// Visible
+
+export function EyeInvisible(props: IconProps) {
+  return <Icon {...props} as={AiFillEyeInvisible} />;
+}
+
+export function Eye(props: IconProps) {
+  return <Icon {...props} as={AiFillEye} />;
+}
+
+export function Rotate(props: IconProps) {
+  return <Icon {...props} as={MdOutlineRotate90DegreesCcw} />;
+}
+
+export function Download(props: IconProps) {
+  return <Icon {...props} as={MdFileDownload} />;
 }

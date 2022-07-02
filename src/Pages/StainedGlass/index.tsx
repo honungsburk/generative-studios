@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Sketch from "react-p5";
 import * as Algorithm from "./Algorithm";
 import {
   Tabs,
@@ -9,37 +8,27 @@ import {
   TabPanel,
   Heading,
   IconButton,
-  Box,
   Flex,
-  useBoolean,
   Spacer,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import * as Icon from "src/Components/Icon";
-import Drawer from "src/Components/Drawer";
-import useNoBodyOverflow from "src/Hooks/useNoBodyOverflow";
-import * as Base64 from "src/Libraries/Base64";
 import { useSearchParams } from "react-router-dom";
-import Hidden from "src/Components/Hidden";
 import { TuneTabProps, TuneTab } from "./TuneTab";
 import About from "./About";
+import AdaptiveSketch from "src/Components/AdaptiveSketch";
+import GenerativeStudio from "src/Components/GenerativeStudio";
+import p5 from "p5";
 
 export default function StainedGlass() {
-  const hasSidebar = useBreakpointValue({ md: true, base: false });
-  const [isOpen, setIsOpen] = useBoolean(false);
-
   const [settings, setSettings] = React.useState(() =>
     Algorithm.generateSettings(Algorithm.generateSeed())
   );
-  const [canvasWidth, setCanvasWidth] = React.useState(400);
-  const [canvasHeight, setCanvasHeight] = React.useState(400);
-  useNoBodyOverflow();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const run = async () => {
-      const configBase64 = searchParams.get("artwork");
+      const configBase64 = searchParams.get("data");
       if (configBase64) {
         const config = await Algorithm.decode(configBase64);
         // TODO: add a typecheck here!
@@ -54,84 +43,42 @@ export default function StainedGlass() {
   useEffect(() => {
     const encoding = Algorithm.encode(settings);
     setSearchParams({
-      version: "1",
-      artwork: encoding,
+      v: "1",
+      data: encoding,
     });
   }, [settings]);
 
-  // TODO: create hook for this effect
-  useEffect(() => {
-    const canvasWrapper = document.getElementById("wrapped-canvas-resizer");
-    const canvases = document.getElementsByClassName("p5Canvas");
-    const canvas = canvases.item(0) as HTMLCanvasElement | null;
-
-    if (canvasWrapper && canvas) {
-      const resize = () => {
-        setCanvasHeight(canvasWrapper.clientHeight);
-        setCanvasWidth(canvasWrapper.clientWidth);
-        canvas.width = canvasWrapper.clientWidth;
-        canvas.height = canvasWrapper.clientHeight;
-        canvas.style.width = `${canvasWrapper.clientWidth}px`;
-        canvas.style.height = `${canvasWrapper.clientHeight}px`;
-      };
-
-      resize();
-      const observer = new ResizeObserver(resize);
-      observer.observe(canvasWrapper);
-
-      return () => observer.disconnect();
-    }
-  }, []);
-
   return (
-    <Drawer
-      isOpen={isOpen && hasSidebar}
-      drawer={
+    <GenerativeStudio
+      onDownload={(width, height) => {
+        Algorithm.download(
+          width,
+          height,
+          settings,
+          "Example",
+          "jpg",
+          new p5(() => {})
+        );
+      }}
+      onGenerateRandomClick={() =>
+        setSettings(Algorithm.generateSettings(Algorithm.generateSeed()))
+      }
+      drawer={(close) => (
         <Sidebar
-          close={setIsOpen.off}
+          close={close}
           width={400}
           tuneProps={{
             settings: settings,
             setSettings: setSettings,
           }}
         />
-      }
+      )}
     >
-      <Box
-        id="wrapped-canvas-resizer"
-        width={"100%"}
-        height="100vh"
-        maxHeight={"100vh"}
-        maxWidth="100%"
-      >
-        <Hidden isHidden={isOpen || !hasSidebar}>
-          <IconButton
-            position="absolute"
-            top={4}
-            left={4}
-            aria-label="Open Side bar"
-            icon={<Icon.Right />}
-            onClick={() => setIsOpen.on()}
-          />
-        </Hidden>
-
-        <IconButton
-          position="absolute"
-          bottom={4}
-          right={4}
-          aria-label="Random Seed"
-          icon={<Icon.Random />}
-          onClick={() =>
-            setSettings(Algorithm.generateSettings(Algorithm.generateSeed()))
-          }
-        />
-        <Sketch
-          setup={Algorithm.setup(canvasWidth, canvasHeight)}
-          draw={Algorithm.draw()(settings, canvasWidth, canvasHeight)}
-          // windowResized={windowResized}
-        />
-      </Box>
-    </Drawer>
+      <AdaptiveSketch
+        setup={Algorithm.setup}
+        draw={(w, h) => Algorithm.draw()(settings, w, h)} // TODO: fix memoization
+      />
+    </GenerativeStudio>
   );
 }
 

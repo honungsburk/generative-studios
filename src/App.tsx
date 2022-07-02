@@ -1,6 +1,5 @@
 import { useState, Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
-import "./App.css";
 import Layout from "./Layout";
 import Loading from "./Pages/Loading";
 
@@ -16,9 +15,9 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/algomarble" element={<AlgoMarble />} />
-          <Route path="/stained-glass" element={<StainedGlass />} />
         </Route>
+        <Route path="/algomarble" element={<AlgoMarble />} />
+        <Route path="/stained-glass" element={<StainedGlass />} />
       </Routes>
     </Suspense>
   );

@@ -84,6 +84,21 @@ export async function decode(s: string): Promise<Settings> {
 // Entry Points
 ////////////////////////////////////////////////////////////////////////////////
 
+export function download(
+  width: number,
+  height: number,
+  settings: Settings,
+  name: string,
+  format: "png" | "jpg",
+  p5: p5Types
+): void {
+  const offScreenCanvas = p5.createGraphics(width, height);
+  offScreenCanvas.rectMode(p5.CENTER); //??? can be removed???
+  draw()(settings, width, height)(offScreenCanvas);
+  p5.saveCanvas(offScreenCanvas, name, format);
+  offScreenCanvas.remove();
+}
+
 /**
  * The setup function is run before anything else.
  */

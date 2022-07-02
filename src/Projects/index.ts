@@ -13,12 +13,12 @@ export type Metadata = {
 };
 
 export const metadata: Metadata[] = [
-  // {
-  //   name: "AlgoMarble",
-  //   href: "/algomarble",
-  //   thumbNailSrc: AlgoMarbleThumbnail,
-  //   userInteractions: ["Mouse", "Audio"],
-  // },
+  {
+    name: "AlgoMarble",
+    href: "/algomarble",
+    thumbNailSrc: AlgoMarbleThumbnail,
+    userInteractions: ["Mouse", "Audio"],
+  },
   {
     name: "Stained Glass",
     href: "/stained-glass",
