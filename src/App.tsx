@@ -7,6 +7,7 @@ import Loading from "./Pages/Loading";
 const Home = lazy(() => import("./Pages/Home"));
 const AlgoMarble = lazy(() => import("./Pages/AlgoMarble"));
 const StainedGlass = lazy(() => import("./Pages/StainedGlass"));
+const NotFound = lazy(() => import("./Pages/NotFound"));
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/*" element={<NotFound />} />
         </Route>
         <Route path="/algomarble" element={<AlgoMarble />} />
         <Route path="/stained-glass" element={<StainedGlass />} />
