@@ -31,6 +31,7 @@ import {
   MdRefresh,
   MdOutlineRotate90DegreesCcw,
   MdFileDownload,
+  MdSource,
 } from "react-icons/md";
 
 import { CgWebsite } from "react-icons/cg";
@@ -164,4 +165,14 @@ export function Rotate(props: IconProps) {
 
 export function Download(props: IconProps) {
   return <Icon {...props} as={MdFileDownload} />;
+}
+
+// Info
+
+export function About(props: IconProps) {
+  return <Icon {...props} as={MdInfo} />;
+}
+
+export function License(props: IconProps) {
+  return <Icon {...props} as={MdSource} />;
 }

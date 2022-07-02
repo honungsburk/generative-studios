@@ -9,6 +9,7 @@ const AlgoMarble = lazy(() => import("./Pages/AlgoMarble"));
 const StainedGlass = lazy(() => import("./Pages/StainedGlass"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
 const License = lazy(() => import("./Pages/License"));
+const About = lazy(() => import("./Pages/About"));
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/license" element={<License />} />
+          <Route path="/About" element={<About />} />
           <Route path="/*" element={<NotFound />} />
         </Route>
         <Route path="/algomarble" element={<AlgoMarble />} />

@@ -24,12 +24,13 @@ export default function TopBarLinks(props: BoxProps): JSX.Element {
     >
       <Menu>
         <MenuButton
+          size={"sm"}
           as={Button}
           variant="ghost"
           rightIcon={<Icon.CaretDown />}
           aria-label="Social Media Links"
         >
-          Links
+          Social
         </MenuButton>
         <MenuList>
           <Link
@@ -58,10 +59,28 @@ export default function TopBarLinks(props: BoxProps): JSX.Element {
           </Link>
         </MenuList>
       </Menu>
-      <Button variant="ghost" to="/license" aria-label="license" as={ReachLink}>
-        License
-      </Button>
+      <Menu>
+        <MenuButton
+          size={"sm"}
+          as={Button}
+          variant="ghost"
+          rightIcon={<Icon.CaretDown />}
+          aria-label="Social Media Links"
+        >
+          Info
+        </MenuButton>
+        <MenuList>
+          <Link as={ReachLink} to="/about">
+            <MenuItem icon={<Icon.About />}>About</MenuItem>
+          </Link>
+
+          <Link as={ReachLink} to="/license">
+            <MenuItem icon={<Icon.License />}>License</MenuItem>
+          </Link>
+        </MenuList>
+      </Menu>
       <IconButtonLink
+        size={"sm"}
         variant="ghost"
         to="/home"
         aria-label="Home"
