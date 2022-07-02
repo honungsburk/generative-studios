@@ -239,19 +239,19 @@ function DistanceStrat(props: {
       </Select>
       {props.strategy.kind === "Dist to Point" ? (
         <CoordinateInput
-          width={size}
-          height={size}
+          width={"100%"}
+          height={"200px"}
           bgColor="blackAlpha.200"
           onPosition={(x: number, y: number) => {
             const copy = {
               ...props.strategy,
             } as DistanceStrategy.Strategy.DistanceToPoint;
-            copy.x = copy.x.fromNumber(x / size);
-            copy.y = copy.y.fromNumber(y / size);
+            copy.x = copy.x.fromNumber(x);
+            copy.y = copy.y.fromNumber(y);
             props.setStrategy(copy);
           }}
-          x={(props.strategy.x.value * size) as number}
-          y={(props.strategy.y.value * size) as number}
+          x={props.strategy.x.value as number}
+          y={props.strategy.y.value as number}
         />
       ) : (
         <></>

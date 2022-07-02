@@ -1,44 +1,61 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useImperativeHandle, useRef } from "react";
 import { Property } from "csstype";
+import React from "react";
 
-export type AdaptiveCanvasProps = {
-  setup?: (canvas: HTMLCanvasElement) => void;
-  width?: Property.Width<string | number>;
-  height?: Property.Width<string | number>;
-};
+// export type AdaptiveCanvasProps = {
+//   setup?: (canvas: HTMLCanvasElement) => void;
+//   width?: Property.Width<string | number>;
+//   height?: Property.Width<string | number>;
+// };
+
+type AdaptiveCanvasProps = React.DetailedHTMLProps<
+  React.CanvasHTMLAttributes<HTMLCanvasElement>,
+  HTMLCanvasElement
+>;
 
 const adaptiveCanvasDefaultProps = { width: "100%", height: "100vh" };
 
-export default function AdaptiveCanvas(props: AdaptiveCanvasProps) {
-  const canvasWrapperRef = useRef<null | HTMLDivElement>(null);
-  const canvasRef = useRef<null | HTMLCanvasElement>(null);
-  const { width, height } = { ...adaptiveCanvasDefaultProps, ...props };
+const AdaptiveCanvas = React.forwardRef(
+  (props: AdaptiveCanvasProps, ref: React.Ref<HTMLCanvasElement>) => {
+    const canvasWrapperRef = useRef<null | HTMLDivElement>(null);
+    const canvasRef = useRef<null | HTMLCanvasElement>(null);
+    useImperativeHandle(ref, () => canvasRef.current as any);
 
-  useEffect(() => {
-    const canvasWrapper = canvasWrapperRef.current;
-    const canvas = canvasRef.current;
+    const { width, height, ...rest } = {
+      ...adaptiveCanvasDefaultProps,
+      ...props,
+    };
 
-    if (canvasWrapper && canvas) {
-      const resize = () => {
-        canvas.width = canvasWrapper.clientWidth;
-        canvas.height = canvasWrapper.clientHeight;
-        canvas.style.width = `${canvasWrapper.clientWidth}px`;
-        canvas.style.height = `${canvasWrapper.clientHeight}px`;
-      };
+    useEffect(() => {
+      const canvasWrapper = canvasWrapperRef.current;
+      const canvas = canvasRef.current;
 
-      resize();
-      const observer = new ResizeObserver(resize);
-      observer.observe(canvasWrapper);
+      if (canvasWrapper && canvas) {
+        const resize = () => {
+          canvas.width = canvasWrapper.clientWidth;
+          canvas.height = canvasWrapper.clientHeight;
+          canvas.style.width = `${canvasWrapper.clientWidth}px`;
+          canvas.style.height = `${canvasWrapper.clientHeight}px`;
+        };
 
-      return () => observer.disconnect();
-    }
-  }, []);
+        resize();
+        const observer = new ResizeObserver(resize);
+        observer.observe(canvasWrapper);
 
-  return (
-    <div ref={canvasWrapperRef} style={{ width: width, height: height }}>
-      <canvas ref={canvasRef}>
-        Your browser does not support the HTML canvas tag.
-      </canvas>
-    </div>
-  );
-}
+        return () => observer.disconnect();
+      }
+    }, []);
+
+    return (
+      <div ref={canvasWrapperRef} style={{ width: width, height: height }}>
+        <canvas ref={canvasRef} {...rest}>
+          Your browser does not support the HTML canvas tag.
+        </canvas>
+      </div>
+    );
+  }
+);
+
+AdaptiveCanvas.displayName = "AdaptiveCanvas";
+
+export default AdaptiveCanvas;

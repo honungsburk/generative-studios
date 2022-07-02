@@ -4,10 +4,12 @@ import Theme from "src/Theme";
 import * as ThemeTools from "@chakra-ui/theme-tools";
 import { useEffect, useRef } from "react";
 import * as CanvasExtra from "src/Libraries/CanvasExtra";
+import AdaptiveCanvas from "./AdaptiveCanvas";
+import { Property } from "csstype";
 
 type CoordinateInputProps = {
-  width: number;
-  height: number;
+  width?: Property.Width<string | number>;
+  height?: Property.Width<string | number>;
   bgColor: string;
   onPosition: (x: number, y: number) => void;
   x: number;
@@ -26,7 +28,7 @@ export default function CoordinateInput(
 
   useEffect(() => {
     positionRef.current = [props.x, props.y];
-  }, [props.x, props.y, props.width, props.height]);
+  }, [props.x, props.y]);
 
   const draw = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -40,7 +42,14 @@ export default function CoordinateInput(
 
     const [positionX, positionY] = positionRef.current;
     ctx.beginPath();
-    ctx.arc(positionX, positionY, 4, 0, 2 * Math.PI, true);
+    ctx.arc(
+      positionX * canvas.width,
+      positionY * canvas.height,
+      4,
+      0,
+      2 * Math.PI,
+      true
+    );
     ctx.fillStyle = "#FF6A6A";
     ctx.fill();
   };
@@ -68,10 +77,10 @@ export default function CoordinateInput(
     <Box
       bgColor={props.bgColor}
       rounded={8}
-      width={`${props.width}px`}
-      height={`${props.height}px`}
+      width={props.width}
+      height={props.height}
     >
-      <canvas
+      <AdaptiveCanvas
         ref={canvasRef}
         style={{ display: "inline-block" }}
         width={props.width}
@@ -82,7 +91,10 @@ export default function CoordinateInput(
         onMouseDown={(e) => {
           if (canvasRef.current) {
             const [x, y] = CanvasExtra.getCursorPosition(canvasRef.current, e);
-            props.onPosition(x, y);
+            props.onPosition(
+              x / canvasRef.current.width,
+              y / canvasRef.current.height
+            );
           }
         }}
         onMouseMove={(e) => {
@@ -96,7 +108,7 @@ export default function CoordinateInput(
         }}
       >
         Your browser does not support the HTML canvas tag.
-      </canvas>
+      </AdaptiveCanvas>
     </Box>
   );
 }
