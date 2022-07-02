@@ -142,7 +142,13 @@ export default function GenerativeStudio({
             position="fixed"
             right={4}
             bottom={16}
-            onDownload={() => onDownload(width, height)}
+            onDownload={() => {
+              if (isFullScreen) {
+                onDownload(windowDimensions.width, windowDimensions.height);
+              } else {
+                onDownload(width, height);
+              }
+            }}
             isFullScreen={isFullScreen}
             onFullScreenChange={() => setIsFullScreen.toggle()}
             isVisible={isOpen}
