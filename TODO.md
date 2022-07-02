@@ -4,24 +4,10 @@
 
 - [ ] Icon
 - [ ] GUI Styling
-  - [ ] Custom components
   - [ ] Color scheme
-- [ x ] About page
-- [ x ] Social Media links
-- [ x ] Mobile GUI
-  - [ x ] Hide side bar
-  - [ x ] Fix canvas size...
-- [ x ] Performance when redering
-- [ x ] Project Info Page
-- [ x ] Encode variables in URL
-  - [ x ] make encodings fit into twitter (<200chars)
-- [ x ] navigate home
 - [ ] Fix flickering
-- [ x ] Remove unused algorithm
 - [ ] don't throw error on touch event + scroll
-- [ x ] deploy
 - [ ] Add tests to catch regressions in art code...
-- [ x ] Fix symmetry not working?
 - [ ] A really good object compression parse/decode library
   - It takes a description of all setters and getters and autogenerates the layout
   - You should be able to add new keys but they must always be added to the back
@@ -30,24 +16,9 @@
   - we want to give mappings.... from
   - use enums instead of strings... auto use numbers???
   - I want to write a bidirectional flow... not specify parser and encoder seperatly
-  - z85 encoding
   - [] Need property based testing
   - [] Need rewrite
-- [ ] Adaptable Canvas
-  - [ x ] Fullscreen
-  - [ x ] Custom resolution
-  - [ x] Rotate
-  - [ x ] Adapt to window size
-  - [ ] Handle ulra high resolution displays
-- [ x ] Download Button
-  - [ x ] Download whatever the resolution is put as
-  - [ x ] You can user more pixels then you have (Always show full canvas)
-- [ ] Frosted Glass Look
 - [ ] Remove P5js
-- [ x ] Hotkeys
-  - [ ] Have a list of all hotkeys
-  - [ x ] Command for each main action
-  - [ ] help hotkey
 
 ## 0.2.0
 
