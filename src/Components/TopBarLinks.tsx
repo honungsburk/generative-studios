@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import IconButtonLink from "./IconButtonLink";
 import * as Icon from "src/Components/Icon";
-
+import { Link as ReachLink } from "react-router-dom";
 export default function TopBarLinks(props: BoxProps): JSX.Element {
   return (
     <HStack
@@ -58,6 +58,9 @@ export default function TopBarLinks(props: BoxProps): JSX.Element {
           </Link>
         </MenuList>
       </Menu>
+      <Button variant="ghost" to="/license" aria-label="license" as={ReachLink}>
+        License
+      </Button>
       <IconButtonLink
         variant="ghost"
         to="/home"
