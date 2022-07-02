@@ -48,7 +48,7 @@ export default function GenerativeStudio({
   children,
 }: GenerativeStudioProps): JSX.Element {
   useNoBodyOverflow();
-  const hasSidebar = useBreakpointValue({ md: true, base: false });
+  const isDesktop = useBreakpointValue({ md: true, base: false });
   const windowDimensions = useWindowDimensions();
   const [isOpen, setIsOpen] = useBoolean(false);
   const [showGUI, setShowGUI] = useBoolean(true);
@@ -94,7 +94,7 @@ export default function GenerativeStudio({
 
   return (
     <Drawer
-      isOpen={hasSidebar !== undefined && hasSidebar && isOpen && showGUI}
+      isOpen={isDesktop !== undefined && isDesktop && isOpen && showGUI}
       drawer={drawer(setIsOpen.off)}
     >
       <Center
@@ -104,7 +104,7 @@ export default function GenerativeStudio({
         maxWidth="100%"
         background={"blackAlpha.300"}
       >
-        <Hidden isHidden={!showGUI || isOpen || !hasSidebar}>
+        <Hidden isHidden={!showGUI || isOpen || !isDesktop}>
           <Box
             layerStyle={"frostedglass"}
             rounded={8}
@@ -136,45 +136,18 @@ export default function GenerativeStudio({
         <Hidden isHidden={!showGUI}>
           <TopBarLinks layerStyle="frostedglass" />
 
-          <RightSideButtons
+          <CanvasControlls
+            isMobile={!(isDesktop == true)}
+            onGenerateRandomClick={onGenerateRandomClick}
             position="fixed"
-            bottom={"50%"}
             right={4}
-            transform="auto"
-            translateY="50%"
+            bottom={16}
             onDownload={() => onDownload(width, height)}
             isFullScreen={isFullScreen}
             onFullScreenChange={() => setIsFullScreen.toggle()}
             isVisible={isOpen}
             onVisibleChange={() => setShowGUI.toggle()}
           />
-
-          <Box
-            layerStyle={"frostedglass"}
-            rounded={8}
-            position="fixed"
-            bottom={4}
-            right={4}
-          >
-            <Tooltip
-              placement="left"
-              label={
-                <WithShortCut
-                  label="Random"
-                  shortcut={[hotkeys.randomArtwork]}
-                />
-              }
-            >
-              <Box>
-                <IconButton
-                  variant={"ghost"}
-                  aria-label="Random Artwork"
-                  icon={<Icon.Random />}
-                  onClick={onGenerateRandomClick}
-                />
-              </Box>
-            </Tooltip>
-          </Box>
 
           <Hidden isHidden={isFullScreen}>
             <CanvasDimensionsInput
@@ -202,6 +175,8 @@ export default function GenerativeStudio({
 }
 
 type RightSideButtonsProps = {
+  isMobile: boolean;
+  onGenerateRandomClick: () => void;
   isVisible?: boolean;
   onVisibleChange?: (v: boolean) => void;
   isFullScreen?: boolean;
@@ -209,31 +184,35 @@ type RightSideButtonsProps = {
   onDownload?: () => void;
 } & BoxProps;
 
-function RightSideButtons({
+function CanvasControlls({
+  isMobile,
   isVisible,
   onVisibleChange,
   isFullScreen,
   onFullScreenChange,
   onDownload,
+  onGenerateRandomClick,
   ...props
 }: RightSideButtonsProps): JSX.Element {
   return (
     <Stack layerStyle="frostedglass" rounded={8} p={1} spacing={1} {...props}>
-      <Tooltip
-        label={<WithShortCut label="Hide" shortcut={[hotkeys.hideGUI]} />}
-        placement="left"
-      >
-        <Box>
-          <ToggleButton
-            variant={"ghost"}
-            value={isVisible}
-            onChange={onVisibleChange}
-            on={<Icon.EyeInvisible />}
-            off={<Icon.Eye />}
-            aria-label="Hide GUI"
-          />
-        </Box>
-      </Tooltip>
+      <Hidden isHidden={isMobile}>
+        <Tooltip
+          label={<WithShortCut label="Hide" shortcut={[hotkeys.hideGUI]} />}
+          placement="left"
+        >
+          <Box>
+            <ToggleButton
+              variant={"ghost"}
+              value={isVisible}
+              onChange={onVisibleChange}
+              on={<Icon.EyeInvisible />}
+              off={<Icon.Eye />}
+              aria-label="Hide GUI"
+            />
+          </Box>
+        </Tooltip>
+      </Hidden>
       <Tooltip
         placement="left"
         label={
@@ -261,6 +240,22 @@ function RightSideButtons({
             aria-label="Download"
             icon={<Icon.Download />}
             onClick={onDownload}
+          />
+        </Box>
+      </Tooltip>
+
+      <Tooltip
+        placement="left"
+        label={
+          <WithShortCut label="Random" shortcut={[hotkeys.randomArtwork]} />
+        }
+      >
+        <Box>
+          <IconButton
+            variant={"ghost"}
+            aria-label="Random Artwork"
+            icon={<Icon.Random />}
+            onClick={onGenerateRandomClick}
           />
         </Box>
       </Tooltip>
