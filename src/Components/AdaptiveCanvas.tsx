@@ -15,6 +15,10 @@ type AdaptiveCanvasProps = React.DetailedHTMLProps<
 
 const adaptiveCanvasDefaultProps = { width: "100%", height: "100vh" };
 
+/**
+ * A canvas element that adapts its rendering resolution to number of actual pixels it is taking up on the screen.
+ * This allows you to css properties such as "width = '100%'" without getting you rendered output stretched/squished
+ */
 const AdaptiveCanvas = React.forwardRef(
   (props: AdaptiveCanvasProps, ref: React.Ref<HTMLCanvasElement>) => {
     const canvasWrapperRef = useRef<null | HTMLDivElement>(null);
