@@ -50,13 +50,13 @@ export default function StainedGlass() {
 
   return (
     <GenerativeStudio
-      onDownload={(width, height) => {
+      onDownload={(width, height, name, format) => {
         Algorithm.download(
           width,
           height,
           settings,
-          "Example",
-          "jpg",
+          name,
+          format,
           new p5(() => {})
         );
       }}

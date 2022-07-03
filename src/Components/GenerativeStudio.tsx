@@ -29,7 +29,12 @@ import useWindowDimensions from "src/Hooks/useWindowDimensions";
 type GenerativeStudioProps = {
   drawer: (close: () => void) => JSX.Element;
   onGenerateRandomClick: () => void;
-  onDownload: (width: number, height: number) => void;
+  onDownload: (
+    width: number,
+    height: number,
+    name: string,
+    format: "jpg" | "png"
+  ) => void;
   children: React.ReactElement;
 };
 
@@ -83,11 +88,24 @@ export default function GenerativeStudio({
     setIsFullScreen.toggle();
   });
 
+  const download = () => {
+    if (isFullScreen) {
+      onDownload(
+        Math.floor(windowDimensions.width * window.devicePixelRatio),
+        Math.floor(windowDimensions.height * window.devicePixelRatio),
+        "Example",
+        "jpg"
+      );
+    } else {
+      onDownload(width, height, "Example", "jpg");
+    }
+  };
+
   useHotkeys(
     hotkeys.download,
     (event) => {
       event.preventDefault();
-      onDownload(width, height);
+      download();
     },
     [width, height]
   );
@@ -142,13 +160,7 @@ export default function GenerativeStudio({
             position="fixed"
             right={4}
             bottom={16}
-            onDownload={() => {
-              if (isFullScreen) {
-                onDownload(windowDimensions.width, windowDimensions.height);
-              } else {
-                onDownload(width, height);
-              }
-            }}
+            onDownload={download}
             isFullScreen={isFullScreen}
             onFullScreenChange={() => setIsFullScreen.toggle()}
             isVisible={isOpen}

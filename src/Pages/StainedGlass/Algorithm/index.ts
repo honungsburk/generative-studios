@@ -92,11 +92,15 @@ export function download(
   format: "png" | "jpg",
   p5: p5Types
 ): void {
-  const offScreenCanvas = p5.createGraphics(width, height);
+  // p5 adjusts for window.devicePixelRatio internally
+  // so we have to counter that ourselves...
+  const drawingWidth = width / window.devicePixelRatio;
+  const drawingHeight = width / window.devicePixelRatio;
+  const offScreenCanvas = p5.createGraphics(drawingWidth, drawingHeight);
   offScreenCanvas.rectMode(p5.CENTER); //??? can be removed???
-  draw()(settings, width, height)(offScreenCanvas);
+  draw()(settings, drawingWidth, drawingHeight)(offScreenCanvas);
   p5.saveCanvas(offScreenCanvas, name, format);
-  // offScreenCanvas.remove();
+  offScreenCanvas.remove();
 }
 
 /**
