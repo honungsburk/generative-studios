@@ -92,11 +92,13 @@ export function download(
   format: "png" | "jpg",
   p5: p5Types
 ): void {
+  console.log("download width", width);
+  console.log("download height", height);
   const offScreenCanvas = p5.createGraphics(width, height);
   offScreenCanvas.rectMode(p5.CENTER); //??? can be removed???
   draw()(settings, width, height)(offScreenCanvas);
   p5.saveCanvas(offScreenCanvas, name, format);
-  offScreenCanvas.remove();
+  // offScreenCanvas.remove();
 }
 
 /**

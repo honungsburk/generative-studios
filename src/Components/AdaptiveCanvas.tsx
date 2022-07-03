@@ -32,8 +32,9 @@ const AdaptiveCanvas = React.forwardRef(
 
       if (canvasWrapper && canvas) {
         const resize = () => {
-          canvas.width = canvasWrapper.clientWidth;
-          canvas.height = canvasWrapper.clientHeight;
+          const scale = window.devicePixelRatio;
+          canvas.width = Math.floor(canvasWrapper.clientWidth * scale);
+          canvas.height = Math.floor(canvasWrapper.clientHeight * scale);
           canvas.style.width = `${canvasWrapper.clientWidth}px`;
           canvas.style.height = `${canvasWrapper.clientHeight}px`;
         };

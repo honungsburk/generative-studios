@@ -35,10 +35,16 @@ export default function AdaptiveSketch(
 
     if (canvasWrapper && canvas) {
       const resize = () => {
-        setCanvasHeight(canvasWrapper.clientHeight);
         setCanvasWidth(canvasWrapper.clientWidth);
-        canvas.width = canvasWrapper.clientWidth;
-        canvas.height = canvasWrapper.clientHeight;
+        setCanvasHeight(canvasWrapper.clientHeight);
+        // P5JS usually deals with devicePixelRatio itself
+        // But since we modify it directly we have to account for it!
+        canvas.width = Math.floor(
+          canvasWrapper.clientWidth * window.devicePixelRatio
+        );
+        canvas.height = Math.floor(
+          canvasWrapper.clientHeight * window.devicePixelRatio
+        );
         canvas.style.width = `${canvasWrapper.clientWidth}px`;
         canvas.style.height = `${canvasWrapper.clientHeight}px`;
       };
@@ -50,6 +56,9 @@ export default function AdaptiveSketch(
       return () => observer.disconnect();
     }
   }, []);
+
+  console.log("clientHeight", canvasHeight);
+  console.log("clientWidth", canvasWidth);
 
   return (
     <div id="wrapped-canvas-resizer" style={{ width: width, height: height }}>
