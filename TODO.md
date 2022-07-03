@@ -3,10 +3,7 @@
 ## 0.1.0
 
 - [ ] Icon
-- [ ] GUI Styling
-  - [ ] Color scheme
 - [ ] Fix flickering
-- [ ] don't throw error on touch event + scroll
 - [ ] Add tests to catch regressions in art code...
 - [ ] A really good object compression parse/decode library
   - It takes a description of all setters and getters and autogenerates the layout
@@ -22,18 +19,19 @@
 
 ## 0.2.0
 
+- [ ] Download modal
 - [ ] Start using immutable datastructures
 - [ ] pull out code into helper hooks...
 - [ ] Show tip on click...
 - [ ] Cos Color Component
-- [ ] Fullscreen support
 - [ ] AlgoMarble
   - [ ] Port AlgoMarble to the web
   - [ ] Add Audio
 
 ## 0.3.0
 
-- [ ] License page
+- [ ] Remember settings
+- [ x ] License page
 - [ ] MOTION
   - [ ] Port Motion to the web
   - [ ] Add Audio
