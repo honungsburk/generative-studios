@@ -57,9 +57,6 @@ export default function AdaptiveSketch(
     }
   }, []);
 
-  console.log("clientHeight", canvasHeight);
-  console.log("clientWidth", canvasWidth);
-
   return (
     <div id="wrapped-canvas-resizer" style={{ width: width, height: height }}>
       <Sketch
