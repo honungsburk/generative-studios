@@ -55,42 +55,6 @@ export function generate(prng: RNG): Strategy {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// encoding
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Encode a Split.Strategy value
- */
-export const encode = (strat: Strategy) => {
-  if (strat === RANDOM) {
-    return "1";
-  } else if (strat === RANDOM_BALANCED) {
-    return "2";
-  } else {
-    return "3";
-  }
-};
-
-/**
- * This encoding must be as small as possible so we can store it in the URL
- *
- * Decode a Split.Strategy value
- */
-export const decode: P.Parser<Strategy> = P.digit.chain((d) => {
-  if (d === "1") {
-    return P.succeed(RANDOM);
-  } else if (d === "2") {
-    return P.succeed(RANDOM_BALANCED);
-  } else if (d === "3") {
-    return P.succeed(MIDDLE);
-  } else {
-    return P.fail(`${d} is not a valid Split.Strategy`);
-  }
-});
-
-////////////////////////////////////////////////////////////////////////////////
 // Execution
 ////////////////////////////////////////////////////////////////////////////////
 
