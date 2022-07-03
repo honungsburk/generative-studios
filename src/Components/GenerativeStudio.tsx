@@ -107,7 +107,7 @@ export default function GenerativeStudio({
       event.preventDefault();
       download();
     },
-    [width, height]
+    [onDownload, width, height]
   );
 
   return (
