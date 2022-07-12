@@ -19,6 +19,7 @@
 
 ## 0.2.0
 
+- [ ] Share Button
 - [ ] Download modal
 - [ ] Start using immutable datastructures
 - [ ] pull out code into helper hooks...
