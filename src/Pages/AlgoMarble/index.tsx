@@ -26,15 +26,25 @@ export default function AlgoMarble() {
           );
           const program = WebGL.createProgram(gl)(vert, frag);
           gl.useProgram(program);
-          setUniforms(gl)(program)(new RNG("hello"));
+          setUniforms(gl)(program)(new RNG("hello, world"));
 
           const vertPosition = gl.getAttribLocation(program, "vertPosition");
           const [quadVertices, quadIndices] =
             createQuad(gl)(program)(vertPosition);
+
+          let lastHeight = 0;
+          let lastWidth = 0;
+
           const cancelAnimation = Window.animate(() => {
+            // Chaning the viewport is super expensive!
+            if (lastHeight !== canvas.height && lastWidth !== canvas.width) {
+              lastHeight = canvas.height;
+              lastWidth = canvas.width;
+              gl.viewport(0, 0, canvas.width, canvas.height);
+            }
             uniform2f(gl)(program)("u_resolution", canvas.width, canvas.height);
-            // console.log(canvas.width, canvas.height);
-            // Enable the attribute
+
+            gl.useProgram(program);
             gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
             gl.enableVertexAttribArray(vertPosition);
