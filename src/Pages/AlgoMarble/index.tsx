@@ -5,7 +5,7 @@ import { uniform1f, uniform2f, uniform3f } from "src/Libraries/WebGL/uniform";
 import * as WebGL from "src/Libraries/WebGL";
 import vertexShaderPath from "./Shaders/shader.vert?url";
 import fragShaderPath from "./Shaders/shader.frag?url";
-
+import * as Window from "src/Util/Window";
 export default function AlgoMarble() {
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
@@ -26,9 +26,28 @@ export default function AlgoMarble() {
           );
           const program = WebGL.createProgram(gl)(vert, frag);
           gl.useProgram(program);
-          uniform2f(gl)(program)("u_resolution", canvas.width, canvas.height);
           setUniforms(gl)(program)(new RNG("hello"));
-          drawQuad(gl)(program);
+
+          const vertPosition = gl.getAttribLocation(program, "vertPosition");
+          const [quadVertices, quadIndices] =
+            createQuad(gl)(program)(vertPosition);
+          const cancelAnimation = Window.animate(() => {
+            uniform2f(gl)(program)("u_resolution", canvas.width, canvas.height);
+            // console.log(canvas.width, canvas.height);
+            // Enable the attribute
+            gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
+            gl.enableVertexAttribArray(vertPosition);
+            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+          });
+
+          return () => {
+            cancelAnimation();
+            gl.useProgram(null);
+            gl.deleteProgram(program);
+            gl.deleteBuffer(quadVertices);
+            gl.deleteBuffer(quadIndices);
+          };
         } else {
           console.error("You don't have webgl2 context... alert user!");
         }
@@ -72,9 +91,10 @@ const setUniforms =
 
 // TODO: gl.deleteBuffer(buffer);
 // + how do we
-const drawQuad =
+const createQuad =
   (gl: WebGL2RenderingContext) =>
-  (program: WebGLProgram): [WebGLBuffer | null, WebGLBuffer | null] => {
+  (program: WebGLProgram) =>
+  (index: number): [WebGLBuffer | null, WebGLBuffer | null] => {
     // Drawing a quad
     let vertices = [
       -1.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 1.0, 1.0, 0.0,
@@ -84,7 +104,6 @@ const drawQuad =
     let triangleVertexBufferObj = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexBufferObj);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW); // Uses the last bound buffer
-    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     // Create an empty buffer object to store Index buffer
     var Index_Buffer = gl.createBuffer();
@@ -96,14 +115,14 @@ const drawQuad =
     );
 
     // Now we need to inform the vertex shader about the quad we just made.
-    var vertPosition = gl.getAttribLocation(program, "vertPosition");
+
     // 3 <- the number of points in each vertex
     // float <- because they are floating point numbers
     // false <- whether or not to normalize data into a certain range, we will skip that
     // stride <- if zero assumed to be thightly packed (3 * Float32Array.BYTES_PER_ELEMENT)
     // offset <- offset in butes to the first component in the vertez attribute array
     gl.vertexAttribPointer(
-      vertPosition,
+      index,
       3,
       gl.FLOAT,
       false,
@@ -111,10 +130,8 @@ const drawQuad =
       0
     );
 
-    // // Enable the attribute
-    gl.enableVertexAttribArray(vertPosition);
-
-    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
     return [triangleVertexBufferObj, Index_Buffer];
   };

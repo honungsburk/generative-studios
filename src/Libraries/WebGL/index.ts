@@ -36,6 +36,7 @@ export const loadShader =
   };
 
 /**
+ *  Will consume the shaders it is given!
  *
  * @param gl the webgl context to create the program within
  * @returns
