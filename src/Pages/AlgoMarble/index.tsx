@@ -9,7 +9,7 @@ import * as Window from "src/Util/Window";
 export default function AlgoMarble() {
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
-  // TODO: add cleanup
+  // Drawing
   useEffect(() => {
     const exec = async () => {
       if (canvasRef.current) {
