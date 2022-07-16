@@ -1,12 +1,6 @@
 import { useEffect, useImperativeHandle, useRef } from "react";
-import { Property } from "csstype";
 import React from "react";
-
-// export type AdaptiveCanvasProps = {
-//   setup?: (canvas: HTMLCanvasElement) => void;
-//   width?: Property.Width<string | number>;
-//   height?: Property.Width<string | number>;
-// };
+import useOnResize from "src/Hooks/useOnResize";
 
 type AdaptiveCanvasProps = React.DetailedHTMLProps<
   React.CanvasHTMLAttributes<HTMLCanvasElement>,
@@ -26,26 +20,20 @@ const AdaptiveCanvas = React.forwardRef(
       ...props,
     };
 
-    useEffect(() => {
-      const canvasWrapper = canvasWrapperRef.current;
-      const canvas = canvasRef.current;
-
-      if (canvasWrapper && canvas) {
-        const resize = () => {
+    useOnResize(
+      canvasWrapperRef,
+      (canvasWrapper) => {
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
           const scale = window.devicePixelRatio;
           canvas.width = Math.floor(canvasWrapper.clientWidth * scale);
           canvas.height = Math.floor(canvasWrapper.clientHeight * scale);
           canvas.style.width = `${canvasWrapper.clientWidth}px`;
           canvas.style.height = `${canvasWrapper.clientHeight}px`;
-        };
-
-        resize();
-        const observer = new ResizeObserver(resize);
-        observer.observe(canvasWrapper);
-
-        return () => observer.disconnect();
-      }
-    }, []);
+        }
+      },
+      [canvasWrapperRef]
+    );
 
     return (
       <div ref={canvasWrapperRef} style={{ width: width, height: height }}>
