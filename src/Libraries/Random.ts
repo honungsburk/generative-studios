@@ -3,6 +3,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ *
+ * @param length the length of the seed to create
+ * @returns a strng usefull as a string
+ */
+export function genSeed(length: number): string {
+  const code = "A".charCodeAt(0);
+  const seed: string[] = [];
+
+  for (let i = 0; i < length; i++) {
+    seed.push(
+      String.fromCharCode(Math.floor(code + Math.random() * (1 + 26 * 2)))
+    );
+  }
+
+  return seed.join("");
+}
+
+/**
  * Use:
  *
  * let rand = randomGen("Apple")

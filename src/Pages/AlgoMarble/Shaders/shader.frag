@@ -156,11 +156,11 @@ float gradient_noise( in vec2 x )
     float ix1;
     float res;
 
-    if (u_interpolation_choice < 1.0){
+    if (u_interpolation_choice < 1.1){
         ix0 = lin(va, vb, u.x);
         ix1 = lin(vc, vd, u.x);
         res = lin(ix0, ix1, u.y);
-    } else if (u_interpolation_choice < 2.0){
+    } else if (u_interpolation_choice < 2.1){
         ix0 = cubic(va, vb, u.x);
         ix1 = cubic(vc, vd, u.x);
         res = cubic(ix0, ix1, u.y);
@@ -245,19 +245,19 @@ void main() {
     // The default is that no extra is added
     float pixel_dist = 0.0;
 
-    if (u_pixel_distance_choice < 0.05) {
+    if (u_pixel_distance_choice < 1.1) {
         pixel_dist = p.x * u_color_speed;
-    } else if (u_pixel_distance_choice < 0.1) {
+    } else if (u_pixel_distance_choice < 2.1) {
         pixel_dist = p.y * u_color_speed;
-    } else if (u_pixel_distance_choice < 0.15) {
+    } else if (u_pixel_distance_choice < 3.1) {
         pixel_dist = length(u_center_point * u_zoom - p) * u_color_speed;
-    } else if (u_pixel_distance_choice < 0.3) {
+    } else if (u_pixel_distance_choice < 4.1) {
         pixel_dist = dot(p, q);
-    } else if (u_pixel_distance_choice < 0.4) {
+    } else if (u_pixel_distance_choice < 5.1) {
         pixel_dist = dot(q, r) / (length(q) * length(r));
-    } else if (u_pixel_distance_choice < 0.5) {
+    } else if (u_pixel_distance_choice < 6.1) {
         pixel_dist = dot(p, r) / (length(p) * length(r));
-    } else if (u_pixel_distance_choice < 0.55) {
+    } else if (u_pixel_distance_choice < 7.1) {
         pixel_dist = manhattan_distance(u_center_point * u_zoom, p) * u_color_speed;
     } else {
         pixel_dist = 0.0;

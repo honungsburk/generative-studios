@@ -35,7 +35,7 @@ type GenerativeStudioProps = {
     name: string,
     format: "jpg" | "png"
   ) => void;
-  children: React.ReactElement;
+  children: React.ReactNode;
 };
 
 const hotkeys = {

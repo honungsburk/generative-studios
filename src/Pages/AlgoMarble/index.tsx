@@ -1,13 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import AdaptiveCanvas from "src/Components/AdaptiveCanvas";
-import { RNG } from "src/Libraries/Random";
+import * as Random from "src/Libraries/Random";
 import { uniform1f, uniform2f, uniform3f } from "src/Libraries/WebGL/uniform";
 import * as WebGL from "src/Libraries/WebGL";
 import vertexShaderPath from "./Shaders/shader.vert?url";
 import fragShaderPath from "./Shaders/shader.frag?url";
 import * as Window from "src/Util/Window";
+import GenerativeStudio from "src/Components/GenerativeStudio";
+import * as Settings from "./Settings";
+
+const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
+
 export default function AlgoMarble() {
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
+  const [settings, setSettings] = useState(randomSetting);
 
   // Drawing
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function AlgoMarble() {
           );
           const program = WebGL.createProgram(gl)(vert, frag);
           gl.useProgram(program);
-          setUniforms(gl)(program)(new RNG("hello, world"));
+          Settings.setUniforms(gl)(program)(settings);
 
           const vertPosition = gl.getAttribLocation(program, "vertPosition");
           const [quadVertices, quadIndices] =
@@ -41,14 +47,18 @@ export default function AlgoMarble() {
               lastHeight = canvas.height;
               lastWidth = canvas.width;
               gl.viewport(0, 0, canvas.width, canvas.height);
-            }
-            uniform2f(gl)(program)("u_resolution", canvas.width, canvas.height);
+              uniform2f(gl)(program)(
+                "u_resolution",
+                canvas.width,
+                canvas.height
+              );
 
-            gl.useProgram(program);
-            gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
-            gl.enableVertexAttribArray(vertPosition);
-            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+              gl.useProgram(program);
+              gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
+              gl.enableVertexAttribArray(vertPosition);
+              gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            }
           });
 
           return () => {
@@ -65,42 +75,52 @@ export default function AlgoMarble() {
     };
 
     exec();
-  }, []);
+  }, [settings]);
 
-  return <AdaptiveCanvas ref={canvasRef} />;
+  return (
+    <GenerativeStudio
+      drawer={(v) => <></>}
+      onGenerateRandomClick={() => {
+        setSettings(randomSetting());
+      }}
+      onDownload={() => {
+        1 + 1;
+      }}
+    >
+      <AdaptiveCanvas ref={canvasRef} />;
+    </GenerativeStudio>
+  );
 }
 
-const setUniforms =
-  (gl: WebGL2RenderingContext) =>
-  (program: WebGLProgram) =>
-  (random: RNG): void => {
-    const u1f = uniform1f(gl)(program);
-    const u2f = uniform2f(gl)(program);
-    const u3f = uniform3f(gl)(program);
-    u1f("u_numOctaves", random.uniform(8, 16));
-    u1f("u_zoom", random.uniform(0.4, 1.6));
-    u3f(
-      "u_cc",
-      random.uniform(10, 20),
-      random.uniform(10, 20),
-      random.uniform(10, 20)
-    );
-    u3f("u_dd", random.random(), random.random(), random.random());
-    u2f("u_q_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
-    u2f("u_r_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
-    u1f("u_pattern_h", random.uniform(0.8, 1.2));
-    u2f("u_center_point", random.random(), random.random());
-    u1f("u_pixel_distance_choice", random.random());
-    u1f("u_interpolation_choice", random.uniform(0.0, 3.0));
-    u2f("u_q_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
-    u2f("u_q_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
-    u2f("u_r_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
-    u2f("u_r_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
-    u1f("u_color_speed", random.uniform(0.5, 1.0));
-  };
+// const setUniforms =
+//   (gl: WebGL2RenderingContext) =>
+//   (program: WebGLProgram) =>
+//   (random: RNG): void => {
+//     const u1f = uniform1f(gl)(program);
+//     const u2f = uniform2f(gl)(program);
+//     const u3f = uniform3f(gl)(program);
+//     u1f("u_numOctaves", random.uniform(8, 16));
+//     u1f("u_zoom", random.uniform(0.4, 1.6));
+//     u3f(
+//       "u_cc",
+//       random.uniform(10, 20),
+//       random.uniform(10, 20),
+//       random.uniform(10, 20)
+//     );
+//     u3f("u_dd", random.random(), random.random(), random.random());
+//     u2f("u_q_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
+//     u2f("u_r_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
+//     u1f("u_pattern_h", random.uniform(0.8, 1.2));
+//     u2f("u_center_point", random.random(), random.random());
+//     u1f("u_pixel_distance_choice", random.random());
+//     u1f("u_interpolation_choice", random.uniform(0.0, 3.0));
+//     u2f("u_q_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
+//     u2f("u_q_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
+//     u2f("u_r_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
+//     u2f("u_r_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
+//     u1f("u_color_speed", random.uniform(0.5, 1.0));
+//   };
 
-// TODO: gl.deleteBuffer(buffer);
-// + how do we
 const createQuad =
   (gl: WebGL2RenderingContext) =>
   (program: WebGLProgram) =>
