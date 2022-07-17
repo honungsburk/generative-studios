@@ -2,57 +2,126 @@ import * as CN from "src/Libraries/ConstrainedNumber";
 import * as P5Extra from "src/Libraries/P5Extra/Palette";
 import { RNG } from "src/Libraries/Random";
 import { uniform1f, uniform2f, uniform3f } from "src/Libraries/WebGL/uniform";
-
+import * as UrlEncode from "src/Libraries/UrlEncode";
 export namespace Constraints {
-  export type Cosine = CN.ConstrainedNumber<0.1, 0, 20>;
-  export const makeCosine: (n: number) => Cosine = CN.fromNumber({
-    step: 0.1,
-    min: 0,
-    max: 20,
-  });
-  export type Noise = CN.ConstrainedNumber<0.01, 0.7, 1.3>;
-  export const makeNoise: (n: number) => Noise = CN.fromNumber({
-    step: 0.01,
-    min: 0.7,
-    max: 1.3,
-  });
-  export type Displace = CN.ConstrainedNumber<0.1, 0, 20>;
-  export const makeDisplace: (n: number) => Displace = CN.fromNumber({
-    step: 0.1,
-    min: 0,
-    max: 20,
-  });
-  export type Coordinate = CN.ConstrainedNumber<0.01, 0, 1>;
-  export const makeCoordinate: (n: number) => Coordinate = CN.fromNumber({
-    step: 0.01,
-    min: 0,
-    max: 1,
-  });
+  export namespace Cosine {
+    export type params = { step: 0.1; min: 0; max: 20 };
+    export const params: params = { step: 0.1, min: 0, max: 20 };
+    export type CN = CN.ConstrainedNumber<
+      params["step"],
+      params["min"],
+      params["max"]
+    >;
+    export const make: (n: number) => CN = CN.fromNumber(params);
+  }
+  export namespace Noise {
+    export type params = { step: 0.01; min: 0.7; max: 1.3 };
+    export const params: params = { step: 0.01, min: 0.7, max: 1.3 };
+    export type CN = CN.ConstrainedNumber<
+      params["step"],
+      params["min"],
+      params["max"]
+    >;
+    export const make: (n: number) => CN = CN.fromNumber(params);
+  }
+  export namespace Displace {
+    export type params = { step: 0.1; min: 0; max: 20 };
+    export const params: params = { step: 0.1, min: 0, max: 20 };
+    export type CN = CN.ConstrainedNumber<
+      params["step"],
+      params["min"],
+      params["max"]
+    >;
+    export const make: (n: number) => CN = CN.fromNumber(params);
+  }
+
+  export namespace Coordinate {
+    export type params = { step: 0.01; min: 0; max: 1 };
+    export const params: params = { step: 0.01, min: 0, max: 1 };
+    export type CN = CN.ConstrainedNumber<
+      params["step"],
+      params["min"],
+      params["max"]
+    >;
+    export const make: (n: number) => CN = CN.fromNumber(params);
+  }
 }
 
 export type Settings = {
   zoom: CN.ConstrainedNumber<0.1, 0.4, 1.6>;
 
   // Color
-  cosineC: [Constraints.Cosine, Constraints.Cosine, Constraints.Cosine];
-  cosineD: [Constraints.Cosine, Constraints.Cosine, Constraints.Cosine];
+  cosineC: [
+    Constraints.Cosine.CN,
+    Constraints.Cosine.CN,
+    Constraints.Cosine.CN
+  ];
+  cosineD: [
+    Constraints.Cosine.CN,
+    Constraints.Cosine.CN,
+    Constraints.Cosine.CN
+  ];
   colorSpeed: CN.ConstrainedNumber<0.1, 0.5, 1.0>;
 
   // Noise Params
   numOctaves: 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
-  q: [Constraints.Noise, Constraints.Noise];
-  r: [Constraints.Noise, Constraints.Noise];
+  q: [Constraints.Noise.CN, Constraints.Noise.CN];
+  r: [Constraints.Noise.CN, Constraints.Noise.CN];
   pattern: CN.ConstrainedNumber<0.01, 0.8, 1.2>;
-  qDisplaceX: [Constraints.Displace, Constraints.Displace];
-  qDisplaceY: [Constraints.Displace, Constraints.Displace];
-  rDisplaceX: [Constraints.Displace, Constraints.Displace];
-  rDisplaceY: [Constraints.Displace, Constraints.Displace];
+  qDisplaceX: [Constraints.Displace.CN, Constraints.Displace.CN];
+  qDisplaceY: [Constraints.Displace.CN, Constraints.Displace.CN];
+  rDisplaceX: [Constraints.Displace.CN, Constraints.Displace.CN];
+  rDisplaceY: [Constraints.Displace.CN, Constraints.Displace.CN];
 
   // Strategies
   pixelDistanceStrategy: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   interpolationStrategy: 1 | 2 | 3;
-  centerPoint: [Constraints.Coordinate, Constraints.Coordinate];
+  centerPoint: [Constraints.Coordinate.CN, Constraints.Coordinate.CN];
 };
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// const vSchema = UrlEncode.VObject({
+//   zoom: UrlEncode.VConstrainedNumber({step: 0.1, min: 0.4, max: 1.6}),
+
+//   // Color
+//   cosineC: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
+//   cosineD: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
+//   colorSpeed: UrlEncode.VConstrainedNumber({step: 0.1, min: 0.5, max: 1.0}),
+
+//   // Noise Params
+//   numOctaves: UrlEncode.VNumberm
+//   q: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
+//   r: [Constraints.Noise, Constraints.Noise];
+//   pattern: CN.ConstrainedNumber<0.01, 0.8, 1.2>;
+//   qDisplaceX: [Constraints.Displace, Constraints.Displace];
+//   qDisplaceY: [Constraints.Displace, Constraints.Displace];
+//   rDisplaceX: [Constraints.Displace, Constraints.Displace];
+//   rDisplaceY: [Constraints.Displace, Constraints.Displace];
+
+//   // Strategies
+//   pixelDistanceStrategy: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+//   interpolationStrategy: 1 | 2 | 3;
+//   centerPoint: [Constraints.Coordinate, Constraints.Coordinate];
+// });
+
+// const pairEnDecode = UrlEncode.construct(vSchema);
+
+// export function encode(settings: Settings): string {
+//   const sett: any = { ...settings };
+//   sett.depthStrategy = sett.depthStrategy.toValue();
+//   return pairEnDecode.encode(sett);
+// }
+// export async function decode(s: string): Promise<Settings> {
+//   const val: any = await pairEnDecode.decode(s);
+//   val.depthStrategy = Depth.build(val.depthStrategy);
+//   return val as Settings;
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+// RNG
+////////////////////////////////////////////////////////////////////////////////
 
 export function random(rng: RNG): Settings {
   return {
@@ -60,14 +129,14 @@ export function random(rng: RNG): Settings {
 
     // Color
     cosineC: [
-      Constraints.makeCosine(rng.uniform(10, 20)),
-      Constraints.makeCosine(rng.uniform(10, 20)),
-      Constraints.makeCosine(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
     ],
     cosineD: [
-      Constraints.makeCosine(rng.uniform(10, 20)),
-      Constraints.makeCosine(rng.uniform(10, 20)),
-      Constraints.makeCosine(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
+      Constraints.Cosine.make(rng.uniform(10, 20)),
     ],
     colorSpeed: CN.fromNumber({ step: 0.1, min: 0.5, max: 1.0 })(
       rng.uniform(0.5, 1.0)
@@ -76,39 +145,39 @@ export function random(rng: RNG): Settings {
     // Noise Params
     numOctaves: rng.pickUniform([8, 9, 10, 11, 12, 13, 14, 15, 16]),
     q: [
-      Constraints.makeNoise(rng.uniform(0.7, 1.3)),
-      Constraints.makeNoise(rng.uniform(0.7, 1.3)),
+      Constraints.Noise.make(rng.uniform(0.7, 1.3)),
+      Constraints.Noise.make(rng.uniform(0.7, 1.3)),
     ],
     r: [
-      Constraints.makeNoise(rng.uniform(0.7, 1.3)),
-      Constraints.makeNoise(rng.uniform(0.7, 1.3)),
+      Constraints.Noise.make(rng.uniform(0.7, 1.3)),
+      Constraints.Noise.make(rng.uniform(0.7, 1.3)),
     ],
     pattern: CN.fromNumber({ step: 0.01, min: 0.8, max: 1.2 })(
       rng.uniform(0.8, 1.2)
     ),
     qDisplaceX: [
-      Constraints.makeDisplace(rng.uniform(0, 20)),
-      Constraints.makeDisplace(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
     ],
     qDisplaceY: [
-      Constraints.makeDisplace(rng.uniform(0, 20)),
-      Constraints.makeDisplace(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
     ],
     rDisplaceX: [
-      Constraints.makeDisplace(rng.uniform(0, 20)),
-      Constraints.makeDisplace(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
     ],
     rDisplaceY: [
-      Constraints.makeDisplace(rng.uniform(0, 20)),
-      Constraints.makeDisplace(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
+      Constraints.Displace.make(rng.uniform(0, 20)),
     ],
 
     // Strategies
     pixelDistanceStrategy: rng.pickUniform([1, 2, 3, 4, 5, 6, 7, 8]),
     interpolationStrategy: rng.pickUniform([1, 2, 3]),
     centerPoint: [
-      Constraints.makeCoordinate(rng.random()),
-      Constraints.makeCoordinate(rng.random()),
+      Constraints.Coordinate.make(rng.random()),
+      Constraints.Coordinate.make(rng.random()),
     ],
   };
 }
