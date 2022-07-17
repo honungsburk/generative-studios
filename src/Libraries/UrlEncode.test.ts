@@ -42,6 +42,13 @@ test("Validate a VEnumString schema", () => {
   expect(UrlEncode.validate(schema)(true)).false;
 });
 
+test("Validate a VArray schema", () => {
+  const schema = UrlEncode.VArray(UrlEncode.VNumber);
+  expect(UrlEncode.validate(schema)("1")).false;
+  expect(UrlEncode.validate(schema)(["1"])).false;
+  expect(UrlEncode.validate(schema)([1, 2, 3, 4])).true;
+});
+
 test("Validate a VObject schema", () => {
   const schema = UrlEncode.VObject({
     boolean: UrlEncode.VBoolean,
@@ -192,6 +199,40 @@ test("keyShrink can compress a VOr schema", () => {
   expect(() => shrink.decode(shrink.encode(ex3))).throw;
 });
 
+test("keyShrink can compress a keys inside of arrays", () => {
+  const schema = UrlEncode.VArray(
+    UrlEncode.VObject({
+      kind: UrlEncode.VEnumString(["one"]),
+      value1: UrlEncode.VBoolean,
+    })
+  );
+
+  const shrink = UrlEncode.keyShrink(schema);
+
+  const ex1 = [
+    {
+      kind: "one",
+      value1: true,
+    },
+  ];
+
+  const ex2 = [
+    {
+      kind: "two",
+      value1: false,
+    },
+  ];
+
+  const ex3 = [true];
+
+  expect(
+    Object.keys((shrink.encode(ex1) as Object[])[0])[0].length
+  ).toStrictEqual(1);
+  expect(shrink.decode(shrink.encode(ex1))).toStrictEqual(ex1);
+  expect(shrink.decode(shrink.encode(ex2))).toStrictEqual(ex2);
+  expect(() => shrink.decode(shrink.encode(ex3))).throw;
+});
+
 ////////////////////////////////////////////////////////////////////////////////
 // EnumStringCompress
 ////////////////////////////////////////////////////////////////////////////////
@@ -281,6 +322,20 @@ test("EnumStringCompress can compress and expand VOr EnumStrings", () => {
   expect(shrink.decode(shrink.encode(ex1))).toStrictEqual(ex1);
   expect(shrink.decode(shrink.encode(ex2))).toStrictEqual(ex2);
 });
+
+test("EnumStringCompress can compress and expand VArray EnumStrings", () => {
+  const schema = UrlEncode.VArray(UrlEncode.VEnumString(["hi", "hello"]));
+
+  const shrink = UrlEncode.valueCompress(schema);
+
+  const ex1 = ["hi", "hi", "hello"];
+  const ex2: typeof ex1 = [];
+  expect((shrink.encode(ex1) as string[])[0].length).toStrictEqual(1);
+  expect(shrink.decode(shrink.encode(ex1))).toStrictEqual(ex1);
+  expect(shrink.decode(shrink.encode(ex1))).toStrictEqual(ex1);
+  expect(shrink.decode(shrink.encode(ex2))).toStrictEqual(ex2);
+});
+
 ////////////////////////////////////////////////////////////////////////////////
 // construct
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,6 +350,7 @@ test("Construct can encode and decode", async () => {
     object: UrlEncode.VObject({
       element: UrlEncode.VEnumString(["hello", "world2"]),
       cnum: UrlEncode.VConstrainedNumber(cnum),
+      array: UrlEncode.VArray(UrlEncode.VNumber),
     }),
   });
 
@@ -307,6 +363,7 @@ test("Construct can encode and decode", async () => {
     object: {
       element: "world2",
       cnum: mkNum(6),
+      array: [2.3],
     },
   };
 

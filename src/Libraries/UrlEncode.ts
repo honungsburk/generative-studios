@@ -13,6 +13,7 @@ export type Value =
   | string
   | boolean
   | number
+  | Value[]
   | ConstrainedNumber.ConstrainedNumber<any, any, any>;
 
 export function VConstrainedNumber<
@@ -42,6 +43,7 @@ export const VBoolean: VBoolean = { kind: "VBoolean" };
 type VBoolean = { readonly kind: "VBoolean" };
 export const VString: VString = { kind: "VString" };
 type VString = { readonly kind: "VString" };
+
 export const VEnumString = (values: Iterable<string> | ArrayLike<string>) => {
   if (typeof values !== "string") {
     return {
@@ -55,6 +57,18 @@ export const VEnumString = (values: Iterable<string> | ArrayLike<string>) => {
   }
 };
 type VEnumString = { readonly kind: "VEnumString"; value: Set<string> };
+
+export function VArray(value: ValueSchema): VArray {
+  return {
+    kind: "VArray",
+    value: value,
+  };
+}
+
+type VArray = {
+  kind: "VArray";
+  value: ValueSchema;
+};
 
 export function VObject(value: { [key: string]: ValueSchema }): VObject {
   return {
@@ -85,6 +99,7 @@ export type ValueSchema =
   | VEnumString
   | VBoolean
   | VNumber
+  | VArray
   | VConstrainedNumber<any, any, any>
   | VOr;
 
@@ -124,6 +139,14 @@ export class InvalidKeyError extends CustomError {
 export const validateWithErr = (schema: ValueSchema) => (value: Value) => {
   let isValid = false;
   switch (schema.kind) {
+    case "VArray":
+      if (
+        Array.isArray(value) &&
+        value.every((v) => validateWithErr(schema.value)(v))
+      ) {
+        return true;
+      }
+      throw new IncorrectTypeError("VArray", typeof value);
     case "VOr":
       for (let sch of schema.value) {
         try {
@@ -201,7 +224,26 @@ export function keyShrink(schema: ValueSchema): {
   decode: (value: Value) => Value;
   schema: ValueSchema;
 } {
-  if (schema.kind === "VObject") {
+  if (schema.kind === "VArray") {
+    const rec = keyShrink(schema.value);
+    return {
+      schema: VArray(rec.schema),
+      encode: (v) => {
+        if (Array.isArray(v)) {
+          return v.map(rec.encode);
+        } else {
+          throw Error(`Expected ${v} to be an Array`);
+        }
+      },
+      decode: (v) => {
+        if (Array.isArray(v)) {
+          return v.map(rec.decode);
+        } else {
+          throw Error(`Expected ${v} to be an Array`);
+        }
+      },
+    };
+  } else if (schema.kind === "VObject") {
     const keys = Object.keys(schema.value).sort();
     const compress: any = {};
     const compressor = new KeyCharMap(keys);
@@ -217,7 +259,8 @@ export function keyShrink(schema: ValueSchema): {
       encode: (v) => {
         if (
           typeof v === "object" &&
-          !(v instanceof ConstrainedNumber.ConstrainedNumber)
+          !(v instanceof ConstrainedNumber.ConstrainedNumber) &&
+          !Array.isArray(v)
         ) {
           const newV: any = {};
           for (let key of keys) {
@@ -232,7 +275,8 @@ export function keyShrink(schema: ValueSchema): {
       decode: (v) => {
         if (
           typeof v === "object" &&
-          !(v instanceof ConstrainedNumber.ConstrainedNumber)
+          !(v instanceof ConstrainedNumber.ConstrainedNumber) &&
+          !Array.isArray(v)
         ) {
           const newV: any = {};
           for (let char in v) {
@@ -320,7 +364,25 @@ function valueCompressUnsafe(schema: ValueSchema): {
   encode: (value: Value) => Value;
   decode: (value: Value) => Value;
 } {
-  if (schema.kind === "VObject") {
+  if (schema.kind === "VArray") {
+    const compressor = valueCompressUnsafe(schema.value);
+    return {
+      encode: (v) => {
+        if (Array.isArray(v)) {
+          return v.map(compressor.encode);
+        } else {
+          throw Error(`Expected ${v} to be an array`);
+        }
+      },
+      decode: (v) => {
+        if (Array.isArray(v)) {
+          return v.map(compressor.decode);
+        } else {
+          throw Error(`Expected ${v} to be an array`);
+        }
+      },
+    };
+  } else if (schema.kind === "VObject") {
     const keys = Object.keys(schema.value).sort();
     const compress: any = {};
 
@@ -332,7 +394,8 @@ function valueCompressUnsafe(schema: ValueSchema): {
       encode: (v) => {
         if (
           typeof v === "object" &&
-          !(v instanceof ConstrainedNumber.ConstrainedNumber)
+          !(v instanceof ConstrainedNumber.ConstrainedNumber) &&
+          !Array.isArray(v)
         ) {
           const newV: any = {};
           for (let key of keys) {
@@ -347,7 +410,8 @@ function valueCompressUnsafe(schema: ValueSchema): {
       decode: (v) => {
         if (
           typeof v === "object" &&
-          !(v instanceof ConstrainedNumber.ConstrainedNumber)
+          !(v instanceof ConstrainedNumber.ConstrainedNumber) &&
+          !Array.isArray(v)
         ) {
           const newV: any = {};
           for (let key of keys) {
@@ -420,7 +484,8 @@ function valueCompressUnsafe(schema: ValueSchema): {
       decode: (v) => {
         if (
           typeof v === "object" &&
-          !(v instanceof ConstrainedNumber.ConstrainedNumber)
+          !(v instanceof ConstrainedNumber.ConstrainedNumber) &&
+          !Array.isArray(v)
         ) {
           const index = v["i"] as number;
           return pairs[index].decode(v["v"]);

@@ -82,42 +82,50 @@ export type Settings = {
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-// const vSchema = UrlEncode.VObject({
-//   zoom: UrlEncode.VConstrainedNumber({step: 0.1, min: 0.4, max: 1.6}),
+const vSchema = UrlEncode.VObject({
+  zoom: UrlEncode.VConstrainedNumber({ step: 0.1, min: 0.4, max: 1.6 }),
 
-//   // Color
-//   cosineC: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
-//   cosineD: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
-//   colorSpeed: UrlEncode.VConstrainedNumber({step: 0.1, min: 0.5, max: 1.0}),
+  // Color
+  cosineC: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Cosine.params)
+  ),
+  cosineD: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Cosine.params)
+  ),
+  colorSpeed: UrlEncode.VConstrainedNumber({ step: 0.1, min: 0.5, max: 1.0 }),
 
-//   // Noise Params
-//   numOctaves: UrlEncode.VNumberm
-//   q: UrlEncode.VArray(UrlEncode.VConstrainedNumber({step: 0.1, min: 0, max: 20})),
-//   r: [Constraints.Noise, Constraints.Noise];
-//   pattern: CN.ConstrainedNumber<0.01, 0.8, 1.2>;
-//   qDisplaceX: [Constraints.Displace, Constraints.Displace];
-//   qDisplaceY: [Constraints.Displace, Constraints.Displace];
-//   rDisplaceX: [Constraints.Displace, Constraints.Displace];
-//   rDisplaceY: [Constraints.Displace, Constraints.Displace];
+  // Noise Params
+  numOctaves: UrlEncode.VNumber,
+  q: UrlEncode.VArray(UrlEncode.VConstrainedNumber(Constraints.Noise.params)),
+  r: UrlEncode.VArray(UrlEncode.VConstrainedNumber(Constraints.Noise.params)),
+  pattern: UrlEncode.VConstrainedNumber({ step: 0.01, min: 0.8, max: 1.2 }),
+  qDisplaceX: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Displace.params)
+  ),
+  qDisplaceY: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Displace.params)
+  ),
+  rDisplaceX: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Displace.params)
+  ),
+  rDisplaceY: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Displace.params)
+  ),
 
-//   // Strategies
-//   pixelDistanceStrategy: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-//   interpolationStrategy: 1 | 2 | 3;
-//   centerPoint: [Constraints.Coordinate, Constraints.Coordinate];
-// });
+  // Strategies
+  pixelDistanceStrategy: UrlEncode.VNumber,
+  interpolationStrategy: UrlEncode.VNumber,
+  centerPoint: UrlEncode.VArray(
+    UrlEncode.VConstrainedNumber(Constraints.Coordinate.params)
+  ),
+});
 
-// const pairEnDecode = UrlEncode.construct(vSchema);
+export namespace URL {
+  const pairEnDecode = UrlEncode.construct(vSchema);
 
-// export function encode(settings: Settings): string {
-//   const sett: any = { ...settings };
-//   sett.depthStrategy = sett.depthStrategy.toValue();
-//   return pairEnDecode.encode(sett);
-// }
-// export async function decode(s: string): Promise<Settings> {
-//   const val: any = await pairEnDecode.decode(s);
-//   val.depthStrategy = Depth.build(val.depthStrategy);
-//   return val as Settings;
-// }
+  export const encode: (value: Settings) => string = pairEnDecode.encode;
+  export const decode = pairEnDecode.decode as (s: string) => Promise<Settings>;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // RNG

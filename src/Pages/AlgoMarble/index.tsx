@@ -8,12 +8,17 @@ import fragShaderPath from "./Shaders/shader.frag?url";
 import * as Window from "src/Util/Window";
 import GenerativeStudio from "src/Components/GenerativeStudio";
 import * as Settings from "./Settings";
+import { useStoreInUrl } from "src/Hooks/useStoreInUrl";
 
 const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
 
 export default function AlgoMarble() {
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
-  const [settings, setSettings] = useState(randomSetting);
+  const [settings, setSettings] = useStoreInUrl(
+    Settings.URL.encode,
+    Settings.URL.decode,
+    randomSetting
+  );
 
   // Drawing
   useEffect(() => {
