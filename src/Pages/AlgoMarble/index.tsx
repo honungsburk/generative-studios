@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import AdaptiveCanvas from "src/Components/AdaptiveCanvas";
 import * as Random from "src/Libraries/Random";
 import { uniform2f } from "src/Libraries/WebGL/uniform";
@@ -9,7 +9,7 @@ import * as Window from "src/Util/Window";
 import GenerativeStudio from "src/Components/GenerativeStudio";
 import * as Settings from "./Settings";
 import { useStoreInUrl } from "src/Hooks/useStoreInUrl";
-import { NumberIncrementStepperProps } from "@chakra-ui/react";
+import * as Canvas from "src/Libraries/Canvas";
 
 const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
 
@@ -60,7 +60,7 @@ export default function AlgoMarble() {
         setSettings(randomSetting());
       }}
       onDownload={(width, height, name, format) => {
-        saveCanvas(width, height, name, format, async (canvas) => {
+        Canvas.save(width, height, name, format, async (canvas) => {
           const ss = await setup(canvas);
           render(ss, settings, width, height);
           clean(ss);
@@ -70,35 +70,6 @@ export default function AlgoMarble() {
       <AdaptiveCanvas ref={canvasRef} />
     </GenerativeStudio>
   );
-}
-
-async function saveCanvas(
-  width: number,
-  height: number,
-  name: string,
-  format: "jpeg" | "png",
-  render: (canvas: HTMLCanvasElement) => Promise<void>
-): Promise<void> {
-  const offScreenCanvas = document.createElement("canvas");
-  offScreenCanvas.width = width;
-  offScreenCanvas.height = height;
-  await render(offScreenCanvas);
-  const type = `image/${format}`;
-  const imageURI = offScreenCanvas
-    .toDataURL(type, 1)
-    .replace(type, "image/octet-stream");
-  downloadURI(imageURI, name + "." + format);
-  offScreenCanvas.remove();
-}
-
-function downloadURI(uri: string, name: string) {
-  var link = document.createElement("a");
-  link.download = name;
-  link.href = uri;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  link.remove();
 }
 
 const createQuad =
