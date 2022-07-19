@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import AdaptiveCanvas from "src/Components/AdaptiveCanvas";
 import * as Random from "src/Libraries/Random";
-import { uniform1f, uniform2f, uniform3f } from "src/Libraries/WebGL/uniform";
+import { uniform2f } from "src/Libraries/WebGL/uniform";
 import * as WebGL from "src/Libraries/WebGL";
 import vertexShaderPath from "./Shaders/shader.vert?url";
 import fragShaderPath from "./Shaders/shader.frag?url";
@@ -9,6 +9,7 @@ import * as Window from "src/Util/Window";
 import GenerativeStudio from "src/Components/GenerativeStudio";
 import * as Settings from "./Settings";
 import { useStoreInUrl } from "src/Hooks/useStoreInUrl";
+import { NumberIncrementStepperProps } from "@chakra-ui/react";
 
 const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
 
@@ -25,57 +26,27 @@ export default function AlgoMarble() {
     const exec = async () => {
       if (canvasRef.current) {
         const canvas = canvasRef.current;
-        const gl = canvas.getContext("webgl2");
-        if (gl) {
-          const vert = await WebGL.loadShader(gl)(
-            gl.VERTEX_SHADER,
-            vertexShaderPath
-          );
-          const frag = await WebGL.loadShader(gl)(
-            gl.FRAGMENT_SHADER,
-            fragShaderPath
-          );
-          const program = WebGL.createProgram(gl)(vert, frag);
-          gl.useProgram(program);
-          Settings.setUniforms(gl)(program)(settings);
+        const ss = await setup(canvas);
 
-          const vertPosition = gl.getAttribLocation(program, "vertPosition");
-          const [quadVertices, quadIndices] =
-            createQuad(gl)(program)(vertPosition);
+        let lastHeight = 0;
+        let lastWidth = 0;
 
-          let lastHeight = 0;
-          let lastWidth = 0;
+        const cancelAnimation = Window.animate(() => {
+          // Chaning the viewport is super expensive!
+          if (lastHeight !== canvas.height && lastWidth !== canvas.width) {
+            lastHeight = canvas.height;
+            lastWidth = canvas.width;
 
-          const cancelAnimation = Window.animate(() => {
-            // Chaning the viewport is super expensive!
-            if (lastHeight !== canvas.height && lastWidth !== canvas.width) {
-              lastHeight = canvas.height;
-              lastWidth = canvas.width;
-              gl.viewport(0, 0, canvas.width, canvas.height);
-              uniform2f(gl)(program)(
-                "u_resolution",
-                canvas.width,
-                canvas.height
-              );
+            render(ss, settings, canvas.width, canvas.height);
+          }
+        });
 
-              gl.useProgram(program);
-              gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
-              gl.enableVertexAttribArray(vertPosition);
-              gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-            }
-          });
-
-          return () => {
-            cancelAnimation();
-            gl.useProgram(null);
-            gl.deleteProgram(program);
-            gl.deleteBuffer(quadVertices);
-            gl.deleteBuffer(quadIndices);
-          };
-        } else {
-          console.error("You don't have webgl2 context... alert user!");
-        }
+        return () => {
+          cancelAnimation();
+          clean(ss);
+        };
+      } else {
+        console.error("You don't have webgl2 context... alert user!");
       }
     };
 
@@ -88,8 +59,12 @@ export default function AlgoMarble() {
       onGenerateRandomClick={() => {
         setSettings(randomSetting());
       }}
-      onDownload={() => {
-        1 + 1;
+      onDownload={(width, height, name, format) => {
+        saveCanvas(width, height, name, format, async (canvas) => {
+          const ss = await setup(canvas);
+          render(ss, settings, width, height);
+          clean(ss);
+        });
       }}
     >
       <AdaptiveCanvas ref={canvasRef} />
@@ -97,38 +72,37 @@ export default function AlgoMarble() {
   );
 }
 
-// const setUniforms =
-//   (gl: WebGL2RenderingContext) =>
-//   (program: WebGLProgram) =>
-//   (random: RNG): void => {
-//     const u1f = uniform1f(gl)(program);
-//     const u2f = uniform2f(gl)(program);
-//     const u3f = uniform3f(gl)(program);
-//     u1f("u_numOctaves", random.uniform(8, 16));
-//     u1f("u_zoom", random.uniform(0.4, 1.6));
-//     u3f(
-//       "u_cc",
-//       random.uniform(10, 20),
-//       random.uniform(10, 20),
-//       random.uniform(10, 20)
-//     );
-//     u3f("u_dd", random.random(), random.random(), random.random());
-//     u2f("u_q_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
-//     u2f("u_r_h", random.uniform(0.7, 1.3), random.uniform(0.7, 1.3));
-//     u1f("u_pattern_h", random.uniform(0.8, 1.2));
-//     u2f("u_center_point", random.random(), random.random());
-//     u1f("u_pixel_distance_choice", random.random());
-//     u1f("u_interpolation_choice", random.uniform(0.0, 3.0));
-//     u2f("u_q_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
-//     u2f("u_q_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
-//     u2f("u_r_fbm_displace_1", random.uniform(0, 20), random.uniform(0, 20));
-//     u2f("u_r_fbm_displace_2", random.uniform(0, 20), random.uniform(0, 20));
-//     u1f("u_color_speed", random.uniform(0.5, 1.0));
-//   };
+async function saveCanvas(
+  width: number,
+  height: number,
+  name: string,
+  format: "jpeg" | "png",
+  render: (canvas: HTMLCanvasElement) => Promise<void>
+): Promise<void> {
+  const offScreenCanvas = document.createElement("canvas");
+  offScreenCanvas.width = width;
+  offScreenCanvas.height = height;
+  await render(offScreenCanvas);
+  const type = `image/${format}`;
+  const imageURI = offScreenCanvas
+    .toDataURL(type, 1)
+    .replace(type, "image/octet-stream");
+  downloadURI(imageURI, name + "." + format);
+  offScreenCanvas.remove();
+}
+
+function downloadURI(uri: string, name: string) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  link.remove();
+}
 
 const createQuad =
   (gl: WebGL2RenderingContext) =>
-  (program: WebGLProgram) =>
   (index: number): [WebGLBuffer | null, WebGLBuffer | null] => {
     // Drawing a quad
     let vertices = [
@@ -170,3 +144,59 @@ const createQuad =
 
     return [triangleVertexBufferObj, Index_Buffer];
   };
+
+type Setup = {
+  quadVertices: WebGLBuffer;
+  quadIndices: WebGLBuffer;
+  vertPosition: number;
+  gl: WebGL2RenderingContext;
+  program: WebGLProgram;
+};
+
+async function setup(canvas: HTMLCanvasElement): Promise<Setup> {
+  const gl = canvas.getContext("webgl2");
+  if (gl) {
+    const vert = await WebGL.loadShader(gl)(gl.VERTEX_SHADER, vertexShaderPath);
+    const frag = await WebGL.loadShader(gl)(gl.FRAGMENT_SHADER, fragShaderPath);
+    const program = WebGL.createProgram(gl)(vert, frag);
+    gl.useProgram(program);
+
+    const vertPosition = gl.getAttribLocation(program, "vertPosition");
+    const [quadVertices, quadIndices] = createQuad(gl)(vertPosition);
+    if (quadVertices && quadIndices) {
+      return {
+        quadVertices: quadVertices,
+        quadIndices: quadIndices,
+        vertPosition: vertPosition,
+        gl: gl,
+        program: program,
+      };
+    }
+  }
+
+  throw Error("Could not setup AlgoMarble");
+}
+
+function render(
+  setup: Setup,
+  settings: Settings.Settings,
+  width: number,
+  height: number
+): void {
+  const { quadVertices, quadIndices, vertPosition, gl, program } = setup;
+  gl.viewport(0, 0, width, height);
+  Settings.setUniforms(gl)(program)(settings);
+  uniform2f(gl)(program)("u_resolution", width, height);
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
+  gl.enableVertexAttribArray(vertPosition);
+  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+}
+
+function clean(setup: Setup): void {
+  setup.gl.useProgram(null);
+  setup.gl.deleteProgram(setup.program);
+  setup.gl.deleteBuffer(setup.quadVertices);
+  setup.gl.deleteBuffer(setup.quadIndices);
+}

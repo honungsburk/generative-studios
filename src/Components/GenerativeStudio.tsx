@@ -33,7 +33,7 @@ type GenerativeStudioProps = {
     width: number,
     height: number,
     name: string,
-    format: "jpg" | "png"
+    format: "jpeg" | "png"
   ) => void;
   children: React.ReactNode;
 };
@@ -68,8 +68,6 @@ export default function GenerativeStudio({
     height
   );
 
-  console.log(canvasDims);
-
   // Hot Keys
   useHotkeys(hotkeys.drawerToggle, (event) => {
     event.preventDefault();
@@ -96,10 +94,10 @@ export default function GenerativeStudio({
         Math.floor(windowDimensions.width * window.devicePixelRatio),
         Math.floor(windowDimensions.height * window.devicePixelRatio),
         "Example",
-        "jpg"
+        "jpeg"
       );
     } else {
-      onDownload(width, height, "Example", "jpg");
+      onDownload(width, height, "Example", "jpeg");
     }
   };
 
