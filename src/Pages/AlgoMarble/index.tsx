@@ -92,7 +92,7 @@ export default function AlgoMarble() {
         1 + 1;
       }}
     >
-      <AdaptiveCanvas ref={canvasRef} />;
+      <AdaptiveCanvas ref={canvasRef} />
     </GenerativeStudio>
   );
 }

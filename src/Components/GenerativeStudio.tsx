@@ -68,6 +68,8 @@ export default function GenerativeStudio({
     height
   );
 
+  console.log(canvasDims);
+
   // Hot Keys
   useHotkeys(hotkeys.drawerToggle, (event) => {
     event.preventDefault();

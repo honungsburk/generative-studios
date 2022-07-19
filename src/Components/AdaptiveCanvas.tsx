@@ -7,7 +7,7 @@ type AdaptiveCanvasProps = React.DetailedHTMLProps<
   HTMLCanvasElement
 >;
 
-const adaptiveCanvasDefaultProps = { width: "100%", height: "100vh" };
+const adaptiveCanvasDefaultProps = { width: "100%", height: "100%" };
 
 const AdaptiveCanvas = React.forwardRef(
   (props: AdaptiveCanvasProps, ref: React.Ref<HTMLCanvasElement>) => {
