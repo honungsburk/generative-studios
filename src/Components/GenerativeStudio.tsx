@@ -234,7 +234,7 @@ function CanvasControlls({
       <Tooltip
         placement="left"
         label={
-          <WithShortCut label="Fullscreen" shortcut={[hotkeys.fullscreen]} />
+          <WithShortCut label="Resolution" shortcut={[hotkeys.fullscreen]} />
         }
       >
         <Box>
