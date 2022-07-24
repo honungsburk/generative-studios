@@ -10,7 +10,6 @@ import {
   useBreakpointValue,
   Kbd,
   Center,
-  Input,
   Flex,
   NumberInput,
   NumberInputField,
@@ -25,9 +24,12 @@ import * as Util from "src/Util";
 import TopBarLinks from "./TopBarLinks";
 import { useState } from "react";
 import useWindowDimensions from "src/Hooks/useWindowDimensions";
+import Sidebar from "./Sidebar";
 
 type GenerativeStudioProps = {
-  drawer: (close: () => void) => JSX.Element;
+  name: string;
+  tuneTab: React.ReactNode;
+  aboutTab: React.ReactNode;
   onGenerateRandomClick: () => void;
   onDownload: (
     width: number,
@@ -47,7 +49,9 @@ const hotkeys = {
 } as const;
 
 export default function GenerativeStudio({
-  drawer,
+  name,
+  tuneTab,
+  aboutTab,
   onGenerateRandomClick,
   onDownload,
   children,
@@ -113,7 +117,15 @@ export default function GenerativeStudio({
   return (
     <Drawer
       isOpen={isDesktop !== undefined && isDesktop && isOpen && showGUI}
-      drawer={drawer(setIsOpen.off)}
+      drawer={
+        <Sidebar
+          close={setIsOpen.off}
+          width="400px"
+          name={name}
+          tuneTab={tuneTab}
+          aboutTab={aboutTab}
+        />
+      }
     >
       <Center
         width={"100%"}

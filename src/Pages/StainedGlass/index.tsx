@@ -63,73 +63,14 @@ export default function StainedGlass() {
       onGenerateRandomClick={() =>
         setSettings(Algorithm.generateSettings(Algorithm.generateSeed()))
       }
-      drawer={(close) => (
-        <Sidebar
-          close={close}
-          width={400}
-          tuneProps={{
-            settings: settings,
-            setSettings: setSettings,
-          }}
-        />
-      )}
+      name="Stained Glass"
+      tuneTab={<TuneTab setSettings={setSettings} settings={settings} />}
+      aboutTab={<About />}
     >
       <AdaptiveSketch
         setup={Algorithm.setup}
         draw={(w, h) => Algorithm.draw()(settings, w, h)} // TODO: fix memoization
       />
     </GenerativeStudio>
-  );
-}
-
-function Sidebar(props: {
-  width: number;
-  tuneProps: TuneTabProps;
-  close: () => void;
-}) {
-  const totalHeight = 116; //headerHeight + tabListHeight + 32; // add margin as well
-
-  return (
-    <Flex
-      alignItems={"left"}
-      width={`${props.width}px`}
-      height="100vh"
-      direction={"column"}
-      overflow={"hidden"}
-    >
-      <Flex align={"center"} m={4}>
-        <Heading fontSize={28}>Stained Glass</Heading>
-        <Spacer />
-        <IconButton
-          variant={"brutalist-ghost"}
-          colorScheme="blackAlpha"
-          aria-label="Close Side bar"
-          icon={<Icon.Left />}
-          onClick={() => props.close()}
-        />
-      </Flex>
-
-      <Tabs size="md" colorScheme={"blackAlpha"} variant="brutalist" flex="1">
-        <TabList>
-          <Tab>
-            <Icon.Tune boxSize={6} />
-          </Tab>
-          <Tab>
-            <Icon.Home boxSize={6} />
-          </Tab>
-        </TabList>
-        <TabPanels
-          style={{ height: `calc(100vh - ${totalHeight}px)` }}
-          overflowY={"auto"}
-        >
-          <TabPanel padding={0}>
-            <TuneTab {...props.tuneProps} />
-          </TabPanel>
-          <TabPanel>
-            <About />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Flex>
   );
 }

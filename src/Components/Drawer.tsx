@@ -15,8 +15,8 @@ import { useState } from "react";
 import Theme from "src/Theme";
 import React from "react";
 export type DrawerProps = {
-  drawer?: React.ReactElement | React.ReactElement[];
-  children?: React.ReactElement | React.ReactElement[];
+  drawer?: React.ReactNode;
+  children?: React.ReactNode;
   isOpen?: boolean;
 };
 
