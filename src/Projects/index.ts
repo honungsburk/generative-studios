@@ -17,7 +17,7 @@ export const metadata: Metadata[] = [
     name: "AlgoMarble",
     href: "/algomarble",
     thumbNailSrc: AlgoMarbleThumbnail,
-    userInteractions: ["Mouse", "Audio"],
+    userInteractions: [], //["Mouse", "Audio"],
   },
   {
     name: "Stained Glass",

@@ -175,6 +175,17 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
             update((copy) => (copy.cosineD[2] = d));
           }}
         />
+        <Text fontSize="sm" whiteSpace={"nowrap"}>
+          Color Speed
+        </Text>
+        <Slider
+          info="How fast the color changes"
+          label="speed"
+          value={props.settings.colorSpeed}
+          setValue={(colorSpeed) =>
+            update((copy) => (copy.colorSpeed = colorSpeed))
+          }
+        />
       </Folder>
     </VStack>
   );

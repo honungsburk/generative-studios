@@ -183,7 +183,9 @@ export namespace URL {
 
 export function random(rng: RNG): Settings {
   return {
-    zoom: CN.fromNumber({ step: 0.1, min: 0.4, max: 1.6 })(rng.uniform(8, 16)),
+    zoom: CN.fromNumber({ step: 0.1, min: 0.4, max: 1.6 })(
+      rng.uniform(0.4, 1.6)
+    ),
 
     // Color
     cosineC: [

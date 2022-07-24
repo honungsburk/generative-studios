@@ -2,14 +2,17 @@
 
 ## AlgoMarble release
 
+- [ ] Add fullscreen mode
 - [ ] Bump Chakra version
 - [ ] Share Button
+- [ ] Fix Sidebar input elements
+- [ ] Simplify AlgoMarble inputss
 - [ ] AlgoMarble
   - [ x ] Port AlgoMarble to the web
   - [ ] Make artwork independent on resolution
-  - [ ] Add download
-  - [ ] Add sidebar settings
-  - [ ] Add Audio
+  - [ x ] Add download
+  - [ x ] Add sidebar settings
+  - [ x ] Add Audio
 
 ## Backlog
 
@@ -32,7 +35,7 @@
   - [ ] Port Motion to the web
   - [ ] Add Audio
 - [ ] Generate Art Settings
-- [ ] Add a heart tab
+- [ ] Add a like button
 - [ ] Save settings of pieces you have discovered and be able to browse them
   - [ ] store them locally
   - [ ] Page to view and filter/search them
