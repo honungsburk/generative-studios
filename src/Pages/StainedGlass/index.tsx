@@ -1,19 +1,7 @@
 import React, { useEffect } from "react";
 import * as Algorithm from "./Algorithm";
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Heading,
-  IconButton,
-  Flex,
-  Spacer,
-} from "@chakra-ui/react";
-import * as Icon from "src/Components/Icon";
 import { useSearchParams } from "react-router-dom";
-import { TuneTabProps, TuneTab } from "./TuneTab";
+import { TuneTab } from "./TuneTab";
 import About from "./About";
 import AdaptiveSketch from "src/Components/AdaptiveSketch";
 import GenerativeStudio from "src/Components/GenerativeStudio";
