@@ -10,7 +10,7 @@ import GenerativeStudio from "src/Components/GenerativeStudio";
 import * as Settings from "./Settings";
 import { useStoreInUrl } from "src/Hooks/useStoreInUrl";
 import * as Canvas from "src/Libraries/Canvas";
-import About from "./About";
+import AboutTab from "./AboutTab";
 
 const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
 
@@ -68,7 +68,7 @@ export default function AlgoMarble() {
       }}
       name={"AlgoMarble"}
       tuneTab={<></>}
-      aboutTab={<About />}
+      aboutTab={<AboutTab />}
     >
       <AdaptiveCanvas ref={canvasRef} />
     </GenerativeStudio>

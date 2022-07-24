@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import * as Algorithm from "./Algorithm";
 import { useSearchParams } from "react-router-dom";
 import { TuneTab } from "./TuneTab";
-import About from "./About";
+import AboutTab from "./AboutTab";
 import AdaptiveSketch from "src/Components/AdaptiveSketch";
 import GenerativeStudio from "src/Components/GenerativeStudio";
 import p5 from "p5";
@@ -53,7 +53,7 @@ export default function StainedGlass() {
       }
       name="Stained Glass"
       tuneTab={<TuneTab setSettings={setSettings} settings={settings} />}
-      aboutTab={<About />}
+      aboutTab={<AboutTab />}
     >
       <AdaptiveSketch
         setup={Algorithm.setup}
