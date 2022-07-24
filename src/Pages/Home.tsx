@@ -2,11 +2,12 @@ import {
   Heading,
   Text,
   Stack,
-  SimpleGrid,
+  Wrap,
   Image,
   LinkBox,
   LinkOverlay,
-  Box,
+  WrapItem,
+  Center,
 } from "@chakra-ui/react";
 import UserInteractionIcon from "../Components/UserInteractionIcon";
 import * as Projects from "../Projects";
@@ -18,18 +19,13 @@ export default function Home() {
         <Heading>Generative Studios</Heading>;
         <Text>Generative art for the masses.</Text>
       </Stack>
-      <SimpleGrid
-        px={8}
-        spacing={2}
-        width={"100%"}
-        minChildWidth={["300px", null, "400px"]}
-      >
+      <Wrap justify="center" align="center" px={8} spacing={4}>
         {Projects.metadata.map((meta, index) => (
-          <Box mx="auto" key={index}>
+          <WrapItem key={index}>
             <Project metadata={meta} />
-          </Box>
+          </WrapItem>
         ))}
-      </SimpleGrid>
+      </Wrap>
     </Stack>
   );
 }
