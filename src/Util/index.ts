@@ -45,3 +45,22 @@ export function fitToDimensions(
     height: Math.floor(toMul < 1 ? h * toMul : h),
   };
 }
+
+/**
+ *
+ * @param start number to start at (inclusive)
+ * @param stop number to end at (inclusive)
+ * @param step how many steps to take
+ * @returns an array
+ */
+export function* range(
+  start: number,
+  stop?: number,
+  step: number = 1
+): Generator<number, void, unknown> {
+  let i = start;
+  while (stop === undefined || i < stop) {
+    yield i;
+    i += step;
+  }
+}

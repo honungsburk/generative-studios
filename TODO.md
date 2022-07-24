@@ -2,8 +2,8 @@
 
 ## AlgoMarble release
 
+- [ ] Bump Chakra version
 - [ ] Share Button
-- [ ] Rework side bar and make transparent + simpler
 - [ ] AlgoMarble
   - [ x ] Port AlgoMarble to the web
   - [ ] Make artwork independent on resolution
@@ -13,6 +13,7 @@
 
 ## Backlog
 
+- [ ] Rework side bar and make transparent + simpler
 - [ ] Icon
 - [ ] Fix flickering
 - [ ] Add tests to catch regressions in art code...

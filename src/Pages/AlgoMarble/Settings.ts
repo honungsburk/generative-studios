@@ -64,20 +64,70 @@ export type Settings = {
   colorSpeed: CN.ConstrainedNumber<0.1, 0.5, 1.0>;
 
   // Noise Params
-  numOctaves: 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
+  numOctaves: CN.ConstrainedNumber<1, 8, 16>;
   q: [Constraints.Noise.CN, Constraints.Noise.CN];
   r: [Constraints.Noise.CN, Constraints.Noise.CN];
   pattern: CN.ConstrainedNumber<0.01, 0.8, 1.2>;
+
+  // This create variations of the same art work. Not super intersting
   qDisplaceX: [Constraints.Displace.CN, Constraints.Displace.CN];
   qDisplaceY: [Constraints.Displace.CN, Constraints.Displace.CN];
   rDisplaceX: [Constraints.Displace.CN, Constraints.Displace.CN];
   rDisplaceY: [Constraints.Displace.CN, Constraints.Displace.CN];
 
   // Strategies
-  pixelDistanceStrategy: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  pixelDistanceStrategy: PixelDistance.Strategy;
   interpolationStrategy: 1 | 2 | 3;
   centerPoint: [Constraints.Coordinate.CN, Constraints.Coordinate.CN];
 };
+
+export namespace PixelDistance {
+  export const all: Strategy[] = [1, 2, 3, 4, 5, 6, 7, 8];
+  export type Strategy = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  export type StrategyKind = string;
+
+  export function toKind(strategy: Strategy): StrategyKind {
+    switch (strategy) {
+      case 1:
+        return "X-Axis";
+      case 2:
+        return "Y-Axis";
+      case 3:
+        return "Circular";
+      case 4:
+        return "Manhattan Distance";
+      case 5:
+        return "Dot Product - Simple";
+      case 6:
+        return "Dot Product - Normalized - 1";
+      case 7:
+        return "Dot Product - Normalized - 2";
+      case 8:
+        return "Noise Value";
+    }
+  }
+
+  export function hasCenterPoint(strategy: Strategy): boolean {
+    return strategy === 3 || strategy === 4;
+  }
+}
+
+export namespace Interpolation {
+  export const all: Strategy[] = [1, 2, 3];
+  export type Strategy = 1 | 2 | 3;
+  export type StrategyKind = string;
+  export function toKind(strategy: Strategy): StrategyKind {
+    switch (strategy) {
+      case 1:
+        return "Linear";
+      case 2:
+        return "Cubic";
+      case 3:
+        return "Super Smooth";
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +145,7 @@ const vSchema = UrlEncode.VObject({
   colorSpeed: UrlEncode.VConstrainedNumber({ step: 0.1, min: 0.5, max: 1.0 }),
 
   // Noise Params
-  numOctaves: UrlEncode.VNumber,
+  numOctaves: UrlEncode.VConstrainedNumber({ step: 1, min: 8, max: 16 }),
   q: UrlEncode.VArray(UrlEncode.VConstrainedNumber(Constraints.Noise.params)),
   r: UrlEncode.VArray(UrlEncode.VConstrainedNumber(Constraints.Noise.params)),
   pattern: UrlEncode.VConstrainedNumber({ step: 0.01, min: 0.8, max: 1.2 }),
@@ -151,7 +201,9 @@ export function random(rng: RNG): Settings {
     ),
 
     // Noise Params
-    numOctaves: rng.pickUniform([8, 9, 10, 11, 12, 13, 14, 15, 16]),
+    numOctaves: CN.fromNumber({ step: 1, min: 8, max: 16 })(
+      rng.pickUniform([8, 9, 10, 11, 12, 13, 14, 15, 16])
+    ),
     q: [
       Constraints.Noise.make(rng.uniform(0.7, 1.3)),
       Constraints.Noise.make(rng.uniform(0.7, 1.3)),
@@ -197,7 +249,7 @@ export const setUniforms =
     const u1f = uniform1f(gl)(program);
     const u2f = uniform2f(gl)(program);
     const u3f = uniform3f(gl)(program);
-    u1f("u_numOctaves", settings.numOctaves);
+    u1f("u_numOctaves", settings.numOctaves.value);
     u1f("u_zoom", settings.zoom.value);
     u3f(
       "u_cc",

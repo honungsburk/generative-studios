@@ -228,7 +228,7 @@ void main() {
     // The point to send to pattern
     // now all points are between 0-1 ... I need a larger scope 0-10
     vec2 p = (gl_FragCoord.xy / u_resolution) * u_zoom; //* zoom;
-
+    vec2 center_point = vec2(u_center_point.x, 1.0 - u_center_point.y) * u_zoom;
 
     //Generate nice noise
     vec2 q = vec2( 0.0, 0.0);
@@ -250,15 +250,16 @@ void main() {
     } else if (u_pixel_distance_choice < 2.1) {
         pixel_dist = p.y * u_color_speed;
     } else if (u_pixel_distance_choice < 3.1) {
-        pixel_dist = length(u_center_point * u_zoom - p) * u_color_speed;
+        pixel_dist = length(center_point - p) * u_color_speed;
     } else if (u_pixel_distance_choice < 4.1) {
-        pixel_dist = dot(p, q);
+        pixel_dist = manhattan_distance(center_point, p) * u_color_speed;
     } else if (u_pixel_distance_choice < 5.1) {
-        pixel_dist = dot(q, r) / (length(q) * length(r));
+        pixel_dist = dot(p, q);
     } else if (u_pixel_distance_choice < 6.1) {
-        pixel_dist = dot(p, r) / (length(p) * length(r));
+        pixel_dist = dot(q, r) / (length(q) * length(r));
     } else if (u_pixel_distance_choice < 7.1) {
-        pixel_dist = manhattan_distance(u_center_point * u_zoom, p) * u_color_speed;
+        pixel_dist = dot(p, r) / (length(p) * length(r));
+
     } else {
         pixel_dist = 0.0;
     }

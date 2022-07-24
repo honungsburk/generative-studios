@@ -11,6 +11,7 @@ import * as Settings from "./Settings";
 import { useStoreInUrl } from "src/Hooks/useStoreInUrl";
 import * as Canvas from "src/Libraries/Canvas";
 import AboutTab from "./AboutTab";
+import TuneTab from "./TuneTab";
 
 const randomSetting = () => Settings.random(new Random.RNG(Random.genSeed(8)));
 
@@ -67,7 +68,7 @@ export default function AlgoMarble() {
         });
       }}
       name={"AlgoMarble"}
-      tuneTab={<></>}
+      tuneTab={<TuneTab settings={settings} setSettings={setSettings} />}
       aboutTab={<AboutTab />}
     >
       <AdaptiveCanvas ref={canvasRef} />
