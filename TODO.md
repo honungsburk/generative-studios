@@ -6,13 +6,14 @@
 - [ ] Bump Chakra version
 - [ ] Share Button
 - [ ] Fix Sidebar input elements
-- [ ] Simplify AlgoMarble inputss
+- [ ] Simplify AlgoMarble inputs
 - [ ] AlgoMarble
   - [ x ] Port AlgoMarble to the web
   - [ ] Make artwork independent on resolution
   - [ x ] Add download
   - [ x ] Add sidebar settings
-  - [ x ] Add Audio
+  - [ ] Add Audio
+  - [ ] Add Animation
 
 ## Backlog
 
