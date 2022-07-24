@@ -1,6 +1,4 @@
-import React, { useEffect } from "react";
 import * as Algorithm from "./Algorithm";
-import { useSearchParams } from "react-router-dom";
 import { TuneTab } from "./TuneTab";
 import AboutTab from "./AboutTab";
 import AdaptiveSketch from "src/Components/AdaptiveSketch";
