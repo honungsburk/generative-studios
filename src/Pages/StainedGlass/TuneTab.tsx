@@ -15,8 +15,6 @@ import Slider from "src/Components/Slider";
 import * as Algorithm from "./Algorithm";
 import * as Depth from "./Algorithm/Strategy/Depth";
 import * as DistanceStrategy from "./Algorithm/Strategy/Distance";
-import * as JitterStrategy from "./Algorithm/Strategy/Jitter";
-import * as PaletteStrategy from "./Algorithm/Strategy/Palette";
 import * as SplitStrategy from "./Algorithm/Strategy/Split";
 
 export type TuneTabProps = {
