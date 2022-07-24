@@ -1,8 +1,7 @@
-import { Select, VStack } from "@chakra-ui/react";
+import { Select, VStack, Text } from "@chakra-ui/react";
 import Folder from "src/Components/Folder";
 import * as Settings from "./Settings";
 import Slider from "src/Components/Slider";
-import * as Util from "src/Util";
 import CoordinateInput from "src/Components/CoordinateInput";
 
 type TuneTabProps = {
@@ -11,6 +10,11 @@ type TuneTabProps = {
 };
 
 export default function TuneTab(props: TuneTabProps): JSX.Element {
+  const update = (fn: (settings: Settings.Settings) => void) => {
+    const copy = { ...props.settings };
+    fn(copy);
+    props.setSettings(copy);
+  };
   return (
     <VStack align={"left"}>
       <Folder label="Zoom" info="how zoomed you are">
@@ -19,11 +23,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="Zoom"
           value={props.settings.zoom}
           setValue={(zoom) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.zoom = zoom;
-            props.setSettings(copy);
+            update((copy) => (copy.zoom = zoom));
           }}
         />
       </Folder>
@@ -34,11 +34,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="Octaves"
           value={props.settings.numOctaves}
           setValue={(numOctaves) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.numOctaves = numOctaves;
-            props.setSettings(copy);
+            update((copy) => (copy.numOctaves = numOctaves));
           }}
         />
         <Slider
@@ -46,11 +42,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="q.x"
           value={props.settings.q[0]}
           setValue={(qX) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.q = [qX, copy.q[1]];
-            props.setSettings(copy);
+            update((copy) => (copy.q = [qX, copy.q[1]]));
           }}
         />
         <Slider
@@ -58,11 +50,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="q.y"
           value={props.settings.q[1]}
           setValue={(qY) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.q = [copy.q[0], qY];
-            props.setSettings(copy);
+            update((copy) => (copy.q = [copy.q[0], qY]));
           }}
         />
         <Slider
@@ -70,11 +58,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="r.x"
           value={props.settings.r[0]}
           setValue={(rX) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.r = [rX, copy.r[1]];
-            props.setSettings(copy);
+            update((copy) => (copy.r = [rX, copy.r[1]]));
           }}
         />
         <Slider
@@ -82,11 +66,7 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="r.y"
           value={props.settings.r[1]}
           setValue={(rY) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.r = [copy.q[0], rY];
-            props.setSettings(copy);
+            update((copy) => (copy.r = [copy.q[0], rY]));
           }}
         />
         <Slider
@@ -94,24 +74,21 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           label="pattern"
           value={props.settings.pattern}
           setValue={(pattern) => {
-            const copy = {
-              ...props.settings,
-            };
-            copy.pattern = pattern;
-            props.setSettings(copy);
+            update((copy) => (copy.pattern = pattern));
           }}
         />
       </Folder>
-      <Folder label="Color" info="How to color the noise">
+      <Folder label="Strategies" info="Strategies">
         <VStack align={"left"}>
           <Select
             variant="filled"
             onChange={(strat) => {
-              const copy = {
-                ...props.settings,
-              };
-              copy.interpolationStrategy = parseInt(strat.target.value) as any;
-              props.setSettings(copy);
+              update(
+                (copy) =>
+                  (copy.interpolationStrategy = parseInt(
+                    strat.target.value
+                  ) as any)
+              );
             }}
             value={props.settings.interpolationStrategy}
           >
@@ -124,11 +101,12 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           <Select
             variant="filled"
             onChange={(strat) => {
-              const copy = {
-                ...props.settings,
-              };
-              copy.pixelDistanceStrategy = parseInt(strat.target.value) as any;
-              props.setSettings(copy);
+              update(
+                (copy) =>
+                  (copy.pixelDistanceStrategy = parseInt(
+                    strat.target.value
+                  ) as any)
+              );
             }}
             value={props.settings.pixelDistanceStrategy}
           >
@@ -147,14 +125,13 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
               height={"200px"}
               bgColor="blackAlpha.200"
               onPosition={(x: number, y: number) => {
-                const copy = {
-                  ...props.settings,
-                };
-                copy.centerPoint = [
-                  copy.centerPoint[0].fromNumber(x),
-                  copy.centerPoint[1].fromNumber(y),
-                ];
-                props.setSettings(copy);
+                update(
+                  (copy) =>
+                    (copy.centerPoint = [
+                      copy.centerPoint[0].fromNumber(x),
+                      copy.centerPoint[1].fromNumber(y),
+                    ])
+                );
               }}
               x={props.settings.centerPoint[0].value}
               y={props.settings.centerPoint[1].value}
@@ -164,6 +141,69 @@ export default function TuneTab(props: TuneTabProps): JSX.Element {
           )}
         </VStack>
       </Folder>
+      <Folder label="Color" info="Color">
+        <PalletePicker
+          name="Red"
+          freq={props.settings.cosineC[0]}
+          setFreq={(f) => {
+            update((copy) => (copy.cosineC[0] = f));
+          }}
+          shift={props.settings.cosineD[0]}
+          setShift={(d) => {
+            update((copy) => (copy.cosineD[0] = d));
+          }}
+        />
+        <PalletePicker
+          name="Green"
+          freq={props.settings.cosineC[1]}
+          setFreq={(f) => {
+            update((copy) => (copy.cosineC[1] = f));
+          }}
+          shift={props.settings.cosineD[1]}
+          setShift={(d) => {
+            update((copy) => (copy.cosineD[1] = d));
+          }}
+        />
+        <PalletePicker
+          name="Blue"
+          freq={props.settings.cosineC[2]}
+          setFreq={(f) => {
+            update((copy) => (copy.cosineC[2] = f));
+          }}
+          shift={props.settings.cosineD[2]}
+          setShift={(d) => {
+            update((copy) => (copy.cosineD[2] = d));
+          }}
+        />
+      </Folder>
     </VStack>
+  );
+}
+
+function PalletePicker(props: {
+  name: string;
+  freq: Settings.Constraints.Cosine.CN;
+  shift: Settings.Constraints.Cosine.CN;
+  setFreq: (freq: Settings.Constraints.Cosine.CN) => void;
+  setShift: (freq: Settings.Constraints.Cosine.CN) => void;
+}) {
+  return (
+    <>
+      <Text fontSize="sm" whiteSpace={"nowrap"}>
+        {props.name}
+      </Text>
+      <Slider
+        info="the frequency of the cosinus wave"
+        label="freq"
+        value={props.freq}
+        setValue={props.setFreq}
+      />
+      <Slider
+        info="the shift of the cosinus wave"
+        label="shift"
+        value={props.shift}
+        setValue={props.setShift}
+      />
+    </>
   );
 }
