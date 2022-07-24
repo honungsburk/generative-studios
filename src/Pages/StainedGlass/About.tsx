@@ -36,7 +36,7 @@ export default function About(): JSX.Element {
       </Text>
       <Text>
         You can explore the algorithm by using the random button as well as
-        changeing the parameters in the 'Tune Tab'.
+        changing the parameters in the 'Tune Tab'.
       </Text>
     </VStack>
   );
