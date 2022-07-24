@@ -89,7 +89,7 @@ export function download(
   height: number,
   settings: Settings,
   name: string,
-  format: "png" | "jpg",
+  format: "png" | "jpeg",
   p5: p5Types
 ): void {
   // p5 adjusts for window.devicePixelRatio internally
