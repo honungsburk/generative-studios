@@ -18,6 +18,7 @@
 
 ## Backlog
 
+- [ ] Fullscreen removes tooltips! (Bug)
 - [ ] Rework side bar and make transparent + simpler
 - [ ] Icon
 - [ ] Fix flickering
