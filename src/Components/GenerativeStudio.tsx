@@ -22,9 +22,10 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { ToggleButton } from "./ToggleButton";
 import * as Util from "src/Util";
 import TopBarLinks from "./TopBarLinks";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useWindowDimensions from "src/Hooks/useWindowDimensions";
 import Sidebar from "./Sidebar";
+import { useFullscreen } from "src/Hooks/useFullscreen";
 
 type GenerativeStudioProps = {
   name: string;
@@ -37,6 +38,7 @@ type GenerativeStudioProps = {
     name: string,
     format: "jpeg" | "png"
   ) => void;
+  onAnimate?: (animate: boolean) => void;
   children: React.ReactNode;
 };
 
@@ -44,6 +46,7 @@ const hotkeys = {
   drawerToggle: "s",
   hideGUI: "h",
   randomArtwork: "r",
+  canvas: "c",
   fullscreen: "f",
   download: "d",
 } as const;
@@ -57,13 +60,17 @@ export default function GenerativeStudio({
   children,
 }: GenerativeStudioProps): JSX.Element {
   useNoBodyOverflow();
+  const drawerRef = useRef<HTMLDivElement>(null);
   const isDesktop = useBreakpointValue({ md: true, base: false });
   const windowDimensions = useWindowDimensions();
+  const [isAnimated, setIsAnimated] = useBoolean(false);
   const [isOpen, setIsOpen] = useBoolean(false);
   const [showGUI, setShowGUI] = useBoolean(true);
-  const [isFullScreen, setIsFullScreen] = useBoolean(true);
+  // const [isFullScreen, setIsFullScreen] = useBoolean(false);
+  const [isCanvas, setIsCanvas] = useBoolean(true);
   const [width, setWidth] = useState(500);
   const [height, setHeight] = useState(500);
+  const [isFullScreen, fullscreenActions] = useFullscreen(drawerRef);
 
   const canvasDims = Util.fitToDimensions(
     windowDimensions.width,
@@ -87,13 +94,18 @@ export default function GenerativeStudio({
     onGenerateRandomClick();
   });
 
+  useHotkeys(hotkeys.canvas, (event) => {
+    event.preventDefault();
+    setIsCanvas.toggle();
+  });
+
   useHotkeys(hotkeys.fullscreen, (event) => {
     event.preventDefault();
-    setIsFullScreen.toggle();
+    fullscreenActions.toggle();
   });
 
   const download = () => {
-    if (isFullScreen) {
+    if (isCanvas) {
       onDownload(
         Math.floor(windowDimensions.width * window.devicePixelRatio),
         Math.floor(windowDimensions.height * window.devicePixelRatio),
@@ -104,7 +116,6 @@ export default function GenerativeStudio({
       onDownload(width, height, "Example", "jpeg");
     }
   };
-
   useHotkeys(
     hotkeys.download,
     (event) => {
@@ -116,6 +127,9 @@ export default function GenerativeStudio({
 
   return (
     <Drawer
+      bg={"background.light"}
+      width="100%"
+      ref={drawerRef}
       isOpen={isDesktop !== undefined && isDesktop && isOpen && showGUI}
       drawer={
         <Sidebar
@@ -173,13 +187,15 @@ export default function GenerativeStudio({
             right={4}
             bottom={16}
             onDownload={download}
+            isCanvas={isCanvas}
+            onCanvasChange={setIsCanvas.toggle}
             isFullScreen={isFullScreen}
-            onFullScreenChange={() => setIsFullScreen.toggle()}
+            onFullScreenChange={() => fullscreenActions.toggle()}
             isVisible={isOpen}
             onVisibleChange={() => setShowGUI.toggle()}
           />
 
-          <Hidden isHidden={isFullScreen}>
+          <Hidden isHidden={isCanvas}>
             <CanvasDimensionsInput
               widthValue={width}
               setWidthValue={setWidth}
@@ -194,8 +210,8 @@ export default function GenerativeStudio({
           </Hidden>
         </Hidden>
         <Box
-          width={isFullScreen ? "100%" : `${canvasDims.width}px`}
-          height={isFullScreen ? "100%" : `${canvasDims.height}px`}
+          width={isCanvas ? "100%" : `${canvasDims.width}px`}
+          height={isCanvas ? "100%" : `${canvasDims.height}px`}
         >
           {children}
         </Box>
@@ -209,6 +225,8 @@ type RightSideButtonsProps = {
   onGenerateRandomClick: () => void;
   isVisible?: boolean;
   onVisibleChange?: (v: boolean) => void;
+  isCanvas?: boolean;
+  onCanvasChange?: (v: boolean) => void;
   isFullScreen?: boolean;
   onFullScreenChange?: (v: boolean) => void;
   onDownload?: () => void;
@@ -218,6 +236,8 @@ function CanvasControlls({
   isMobile,
   isVisible,
   onVisibleChange,
+  isCanvas,
+  onCanvasChange,
   isFullScreen,
   onFullScreenChange,
   onDownload,
@@ -246,7 +266,7 @@ function CanvasControlls({
       <Tooltip
         placement="left"
         label={
-          <WithShortCut label="Resolution" shortcut={[hotkeys.fullscreen]} />
+          <WithShortCut label="Fullscreen" shortcut={[hotkeys.fullscreen]} />
         }
       >
         <Box>
@@ -257,6 +277,21 @@ function CanvasControlls({
             aria-label="Fullscreen on/off"
             value={isFullScreen}
             onChange={onFullScreenChange}
+          />
+        </Box>
+      </Tooltip>
+      <Tooltip
+        placement="left"
+        label={<WithShortCut label="Canvas" shortcut={[hotkeys.canvas]} />}
+      >
+        <Box>
+          <ToggleButton
+            variant={"ghost"}
+            on={<Icon.Dimensions />}
+            off={<Icon.Dimensions />}
+            aria-label="Canvas dimensions"
+            value={isCanvas}
+            onChange={onCanvasChange}
           />
         </Box>
       </Tooltip>

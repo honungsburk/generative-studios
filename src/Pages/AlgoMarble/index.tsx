@@ -32,6 +32,7 @@ export default function AlgoMarble() {
 
         let lastHeight = 0;
         let lastWidth = 0;
+        const time = new Date();
 
         const cancelAnimation = Window.animate(() => {
           // Chaning the viewport is super expensive!

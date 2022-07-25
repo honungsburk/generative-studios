@@ -18,6 +18,8 @@ import {
   AiFillEye,
 } from "react-icons/ai";
 
+import { TbDimensions } from "react-icons/tb";
+
 import {
   MdShare,
   MdTune,
@@ -147,6 +149,10 @@ export function Fullscreen(props: IconProps) {
 
 export function FullscreenExit(props: IconProps) {
   return <Icon {...props} as={MdFullscreenExit} />;
+}
+
+export function Dimensions(props: IconProps) {
+  return <Icon {...props} as={TbDimensions} />;
 }
 
 // Visible

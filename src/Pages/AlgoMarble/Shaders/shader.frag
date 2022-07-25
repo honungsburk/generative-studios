@@ -6,6 +6,8 @@ precision mediump float;
 
 #define PROCESSING_COLOR_SHADER
 
+uniform float time;
+
 uniform vec2 u_resolution;
 
 // FBM

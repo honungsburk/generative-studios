@@ -1,40 +1,55 @@
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  IconButton,
-  keyframes,
-  Stack,
-  useBoolean,
-  useDisclosure,
-} from "@chakra-ui/react";
-import * as Icon from "./Icon";
-import { motion } from "framer-motion";
-import { useState } from "react";
-import Theme from "src/Theme";
+import { Box, Flex, BoxProps } from "@chakra-ui/react";
 import React from "react";
+
 export type DrawerProps = {
   drawer?: React.ReactNode;
   children?: React.ReactNode;
   isOpen?: boolean;
-};
+} & BoxProps;
 
-export default function Drawer(props: DrawerProps): JSX.Element {
-  return (
-    <Box h="100vh">
-      <Flex>
-        <Box
-          display={props.isOpen ? "block" : "none"}
-          bgColor="background.light"
-          maxHeight={"100vh"}
-        >
-          {props.drawer}
-        </Box>
-        <Box height={"100vh"} flex="1" overflowY={"hidden"}>
-          {props.children}
-        </Box>
-      </Flex>
-    </Box>
-  );
-}
+const Drawer = React.forwardRef(
+  (
+    { drawer, children, isOpen, ...rest }: DrawerProps,
+    ref: React.Ref<HTMLDivElement>
+  ) => {
+    return (
+      <Box h="100vh" ref={ref} {...rest}>
+        <Flex>
+          <Box
+            display={isOpen ? "block" : "none"}
+            bgColor="background.light"
+            maxHeight={"100vh"}
+          >
+            {drawer}
+          </Box>
+          <Box height={"100vh"} flex="1" overflowY={"hidden"}>
+            {children}
+          </Box>
+        </Flex>
+      </Box>
+    );
+  }
+);
+
+Drawer.displayName = "Drawer";
+
+export default Drawer;
+
+// export default function Drawer(props: DrawerProps): JSX.Element {
+//   return (
+//     <Box h="100vh">
+//       <Flex>
+//         <Box
+//           display={props.isOpen ? "block" : "none"}
+//           bgColor="background.light"
+//           maxHeight={"100vh"}
+//         >
+//           {props.drawer}
+//         </Box>
+//         <Box height={"100vh"} flex="1" overflowY={"hidden"}>
+//           {props.children}
+//         </Box>
+//       </Flex>
+//     </Box>
+//   );
+// }
