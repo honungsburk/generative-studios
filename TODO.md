@@ -2,7 +2,8 @@
 
 ## AlgoMarble release
 
-- [ ] Add fullscreen mode
+- [ x ] Add fullscreen mode
+- [ x ] Support go back/foward in history
 - [ ] Bump Chakra version
 - [ ] Share Button
 - [ ] Fix Sidebar input elements
