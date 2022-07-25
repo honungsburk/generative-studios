@@ -28,7 +28,7 @@ export default function StainedGlass() {
           new p5(() => {})
         );
       }}
-      onGenerateRandomClick={() => setSettings(randomSetting)}
+      onGenerateRandomClick={() => setSettings(randomSetting())}
       name="Stained Glass"
       tuneTab={<TuneTab setSettings={setSettings} settings={settings} />}
       aboutTab={<AboutTab />}
