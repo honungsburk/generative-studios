@@ -1,5 +1,6 @@
 import { defineConfig, UserConfigExport } from "vitest/config";
 import react from "@vitejs/plugin-react";
+// @ts-ignore
 import * as path from "node:path";
 
 // https://vitejs.dev/config/
