@@ -1,7 +1,7 @@
 {
   "name": "generative-studios",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "pretty": "prettier --write \"./src/**/*.{ts,tsx,json}\"",
     "dev": "vite",
