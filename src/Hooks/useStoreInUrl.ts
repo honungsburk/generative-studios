@@ -5,7 +5,7 @@ export function useStoreInUrl<A>(
   encode: (v: A) => string,
   decode: (s: string) => Promise<A>,
   init: (() => A) | A
-): [A, React.Dispatch<React.SetStateAction<A>>] {
+): [A, (value: A) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
   const [value, setValue] = useState(init);
 
@@ -13,23 +13,37 @@ export function useStoreInUrl<A>(
     const run = async () => {
       const configBase64 = searchParams.get("data");
       if (configBase64) {
-        const config = await decode(configBase64);
-        // TODO: add a typecheck here!
-        if (config) {
-          setValue(config);
+        try {
+          const config = await decode(configBase64);
+          // TODO: add a typecheck here!
+          if (config) {
+            setValue(config);
+          }
+        } catch (err) {
+          console.error(err);
         }
       }
     };
     run();
-  }, []);
 
-  useEffect(() => {
-    const encoding = encode(value);
-    setSearchParams({
-      v: "1",
-      data: encoding,
-    });
-  }, [value]);
+    window.addEventListener("popstate", run);
+    return () => {
+      window.removeEventListener("popstate", run);
+    };
+  }, [searchParams]);
 
-  return [value, setValue];
+  return [
+    value,
+    (newValue) => {
+      setValue(newValue);
+      const encoding = encode(newValue);
+      setSearchParams(
+        {
+          v: "1",
+          data: encoding,
+        },
+        { replace: false }
+      );
+    },
+  ];
 }
