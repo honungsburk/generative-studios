@@ -6,7 +6,7 @@ precision mediump float;
 
 #define PROCESSING_COLOR_SHADER
 
-uniform float time;
+uniform float u_time;
 
 uniform vec2 u_resolution;
 
@@ -229,7 +229,7 @@ float manhattan_distance(in vec2 v1, in vec2 v2){
 void main() {
     // The point to send to pattern
     // now all points are between 0-1 ... I need a larger scope 0-10
-    vec2 p = (gl_FragCoord.xy / u_resolution) * u_zoom; //* zoom;
+    vec2 p = gl_FragCoord.xy / u_resolution * u_zoom; //(gl_FragCoord.xy / u_resolution) * u_zoom; //* zoom;
     vec2 center_point = vec2(u_center_point.x, 1.0 - u_center_point.y) * u_zoom;
 
     //Generate nice noise

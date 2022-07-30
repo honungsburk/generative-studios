@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import AdaptiveCanvas from "src/Components/AdaptiveCanvas";
 import * as Random from "src/Libraries/Random";
-import { uniform2f } from "src/Libraries/WebGL/uniform";
+import { uniform1f, uniform2f } from "src/Libraries/WebGL/uniform";
 import * as WebGL from "src/Libraries/WebGL";
 import vertexShaderPath from "./Shaders/shader.vert?url";
 import fragShaderPath from "./Shaders/shader.frag?url";
@@ -25,6 +25,9 @@ export default function AlgoMarble() {
 
   // Drawing
   useEffect(() => {
+    let cancelAnimation = () => {};
+    let ss: Setup | undefined = undefined;
+
     const exec = async () => {
       if (canvasRef.current) {
         const canvas = canvasRef.current;
@@ -32,28 +35,42 @@ export default function AlgoMarble() {
 
         let lastHeight = 0;
         let lastWidth = 0;
+        let lastScale = 1.0;
         const time = new Date();
+        // time.getMilliseconds()
 
-        const cancelAnimation = Window.animate(() => {
+        cancelAnimation = Window.animate(() => {
           // Chaning the viewport is super expensive!
-          if (lastHeight !== canvas.height && lastWidth !== canvas.width) {
+          if (
+            lastHeight !== canvas.height ||
+            lastWidth !== canvas.width ||
+            window.devicePixelRatio !== lastScale
+          ) {
             lastHeight = canvas.height;
             lastWidth = canvas.width;
-
-            render(ss, settings, canvas.width, canvas.height);
+            lastScale = window.devicePixelRatio;
+            render(
+              ss,
+              settings,
+              canvas.width,
+              canvas.height,
+              1000 // 1 second
+            );
           }
         });
 
-        return () => {
-          cancelAnimation();
-          clean(ss);
-        };
+        console.log("Create");
       } else {
         console.error("You don't have webgl2 context... alert user!");
       }
     };
 
     exec();
+    return () => {
+      console.log("Destroy");
+      cancelAnimation();
+      ss && clean(ss);
+    };
   }, [settings]);
 
   return (
@@ -64,7 +81,7 @@ export default function AlgoMarble() {
       onDownload={(width, height, name, format) => {
         Canvas.save(width, height, name, format, async (canvas) => {
           const ss = await setup(canvas);
-          render(ss, settings, width, height);
+          render(ss, settings, width, height, 1000); // one second
           clean(ss);
         });
       }}
@@ -157,17 +174,22 @@ function render(
   setup: Setup,
   settings: Settings.Settings,
   width: number,
-  height: number
+  height: number,
+  time: number
 ): void {
+  const scale = window.devicePixelRatio;
   const { quadVertices, quadIndices, vertPosition, gl, program } = setup;
   gl.viewport(0, 0, width, height);
-  Settings.setUniforms(gl)(program)(settings);
-  uniform2f(gl)(program)("u_resolution", width, height);
   gl.useProgram(program);
+  Settings.setUniforms(gl)(program)(settings);
+  uniform1f(gl)(program)("u_time", time);
+  uniform2f(gl)(program)("u_resolution", width, height);
   gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
   gl.enableVertexAttribArray(vertPosition);
   gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  // console.log("render", width, height);
+  // console.log(settings);
 }
 
 function clean(setup: Setup): void {
