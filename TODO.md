@@ -17,8 +17,16 @@
   - [ ] Add Audio
   - [ ] Add Animation
 
+## Bugs
+
+- [ ] can not edit resolution on mobile
+
 ## Backlog
 
+- [ ] Google Analytics?
+- [ ] Login
+  - [ ] Like artworks
+    - [ ] What if artwork
 - [ ] PWA Support
 - [ ] Fullscreen removes tooltips! (Bug)
 - [ ] Rework side bar and make transparent + simpler
