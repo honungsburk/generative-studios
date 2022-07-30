@@ -34,22 +34,3 @@ const Drawer = React.forwardRef(
 Drawer.displayName = "Drawer";
 
 export default Drawer;
-
-// export default function Drawer(props: DrawerProps): JSX.Element {
-//   return (
-//     <Box h="100vh">
-//       <Flex>
-//         <Box
-//           display={props.isOpen ? "block" : "none"}
-//           bgColor="background.light"
-//           maxHeight={"100vh"}
-//         >
-//           {props.drawer}
-//         </Box>
-//         <Box height={"100vh"} flex="1" overflowY={"hidden"}>
-//           {props.children}
-//         </Box>
-//       </Flex>
-//     </Box>
-//   );
-// }
