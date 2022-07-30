@@ -202,13 +202,14 @@ float fbm( in vec2 x, in float H )
 // Again, by stacking the fbm on top of each other we get more intersting details.
 float pattern( in vec2 p, out vec2 q, out vec2 r )
 {
+    float seconds =  u_time / 1000.0;
 	
     // We add vectors provided by the CPU so as to make each image more unique
-    q.x = fbm( p + u_q_fbm_displace_1, u_q_h.x );
-    q.y = fbm( p + u_q_fbm_displace_2, u_q_h.y );
+    q.x = fbm( p + u_q_fbm_displace_1 * seconds, u_q_h.x );
+    q.y = fbm( p + u_q_fbm_displace_2 * seconds  ,u_q_h.y );
 
-    r.x = fbm( p + 4.0*q + u_r_fbm_displace_1, u_r_h.x );
-    r.y = fbm( p + 4.0*q + u_r_fbm_displace_2, u_r_h.y );
+    r.x = fbm( p + 4.0*q + u_r_fbm_displace_1 * seconds, u_r_h.x );
+    r.y = fbm( p + 4.0*q + u_r_fbm_displace_2 * seconds, u_r_h.y );
 
     return fbm( p + 4.0*r, u_pattern_h );
 }
@@ -236,7 +237,6 @@ void main() {
     vec2 q = vec2( 0.0, 0.0);
 
     vec2 r = vec2( 0.0, 0.0);
-
     float noise = pattern(p, q, r);
 
 

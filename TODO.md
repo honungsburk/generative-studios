@@ -1,5 +1,10 @@
 # TODO
 
+## Optimizations
+
+- Fix running in lower resolution then screen...
+- TODO: add app errors
+
 ## AlgoMarble release
 
 - [ ] AlgoMarble + different DPI

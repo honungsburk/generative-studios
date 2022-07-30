@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import AdaptiveCanvas from "src/Components/AdaptiveCanvas";
 import * as Random from "src/Libraries/Random";
-import { uniform1f, uniform2f } from "src/Libraries/WebGL/uniform";
 import * as WebGL from "src/Libraries/WebGL";
 import vertexShaderPath from "./Shaders/shader.vert?url";
 import fragShaderPath from "./Shaders/shader.frag?url";
@@ -36,27 +35,29 @@ export default function AlgoMarble() {
         let lastHeight = 0;
         let lastWidth = 0;
         let lastScale = 1.0;
-        const time = new Date();
+
+        const time = new Date().getTime();
         // time.getMilliseconds()
+        console.log(time);
 
         cancelAnimation = Window.animate(() => {
           // Chaning the viewport is super expensive!
-          if (
-            lastHeight !== canvas.height ||
-            lastWidth !== canvas.width ||
-            window.devicePixelRatio !== lastScale
-          ) {
-            lastHeight = canvas.height;
-            lastWidth = canvas.width;
-            lastScale = window.devicePixelRatio;
-            render(
-              ss,
-              settings,
-              canvas.width,
-              canvas.height,
-              1000 // 1 second
-            );
-          }
+          // if (
+          //   lastHeight !== canvas.height ||
+          //   lastWidth !== canvas.width ||
+          //   window.devicePixelRatio !== lastScale
+          // ) {
+          lastHeight = canvas.height;
+          lastWidth = canvas.width;
+          lastScale = window.devicePixelRatio;
+          render(
+            ss,
+            settings,
+            canvas.width,
+            canvas.height,
+            (1000 + time - new Date().getTime()) * 0.005 // 1 second
+          );
+          // }
         });
 
         console.log("Create");
@@ -144,14 +145,21 @@ type Setup = {
   vertPosition: number;
   gl: WebGL2RenderingContext;
   program: WebGLProgram;
+  uniformCache: WebGL.Uniform.Cache;
 };
 
 async function setup(canvas: HTMLCanvasElement): Promise<Setup> {
   const gl = canvas.getContext("webgl2");
   if (gl) {
-    const vert = await WebGL.loadShader(gl)(gl.VERTEX_SHADER, vertexShaderPath);
-    const frag = await WebGL.loadShader(gl)(gl.FRAGMENT_SHADER, fragShaderPath);
-    const program = WebGL.createProgram(gl)(vert, frag);
+    const vert = await WebGL.Utility.loadShader(gl)(
+      gl.VERTEX_SHADER,
+      vertexShaderPath
+    );
+    const frag = await WebGL.Utility.loadShader(gl)(
+      gl.FRAGMENT_SHADER,
+      fragShaderPath
+    );
+    const program = WebGL.Utility.createProgram(gl)(vert, frag);
     gl.useProgram(program);
 
     const vertPosition = gl.getAttribLocation(program, "vertPosition");
@@ -163,6 +171,7 @@ async function setup(canvas: HTMLCanvasElement): Promise<Setup> {
         vertPosition: vertPosition,
         gl: gl,
         program: program,
+        uniformCache: new WebGL.Uniform.Cache(gl, program),
       };
     }
   }
@@ -181,9 +190,9 @@ function render(
   const { quadVertices, quadIndices, vertPosition, gl, program } = setup;
   gl.viewport(0, 0, width, height);
   gl.useProgram(program);
-  Settings.setUniforms(gl)(program)(settings);
-  uniform1f(gl)(program)("u_time", time);
-  uniform2f(gl)(program)("u_resolution", width, height);
+  Settings.setUniforms(setup.uniformCache)(settings);
+  setup.uniformCache.set("u_time", [time]);
+  setup.uniformCache.set("u_resolution", [width, height]);
   gl.bindBuffer(gl.ARRAY_BUFFER, quadVertices);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quadIndices);
   gl.enableVertexAttribArray(vertPosition);

@@ -1,7 +1,6 @@
 import * as CN from "src/Libraries/ConstrainedNumber";
-import * as P5Extra from "src/Libraries/P5Extra/Palette";
 import { RNG } from "src/Libraries/Random";
-import { uniform1f, uniform2f, uniform3f } from "src/Libraries/WebGL/uniform";
+import * as WebGL from "src/Libraries/WebGL";
 import * as UrlEncode from "src/Libraries/UrlEncode";
 export namespace Constraints {
   export namespace Cosine {
@@ -245,55 +244,44 @@ export function random(rng: RNG): Settings {
 }
 
 export const setUniforms =
-  (gl: WebGL2RenderingContext) =>
-  (program: WebGLProgram) =>
+  (uniforms: WebGL.Uniform.Cache) =>
   (settings: Settings): void => {
-    const u1f = uniform1f(gl)(program);
-    const u2f = uniform2f(gl)(program);
-    const u3f = uniform3f(gl)(program);
-    u1f("u_numOctaves", settings.numOctaves.value);
-    u1f("u_zoom", settings.zoom.value);
-    u3f(
-      "u_cc",
+    uniforms.set("u_numOctaves", [settings.numOctaves.value]);
+    uniforms.set("u_zoom", [settings.zoom.value]);
+    uniforms.set("u_cc", [
       settings.cosineC[0].value,
       settings.cosineC[1].value,
-      settings.cosineC[2].value
-    );
-    u3f(
-      "u_dd",
+      settings.cosineC[2].value,
+    ]);
+    uniforms.set("u_dd", [
       settings.cosineD[0].value,
       settings.cosineD[1].value,
-      settings.cosineD[2].value
-    );
-    u2f("u_q_h", settings.q[0].value, settings.q[1].value);
-    u2f("u_r_h", settings.r[0].value, settings.r[1].value);
-    u1f("u_pattern_h", settings.pattern.value);
-    u2f(
-      "u_center_point",
+      settings.cosineD[2].value,
+    ]);
+    uniforms.set("u_q_h", [settings.q[0].value, settings.q[1].value]);
+    uniforms.set("u_r_h", [settings.r[0].value, settings.r[1].value]);
+    uniforms.set("u_pattern_h", [settings.pattern.value]);
+    uniforms.set("u_center_point", [
       settings.centerPoint[0].value,
-      settings.centerPoint[1].value
-    );
-    u1f("u_pixel_distance_choice", settings.pixelDistanceStrategy); // Needs fix
-    u1f("u_interpolation_choice", settings.interpolationStrategy); // Needs fix
-    u2f(
-      "u_q_fbm_displace_1",
+      settings.centerPoint[1].value,
+    ]);
+    uniforms.set("u_pixel_distance_choice", [settings.pixelDistanceStrategy]);
+    uniforms.set("u_interpolation_choice", [settings.interpolationStrategy]);
+    uniforms.set("u_q_fbm_displace_1", [
       settings.qDisplaceX[0].value,
-      settings.qDisplaceX[1].value
-    );
-    u2f(
-      "u_q_fbm_displace_2",
+      settings.qDisplaceX[1].value,
+    ]);
+    uniforms.set("u_q_fbm_displace_2", [
       settings.qDisplaceY[0].value,
-      settings.qDisplaceY[1].value
-    );
-    u2f(
-      "u_r_fbm_displace_1",
+      settings.qDisplaceY[1].value,
+    ]);
+    uniforms.set("u_r_fbm_displace_1", [
       settings.rDisplaceX[0].value,
-      settings.rDisplaceX[1].value
-    );
-    u2f(
-      "u_r_fbm_displace_2",
+      settings.rDisplaceX[1].value,
+    ]);
+    uniforms.set("u_r_fbm_displace_2", [
       settings.rDisplaceY[0].value,
-      settings.rDisplaceY[1].value
-    );
-    u1f("u_color_speed", settings.colorSpeed.value);
+      settings.rDisplaceY[1].value,
+    ]);
+    uniforms.set("u_color_speed", [settings.colorSpeed.value]);
   };
